@@ -1,3 +1,27 @@
+# Nivah
+
+AI-powered cloud storage and document intelligence platform.
+
+## Features
+
+- Authentication
+- File Uploads
+- Folder Management
+- File Sharing
+- Semantic Search
+- AI Summaries
+- Chat with Documents
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- PostgreSQL
+- Prisma
+- Neon
+- Clerk
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
