@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -10,5 +9,21 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  clerkId   String   @unique
   createdAt DateTime @default(now())
+
+  documents Document[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  fileName    String
+  fileType    String
+  fileSize    Int
+  fileUrl     String
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
