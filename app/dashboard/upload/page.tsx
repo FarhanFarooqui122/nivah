@@ -66,8 +66,11 @@ export default function UploadPage() {
 
         await new Promise<void>((resolve, reject) => {
           xhr.onload = () => {
-            if (xhr.status === 200) resolve();
-            else reject(new Error(`Upload failed: ${xhr.status}`));
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+          } else {
+          reject(new Error(`Upload failed: ${xhr.status}`));
+          }
           };
           xhr.onerror = () => reject(new Error("Upload failed"));
           xhr.open("POST", "/api/documents/upload");
