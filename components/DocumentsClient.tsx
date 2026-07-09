@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn, formatBytes, formatDate } from "@/lib/utils";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
-import { TrashIcon, DownloadIcon, UploadIcon, FolderIcon, SearchIcon } from "@/components/Icons";
+import { TrashIcon, DownloadIcon, UploadIcon, FolderIcon, SearchIcon, CopyIcon } from "@/components/Icons";
 
 interface Document {
   id: string;
@@ -24,6 +24,8 @@ export function DocumentsClient({ documents }: { documents: Document[] }) {
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
 
   const uniqueTypes = useMemo(() => {
     const types = new Set<string>();
@@ -83,6 +85,30 @@ export function DocumentsClient({ documents }: { documents: Document[] }) {
     }
     setSelectedDocs(new Set());
     router.refresh();
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportMsg(null);
+    try {
+      const res = await fetch("/api/documents/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentIds: Array.from(selectedDocs) }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        setExportMsg(err.error || "Export failed");
+        return;
+      }
+      const { markdown } = await res.json();
+      await navigator.clipboard.writeText(markdown);
+      setExportMsg("Context copied to clipboard");
+      setTimeout(() => setExportMsg(null), 3000);
+    } catch {
+      setExportMsg("Failed to copy to clipboard");
+    }
+    setExporting(false);
   };
 
   return (
@@ -181,6 +207,19 @@ export function DocumentsClient({ documents }: { documents: Document[] }) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {selectedDocs.size > 0 && (
+        <div className="flex items-center justify-between px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl">
+          <span className="text-sm text-green-400">{selectedDocs.size} documents selected</span>
+          <div className="flex items-center gap-3">
+            {exportMsg && <span className="text-sm text-green-400">{exportMsg}</span>}
+            <button onClick={handleExport} disabled={exporting} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50">
+              <CopyIcon className="w-4 h-4" />
+              {exporting ? "Exporting..." : "Export Context"}
+            </button>
           </div>
         </div>
       )}

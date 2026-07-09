@@ -6,6 +6,8 @@ export async function extractText(
   const type = mimeType.toLowerCase();
   const ext = fileName.toLowerCase().split(".").pop() || "";
 
+  console.log("MIME TYPE:", mimeType);
+
   try {
     if (type === "application/pdf" || ext === "pdf") {
       const { PDFParse } = await import("pdf-parse");
@@ -16,6 +18,7 @@ export async function extractText(
       await parser.load();
       const result = await parser.getText();
       parser.destroy();
+      console.log("[extractText] PDF extraction result length:", result.text?.length);
       return result.text || null;
     }
 
@@ -26,6 +29,7 @@ export async function extractText(
     ) {
       const { extractRawText } = await import("mammoth");
       const result = await extractRawText({ buffer });
+      console.log("[extractText] DOCX extraction result length:", result.value?.length);
       return result.value || null;
     }
 
@@ -37,12 +41,41 @@ export async function extractText(
       return buffer.toString("utf-8");
     }
 
+    if (
+      type === "image/png" ||
+      type === "image/jpeg" ||
+      type === "image/jpg" ||
+      type === "image/webp"
+    ) {
+      console.log("OCR STARTED");
+
+      const path = await import("path");
+      const workerScript = path.join(process.cwd(), "node_modules", "tesseract.js", "src", "worker-script", "node", "index.js");
+
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker("eng", 1, { workerPath: workerScript });
+
+      const { data } = await worker.recognize(buffer);
+      await worker.terminate();
+
+      console.log("OCR DATA KEYS:", Object.keys(data));
+      console.log("OCR TEXT RAW:", JSON.stringify(data.text));
+      console.log("OCR CONFIDENCE:", data.confidence);
+      console.log("OCR BLOCKS:", JSON.stringify(data.blocks));
+
+      const text = data.text?.trim() || null;
+      console.log("OCR RESULT:", text);
+
+      return text;
+    }
+
     return null;
   } catch (error) {
-    console.error("Text extraction failed:", {
+    console.error("[extractText] Extraction failed:", {
       fileName,
       mimeType,
       error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
     });
     return null;
   }
