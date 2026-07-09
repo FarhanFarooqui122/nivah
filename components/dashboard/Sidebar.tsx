@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Search", href: "/dashboard/search", icon: Search },
   { name: "Documents", href: "/dashboard/documents", icon: FolderOpen },
   { name: "Upload", href: "/dashboard/upload", icon: Upload },
   { name: "AI Connections", href: "/dashboard/ai-connections", icon: Bot },

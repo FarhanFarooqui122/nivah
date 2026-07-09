@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { extractText } from "@/lib/extract-text";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -40,6 +41,8 @@ export async function POST(request: NextRequest) {
 
     const fileUrl = `/uploads/${fileName}`;
 
+    const textContent = await extractText(buffer, file.type, file.name);
+
     const document = await prisma.document.create({
       data: {
         title,
@@ -47,6 +50,7 @@ export async function POST(request: NextRequest) {
         fileType: file.type || "application/octet-stream",
         fileSize: file.size,
         fileUrl,
+        textContent,
         userId: user.id,
       },
     });

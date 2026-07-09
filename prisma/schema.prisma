@@ -22,6 +22,8 @@ model Document {
   fileType    String
   fileSize    Int
   fileUrl     String
+  textContent String?
+  summary     String?
   createdAt   DateTime @default(now())
 
   userId      String
