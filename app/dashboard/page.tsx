@@ -1,15 +1,48 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { StatCard, StorageUsage, AIConnectionCard } from "@/components/DashboardComponents";
+import { StatCard } from "@/components/DashboardComponents";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
 import {
-  FileIcon, FolderIcon, StorageIcon, BotIcon, DatabaseIcon,
-  UploadIcon, SettingsIcon,
-  ChatGPTLogo, ClaudeLogo, GeminiLogo, NivahLogo,
+  FileIcon, FolderIcon, ImageIcon, DocumentIcon, CopyIcon,
+  UploadIcon, PdfIcon, SettingsIcon,
 } from "@/components/Icons";
-import { formatBytes, formatRelativeTime } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils";
 import Link from "next/link";
+
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+const TEXT_TYPES = ["text/plain", "text/markdown"];
+const PDF_TYPE = "application/pdf";
+const DOCX_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function categorizeFileType(fileType: string): string {
+  if (fileType === PDF_TYPE) return "PDF";
+  if (fileType === DOCX_TYPE) return "DOCX";
+  if (TEXT_TYPES.includes(fileType)) return "TXT/MD";
+  if (IMAGE_TYPES.includes(fileType)) return "Images";
+  return "Other";
+}
+
+function getFileTypeLabel(fileType: string): string {
+  const lower = fileType.toLowerCase();
+  if (lower.includes("pdf")) return "PDF";
+  if (lower.includes("docx") || lower.includes("word")) return "DOCX";
+  if (lower.includes("markdown")) return "MD";
+  if (lower.includes("text") || lower.includes("txt")) return "TXT";
+  if (lower.includes("png")) return "PNG";
+  if (lower.includes("jpeg") || lower.includes("jpg")) return "JPEG";
+  if (lower.includes("webp")) return "WebP";
+  return fileType;
+}
+
+function countWords(text: string | null): number {
+  if (!text) return 0;
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString();
+}
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -27,22 +60,69 @@ export default async function DashboardPage() {
     });
   }
 
-  const [documents, totalFileSize] = await Promise.all([
-    prisma.document.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-    prisma.document.aggregate({
-      where: { userId: user.id },
-      _sum: { fileSize: true },
+  const whereUser = { userId: user.id };
+
+  const [totalDocuments, totalImages] = await Promise.all([
+    prisma.document.count({ where: whereUser }),
+    prisma.document.count({
+      where: { ...whereUser, fileType: { in: IMAGE_TYPES } },
     }),
   ]);
 
-  const docCount = await prisma.document.count({ where: { userId: user.id } });
-  const usedStorage = totalFileSize._sum.fileSize ?? 0;
-  const storageLimit = 500 * 1024 * 1024;
-  const recentDocs = documents.slice(0, 4);
+  const fileInfos = await prisma.document.findMany({
+    where: whereUser,
+    select: { fileType: true, title: true, fileName: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const textDocs = await prisma.document.findMany({
+    where: { ...whereUser, textContent: { not: null } },
+    select: { title: true, fileName: true, fileType: true, textContent: true },
+  });
+
+  const totalWords = textDocs.reduce((sum, doc) => sum + countWords(doc.textContent), 0);
+
+  const storageBreakdown: Record<string, number> = {};
+  const fileTypeCounts = new Map<string, number>();
+
+  fileInfos.forEach((doc) => {
+    const cat = categorizeFileType(doc.fileType);
+    storageBreakdown[cat] = (storageBreakdown[cat] || 0) + 1;
+    fileTypeCounts.set(doc.fileType, (fileTypeCounts.get(doc.fileType) || 0) + 1);
+  });
+
+  const mostRecentUpload = fileInfos.length > 0
+    ? { title: fileInfos[0].title, fileName: fileInfos[0].fileName, createdAt: fileInfos[0].createdAt }
+    : null;
+
+  const sortedByContent = [...textDocs].sort(
+    (a, b) => (b.textContent?.length || 0) - (a.textContent?.length || 0)
+  );
+
+  const largestDocument = sortedByContent.length > 0
+    ? {
+        title: sortedByContent[0].title,
+        fileName: sortedByContent[0].fileName,
+        fileType: sortedByContent[0].fileType,
+        charCount: sortedByContent[0].textContent?.length ?? 0,
+      }
+    : null;
+
+  const commonFileTypeInfo: { fileType: string; count: number } | null = fileTypeCounts.size > 0
+    ? Array.from(fileTypeCounts.entries()).reduce((max, entry) =>
+        entry[1] > max.count ? { fileType: entry[0], count: entry[1] } : max,
+        { fileType: "", count: 0 }
+      )
+    : null;
+
+  const topDocuments = sortedByContent.slice(0, 5).map((doc) => ({
+    title: doc.title,
+    fileName: doc.fileName,
+    fileType: doc.fileType,
+    charCount: doc.textContent?.length ?? 0,
+  }));
+
+  const hasDocuments = fileInfos.length > 0;
 
   return (
     <div className="space-y-8">
@@ -54,127 +134,194 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Documents" value={docCount} icon={<FileIcon className="w-6 h-6" />} color="green" href="/dashboard/documents" />
-        <StatCard title="Storage Used" value={formatBytes(usedStorage)} icon={<DatabaseIcon className="w-6 h-6" />} color="blue" />
-        <StatCard title="AI Connections" value={0} icon={<BotIcon className="w-6 h-6" />} color="purple" href="/dashboard/ai-connections" />
-        <StatCard title="Free Space" value={formatBytes(storageLimit - usedStorage)} icon={<StorageIcon className="w-6 h-6" />} color="orange" />
+        <StatCard title="Total Documents" value={totalDocuments} icon={<FileIcon className="w-6 h-6" />} color="green" href="/dashboard/documents" />
+        <StatCard title="Images Indexed" value={totalImages} icon={<ImageIcon className="w-6 h-6" />} color="blue" />
+        <StatCard title="Words Indexed" value={formatNumber(totalWords)} icon={<DocumentIcon className="w-6 h-6" />} color="purple" />
+        <StatCard title="Context Exports" value="Coming Soon" icon={<CopyIcon className="w-6 h-6" />} color="orange" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-white">Recent Documents</h2>
-              <Link href="/dashboard/documents" className="text-sm text-green-400 hover:text-green-300 transition-colors">
-                View all →
-              </Link>
+      {!hasDocuments ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center border border-zinc-800 rounded-2xl">
+          <FolderIcon className="w-16 h-16 text-zinc-600 mb-4" />
+          <p className="text-zinc-400 font-medium text-lg">No documents yet</p>
+          <p className="text-zinc-600 text-sm mt-1">Upload your first document to get started</p>
+          <Link href="/dashboard/upload" className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors text-sm">
+            Upload Document
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="border border-zinc-800 rounded-2xl p-6">
+              <h2 className="text-lg font-semibold text-white mb-5">Knowledge Insights</h2>
+              <div className="space-y-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-2.5 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400">
+                    <FileIcon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-500 font-medium">Most Recent Upload</p>
+                    <p className="text-white font-medium truncate mt-0.5">{mostRecentUpload?.title ?? "N/A"}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">
+                      Uploaded {mostRecentUpload ? formatRelativeTime(mostRecentUpload.createdAt) : "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="h-px bg-zinc-800" />
+                <div className="flex items-start gap-4">
+                  <div className="p-2.5 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400">
+                    <DocumentIcon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-500 font-medium">Largest Document</p>
+                    {largestDocument ? (
+                      <>
+                        <p className="text-white font-medium truncate mt-0.5">{largestDocument.title}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                          {formatNumber(largestDocument.charCount)} characters
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-zinc-500 text-sm mt-0.5">No documents with text content</p>
+                    )}
+                  </div>
+                </div>
+                <div className="h-px bg-zinc-800" />
+                <div className="flex items-start gap-4">
+                  <div className="p-2.5 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-400">
+                    <PdfIcon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-500 font-medium">Most Common File Type</p>
+                    {commonFileTypeInfo ? (
+                      <>
+                        <p className="text-white font-medium mt-0.5">
+                          {getFileTypeLabel(commonFileTypeInfo.fileType)}
+                          <span className="text-zinc-400 font-normal">
+                            {" "}({commonFileTypeInfo.count} file{commonFileTypeInfo.count !== 1 ? "s" : ""})
+                          </span>
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-zinc-500 text-sm mt-0.5">N/A</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {recentDocs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FolderIcon className="w-12 h-12 text-zinc-600 mb-4" />
-                <p className="text-zinc-400 font-medium">No documents yet</p>
-                <p className="text-zinc-600 text-sm mt-1">Upload your first document to get started</p>
-                <Link href="/dashboard/upload" className="mt-4 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors text-sm">
-                  Upload Document
+            <div className="border border-zinc-800 rounded-2xl p-6">
+              <h2 className="text-lg font-semibold text-white mb-5">Top Knowledge Sources</h2>
+              {topDocuments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <DocumentIcon className="w-10 h-10 text-zinc-600 mb-3" />
+                  <p className="text-zinc-500 text-sm">No documents with text content yet</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {topDocuments.map((doc, idx) => (
+                    <div key={`${doc.fileName}-${idx}`} className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-900 transition-colors">
+                      <span className="text-xs text-zinc-600 font-mono w-5 text-right">{idx + 1}.</span>
+                      <div className="w-8 h-8 bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center text-zinc-400 flex-shrink-0">
+                        <FileTypeIcon fileType={doc.fileType} className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{doc.title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs font-medium text-zinc-500 bg-zinc-900 px-2 py-1 rounded-md border border-zinc-800">
+                          {getFileTypeLabel(doc.fileType)}
+                        </span>
+                        <span className="text-xs text-zinc-500 font-mono">
+                          {formatNumber(doc.charCount)} chars
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="border border-zinc-800 rounded-2xl p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Link href="/dashboard/upload" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-800 transition-all">
+                  <UploadIcon className="w-6 h-6 text-green-400" />
+                  <span className="text-sm font-medium text-zinc-300">Upload</span>
+                </Link>
+                <Link href="/dashboard/documents" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 transition-all">
+                  <FolderIcon className="w-6 h-6 text-blue-400" />
+                  <span className="text-sm font-medium text-zinc-300">Browse</span>
+                </Link>
+                <Link href="/dashboard/search" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-800 transition-all">
+                  <DocumentIcon className="w-6 h-6 text-purple-400" />
+                  <span className="text-sm font-medium text-zinc-300">Search</span>
+                </Link>
+                <Link href="/dashboard/settings" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-500/50 hover:bg-zinc-800 transition-all">
+                  <SettingsIcon className="w-6 h-6 text-zinc-400" />
+                  <span className="text-sm font-medium text-zinc-300">Settings</span>
                 </Link>
               </div>
-            ) : (
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-2xl p-6">
+              <h2 className="text-lg font-semibold text-white mb-5">Storage Breakdown</h2>
               <div className="space-y-3">
-                {recentDocs.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-900 transition-colors group">
-                    <div className="w-10 h-10 bg-zinc-900 border border-zinc-700 rounded-xl flex items-center justify-center text-zinc-400">
-                      <FileTypeIcon fileType={doc.fileType} className="w-5 h-5" />
+                <Link href="/dashboard/documents?type=pdf" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-red-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-lg bg-red-500/20 text-red-400">
+                      <PdfIcon className="w-4 h-4" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">{doc.title}</p>
-                      <p className="text-xs text-zinc-500">
-                        {formatBytes(doc.fileSize)} · {formatRelativeTime(doc.createdAt)}
-                      </p>
-                    </div>
-                    <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-zinc-800 rounded-lg transition-all text-zinc-400" aria-label="More options">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
+                    <span className="text-sm font-medium text-zinc-300">PDF</span>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">{storageBreakdown["PDF"] ?? 0}</span>
+                    <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                  </div>
+                </Link>
+                <Link href="/dashboard/documents?type=docx" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
+                      <DocumentIcon className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium text-zinc-300">DOCX</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">{storageBreakdown["DOCX"] ?? 0}</span>
+                    <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                  </div>
+                </Link>
+                <Link href="/dashboard/documents?type=text" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-lg bg-zinc-500/20 text-zinc-400">
+                      <FileIcon className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium text-zinc-300">TXT/MD</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">{storageBreakdown["TXT/MD"] ?? 0}</span>
+                    <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                  </div>
+                </Link>
+                <Link href="/dashboard/documents?type=image" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-green-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-lg bg-green-500/20 text-green-400">
+                      <ImageIcon className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium text-zinc-300">Images</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">{storageBreakdown["Images"] ?? 0}</span>
+                    <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                  </div>
+                </Link>
               </div>
-            )}
-          </div>
-
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Link href="/dashboard/upload" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-800 transition-all">
-                <UploadIcon className="w-6 h-6 text-green-400" />
-                <span className="text-sm font-medium text-zinc-300">Upload</span>
-              </Link>
-              <Link href="/dashboard/ai-connections" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-800 transition-all">
-                <BotIcon className="w-6 h-6 text-purple-400" />
-                <span className="text-sm font-medium text-zinc-300">Connect AI</span>
-              </Link>
-              <Link href="/dashboard/documents" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 transition-all">
-                <FolderIcon className="w-6 h-6 text-blue-400" />
-                <span className="text-sm font-medium text-zinc-300">Browse</span>
-              </Link>
-              <Link href="/dashboard/settings" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-500/50 hover:bg-zinc-800 transition-all">
-                <SettingsIcon className="w-6 h-6 text-zinc-400" />
-                <span className="text-sm font-medium text-zinc-300">Settings</span>
-              </Link>
             </div>
           </div>
         </div>
-
-        <div className="space-y-6">
-          <StorageUsage used={usedStorage} total={storageLimit} />
-
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">AI Integrations</h2>
-              <Link href="/dashboard/ai-connections" className="text-sm text-green-400 hover:text-green-300 transition-colors">
-                Manage →
-              </Link>
-            </div>
-            <div className="space-y-3">
-              <AIConnectionCard name="ChatGPT" icon={<ChatGPTLogo className="w-6 h-6" />} status="disconnected" description="Connect your GPT account" />
-              <AIConnectionCard name="Claude" icon={<ClaudeLogo className="w-6 h-6" />} status="disconnected" description="Sync with Claude AI" />
-              <AIConnectionCard name="Gemini" icon={<GeminiLogo className="w-6 h-6" />} status="disconnected" description="Google AI integration" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <NivahLogo className="w-8 h-8" />
-              <div>
-                <h3 className="text-lg font-semibold text-white">Upgrade to Pro</h3>
-                <p className="text-sm text-zinc-400">Get 1TB storage + AI features</p>
-              </div>
-            </div>
-            <ul className="space-y-2 mb-4 text-sm text-zinc-300">
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-                1TB Storage
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-                Unlimited AI Connections
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-                Semantic Search
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-                Priority Support
-              </li>
-            </ul>
-            <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-xl transition-colors">
-              Upgrade Now — $9/mo
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

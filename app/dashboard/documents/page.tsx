@@ -4,12 +4,23 @@ import { prisma } from "@/lib/prisma";
 import { DocumentsClient } from "@/components/DocumentsClient";
 import { formatBytes, formatRelativeTime } from "@/lib/utils";
 
-export default async function DocumentsPage() {
+const FILTER_LABELS: Record<string, string> = {
+  pdf: "PDF",
+  docx: "DOCX",
+  text: "TXT/MD",
+  image: "Images",
+};
+
+export default async function DocumentsPage(props: { searchParams: Promise<{ type?: string }> }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
   const user = await prisma.user.findUnique({ where: { clerkId: userId } });
   if (!user) redirect("/sign-in");
+
+  const searchParams = await props.searchParams;
+  const typeFilter = searchParams.type ?? null;
+  const filterLabel = typeFilter ? FILTER_LABELS[typeFilter] : null;
 
   const documents = await prisma.document.findMany({
     where: { userId: user.id },
@@ -22,9 +33,21 @@ export default async function DocumentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Documents</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-white">Documents</h1>
+            {filterLabel && (
+              <span className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium text-zinc-300">
+                {filterLabel}
+              </span>
+            )}
+          </div>
           <p className="text-zinc-400 mt-1">
             {documents.length} document{documents.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
+            {filterLabel && (
+              <a href="/dashboard/documents" className="ml-2 text-xs text-green-400 hover:text-green-300 transition-colors">
+                Clear filter
+              </a>
+            )}
           </p>
         </div>
         <a
@@ -35,7 +58,7 @@ export default async function DocumentsPage() {
         </a>
       </div>
 
-      <DocumentsClient documents={documents} />
+      <DocumentsClient documents={documents} initialFilter={typeFilter} />
     </div>
   );
 }

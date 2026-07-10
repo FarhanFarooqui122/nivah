@@ -7,6 +7,19 @@ import { cn, formatBytes, formatDate } from "@/lib/utils";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
 import { TrashIcon, DownloadIcon, UploadIcon, FolderIcon, SearchIcon, CopyIcon } from "@/components/Icons";
 
+const PDF_TYPE = "application/pdf";
+const DOCX_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const TEXT_TYPES = ["text/plain", "text/markdown"];
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+
+const FILTER_OPTIONS = [
+  { value: "all", label: "All Types" },
+  { value: "pdf", label: "PDF" },
+  { value: "docx", label: "DOCX" },
+  { value: "text", label: "TXT/MD" },
+  { value: "image", label: "Images" },
+] as const;
+
 interface Document {
   id: string;
   title: string;
@@ -17,24 +30,17 @@ interface Document {
   createdAt: Date | string;
 }
 
-export function DocumentsClient({ documents }: { documents: Document[] }) {
+export function DocumentsClient({ documents, initialFilter }: { documents: Document[]; initialFilter?: string | null }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "name" | "size">("date");
-  const [filterType, setFilterType] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>(
+    initialFilter && FILTER_OPTIONS.some((o) => o.value === initialFilter) ? initialFilter : "all"
+  );
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
-
-  const uniqueTypes = useMemo(() => {
-    const types = new Set<string>();
-    documents.forEach((doc) => {
-      const t = doc.fileType.split("/")[0];
-      types.add(t);
-    });
-    return Array.from(types);
-  }, [documents]);
 
   const filtered = useMemo(() => {
     let result = [...documents];
@@ -43,7 +49,15 @@ export function DocumentsClient({ documents }: { documents: Document[] }) {
       result = result.filter((doc) => doc.title.toLowerCase().includes(q) || doc.fileName.toLowerCase().includes(q));
     }
     if (filterType !== "all") {
-      result = result.filter((doc) => doc.fileType.startsWith(filterType));
+      result = result.filter((doc) => {
+        switch (filterType) {
+          case "pdf": return doc.fileType === PDF_TYPE;
+          case "docx": return doc.fileType === DOCX_TYPE;
+          case "text": return TEXT_TYPES.includes(doc.fileType);
+          case "image": return IMAGE_TYPES.includes(doc.fileType);
+          default: return true;
+        }
+      });
     }
     result.sort((a, b) => {
       switch (sortBy) {
@@ -128,9 +142,8 @@ export function DocumentsClient({ documents }: { documents: Document[] }) {
         </div>
         <div className="flex items-center gap-2">
           <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
-            <option value="all">All Types</option>
-            {uniqueTypes.map((type) => (
-              <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+            {FILTER_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "date" | "name" | "size")} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
