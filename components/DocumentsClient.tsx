@@ -31,6 +31,7 @@ interface Document {
   charCount?: number;
   wordCount?: number;
   chunkCount?: number;
+  embeddedCount?: number;
 }
 
 export function DocumentsClient({ documents, initialFilter }: { documents: Document[]; initialFilter?: string | null }) {
@@ -204,11 +205,16 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
                     <FileTypeIcon fileType={doc.fileType} className="w-4.5 h-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-white truncate">{doc.title}</p>
+                    <a href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-green-400 transition-colors">
+                      {doc.title}
+                    </a>
                     <p className="text-xs text-zinc-500 truncate md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
                     {doc.charCount != null && doc.charCount > 0 && (
-                      <p className="text-xs text-zinc-600 mt-0.5">
-                        {doc.charCount.toLocaleString()} chars · {doc.wordCount?.toLocaleString()} words · {doc.chunkCount} chunks
+                      <p className="text-xs text-zinc-600 mt-0.5 flex items-center gap-2">
+                        <span>{doc.charCount.toLocaleString()} chars · {doc.wordCount?.toLocaleString()} words · {doc.chunkCount} chunks</span>
+                        {doc.embeddedCount != null && doc.chunkCount != null && doc.embeddedCount < doc.chunkCount && (
+                          <span className="text-yellow-500 text-[10px] font-medium">Needs re-index</span>
+                        )}
                       </p>
                     )}
                   </div>

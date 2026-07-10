@@ -29,6 +29,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
   });
 
   const chunkCountMap = new Map<string, number>();
+  const embeddedCountMap = new Map<string, number>();
   if (documents.length > 0) {
     const chunkRows = await prisma.$queryRaw<{ document_id: string; count: number }[]>`
       SELECT "documentId" AS document_id, COUNT(*)::int AS count
@@ -39,12 +40,24 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
     for (const row of chunkRows) {
       chunkCountMap.set(row.document_id, row.count);
     }
+
+    const embeddedRows = await prisma.$queryRaw<{ document_id: string; count: number }[]>`
+      SELECT "documentId" AS document_id, COUNT(*)::int AS count
+      FROM "DocumentChunk"
+      WHERE "documentId" IN (${Prisma.join(documents.map((d) => d.id))})
+        AND "embedding" IS NOT NULL
+      GROUP BY "documentId"
+    `;
+    for (const row of embeddedRows) {
+      embeddedCountMap.set(row.document_id, row.count);
+    }
   }
   const docs = documents.map((doc) => ({
     ...doc,
     charCount: doc.textContent?.length ?? 0,
     wordCount: doc.textContent ? doc.textContent.trim().split(/\s+/).filter(Boolean).length : 0,
     chunkCount: chunkCountMap.get(doc.id) ?? 0,
+    embeddedCount: embeddedCountMap.get(doc.id) ?? 0,
   }));
 
   const totalSize = docs.reduce((acc, doc) => acc + doc.fileSize, 0);

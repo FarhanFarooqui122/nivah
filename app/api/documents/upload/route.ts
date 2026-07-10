@@ -59,17 +59,24 @@ export async function POST(request: NextRequest) {
 
     if (textContent && textContent.length > 0) {
       const chunks = chunkText(textContent);
-      for (const chunk of chunks) {
-        const embedding = await generateEmbedding(chunk.content);
+
+      const embeddings = await Promise.all(
+        chunks.map((chunk) => generateEmbedding(chunk.content))
+      );
+
+      for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const embedding = embeddings[i];
+        const id = `chunk_${document.id}_${chunk.chunkIndex}`;
         if (embedding) {
           await prisma.$executeRaw`
             INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "createdAt")
-            VALUES (${`chunk_${document.id}_${chunk.chunkIndex}`}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, NOW())
+            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, NOW())
           `;
         } else {
           await prisma.$executeRaw`
             INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
-            VALUES (${`chunk_${document.id}_${chunk.chunkIndex}`}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
+            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
           `;
         }
       }

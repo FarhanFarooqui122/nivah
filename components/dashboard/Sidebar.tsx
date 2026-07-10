@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Search", href: "/dashboard/search", icon: Search },
+  { name: "Semantic Search", href: "/dashboard/semantic-search", icon: Search },
   { name: "Documents", href: "/dashboard/documents", icon: FolderOpen },
   { name: "Upload", href: "/dashboard/upload", icon: Upload },
   { name: "AI Connections", href: "/dashboard/ai-connections", icon: Bot },
@@ -94,7 +95,6 @@ export function Sidebar() {
             </p>
             <ul className="space-y-1" role="list">
               {[
-                { name: "Semantic Search", icon: Search, href: "/dashboard/search", comingSoon: true },
                 { name: "AI Workspace Sync", icon: Zap, href: "/dashboard/ai-sync", comingSoon: true },
                 { name: "Cross-AI Memory", icon: Database, href: "/dashboard/cross-ai", comingSoon: true },
                 { name: "Team Workspaces", icon: FolderGit2, href: "/dashboard/teams", comingSoon: true },

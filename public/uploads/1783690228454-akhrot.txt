@@ -1,0 +1,5 @@
+Akhrot is a universal AI memory platform.
+
+It connects ChatGPT, Claude, Gemini and Cursor.
+
+The goal is to eliminate repeated explanations and preserve context across tools.

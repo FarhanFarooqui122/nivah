@@ -18,8 +18,16 @@ export async function extractText(
       await parser.load();
       const result = await parser.getText();
       parser.destroy();
-      console.log("[extractText] PDF extraction result length:", result.text?.length);
-      return result.text || null;
+      const extracted = result.text?.trim() || null;
+      console.log("[extractText] PDF extraction result length:", extracted?.length);
+
+      const MIN_TEXT_LENGTH = 20;
+      if (extracted && extracted.length >= MIN_TEXT_LENGTH) {
+        return extracted;
+      }
+
+      console.log("[extractText] PDF text insufficient, falling back to OCR...");
+      return await ocrPdf(buffer);
     }
 
     if (
@@ -78,5 +86,47 @@ export async function extractText(
       stack: error instanceof Error ? error.stack : undefined,
     });
     return null;
+  }
+}
+
+async function ocrPdf(buffer: Buffer): Promise<string | null> {
+  const pdfjs = await import("pdfjs-dist");
+  const { createCanvas } = await import("@napi-rs/canvas");
+  const { createWorker } = await import("tesseract.js");
+  const path = await import("path");
+
+  const data = new Uint8Array(buffer);
+  const doc = await pdfjs.getDocument({ data }).promise;
+
+  const workerScript = path.join(
+    process.cwd(),
+    "node_modules",
+    "tesseract.js",
+    "src",
+    "worker-script",
+    "node",
+    "index.js"
+  );
+  const worker = await createWorker("eng", 1, { workerPath: workerScript });
+
+  try {
+    const pages: string[] = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = createCanvas(viewport.width, viewport.height);
+      const ctx = canvas.getContext("2d");
+      await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport }).promise;
+      const pngBuf = canvas.toBuffer("image/png");
+      const { data: ocrData } = await worker.recognize(pngBuf);
+      const pageText = ocrData.text?.trim();
+      if (pageText) {
+        pages.push(pageText);
+      }
+    }
+    if (pages.length === 0) return null;
+    return pages.join("\n\n");
+  } finally {
+    await worker.terminate();
   }
 }

@@ -1,0 +1,139 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FileTypeIcon } from "@/components/FileTypeIcon";
+import { ArrowLeftIcon, RefreshIcon } from "@/components/Icons";
+
+interface Document {
+  id: string;
+  title: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileUrl: string;
+  textContent: string | null;
+  createdAt: string;
+}
+
+export function DocumentDetailClient({
+  document,
+  chunkCount,
+  embeddedCount,
+}: {
+  document: Document;
+  chunkCount: number;
+  embeddedCount: number;
+}) {
+  const router = useRouter();
+  const [reindexing, setReindexing] = useState(false);
+  const [reindexMsg, setReindexMsg] = useState<string | null>(null);
+
+  const handleReindex = async () => {
+    if (!confirm("Re-index this document? This will delete and regenerate all chunks and embeddings.")) return;
+    setReindexing(true);
+    setReindexMsg(null);
+    try {
+      const res = await fetch(`/api/documents/${document.id}/reindex`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setReindexMsg(`Re-indexed: ${data.chunkCount} chunks, ${data.embeddedCount} embedded`);
+        router.refresh();
+      } else {
+        setReindexMsg(data.error || "Re-index failed");
+      }
+    } catch {
+      setReindexMsg("Re-index failed");
+    }
+    setReindexing(false);
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Link
+          href="/dashboard/documents"
+          className="p-2 hover:bg-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"
+        >
+          <ArrowLeftIcon className="w-5 h-5" />
+        </Link>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl font-bold text-white truncate">{document.title}</h1>
+          <p className="text-sm text-zinc-400 mt-1">{document.fileName}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Type</p>
+          <p className="text-white font-medium mt-1">{document.fileType.split("/").pop()?.toUpperCase() || "FILE"}</p>
+        </div>
+        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Size</p>
+          <p className="text-white font-medium mt-1">{formatBytes(document.fileSize)}</p>
+        </div>
+        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Chunks</p>
+          <p className="text-white font-medium mt-1">{chunkCount}</p>
+        </div>
+        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Embedded</p>
+          <p className="flex items-center gap-2 mt-1">
+            <span className="text-white font-medium">{embeddedCount}/{chunkCount}</span>
+            {embeddedCount < chunkCount && (
+              <span className="text-xs text-yellow-400">Needs re-index</span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <a
+          href={document.fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors text-sm"
+        >
+          Download file
+        </a>
+        <button
+          onClick={handleReindex}
+          disabled={reindexing}
+          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+        >
+          <RefreshIcon className={`w-4 h-4 ${reindexing ? "animate-spin" : ""}`} />
+          {reindexing ? "Re-indexing..." : "Re-index"}
+        </button>
+      </div>
+
+      {reindexMsg && (
+        <div className={`p-4 rounded-2xl border ${reindexMsg.includes("failed") ? "border-red-500/30 bg-red-500/5" : "border-green-500/30 bg-green-500/5"}`}>
+          <p className={reindexMsg.includes("failed") ? "text-red-400" : "text-green-400"}>{reindexMsg}</p>
+        </div>
+      )}
+
+      {document.textContent && (
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-3">Content Preview</h2>
+          <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+            <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-sans max-h-96 overflow-y-auto">
+              {document.textContent.slice(0, 5000)}
+              {document.textContent.length > 5000 && (
+                <span className="text-zinc-500">... (truncated)</span>
+              )}
+            </pre>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
