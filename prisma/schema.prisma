@@ -28,4 +28,23 @@ model Document {
 
   userId      String
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  chunks DocumentChunk[]
+}
+
+model DocumentChunk {
+  id          String   @id @default(cuid())
+
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  content     String   @db.Text
+
+  chunkIndex  Int
+
+  charCount   Int
+
+  createdAt   DateTime @default(now())
+
+  @@index([documentId])
 }

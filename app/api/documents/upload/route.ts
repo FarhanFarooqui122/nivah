@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { extractText } from "@/lib/extract-text";
+import { chunkText } from "@/lib/chunker";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -54,6 +55,16 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       },
     });
+
+    if (textContent && textContent.length > 0) {
+      const chunks = chunkText(textContent);
+      for (const chunk of chunks) {
+        await prisma.$executeRaw`
+          INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
+          VALUES (${`chunk_${document.id}_${chunk.chunkIndex}`}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
+        `;
+      }
+    }
 
     return NextResponse.json({ document }, { status: 201 });
   } catch (error) {

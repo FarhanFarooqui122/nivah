@@ -1,5 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DocumentsClient } from "@/components/DocumentsClient";
 import { formatBytes, formatRelativeTime } from "@/lib/utils";
@@ -27,7 +28,26 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
     orderBy: { createdAt: "desc" },
   });
 
-  const totalSize = documents.reduce((acc, doc) => acc + doc.fileSize, 0);
+  const chunkCountMap = new Map<string, number>();
+  if (documents.length > 0) {
+    const chunkRows = await prisma.$queryRaw<{ document_id: string; count: number }[]>`
+      SELECT "documentId" AS document_id, COUNT(*)::int AS count
+      FROM "DocumentChunk"
+      WHERE "documentId" IN (${Prisma.join(documents.map((d) => d.id))})
+      GROUP BY "documentId"
+    `;
+    for (const row of chunkRows) {
+      chunkCountMap.set(row.document_id, row.count);
+    }
+  }
+  const docs = documents.map((doc) => ({
+    ...doc,
+    charCount: doc.textContent?.length ?? 0,
+    wordCount: doc.textContent ? doc.textContent.trim().split(/\s+/).filter(Boolean).length : 0,
+    chunkCount: chunkCountMap.get(doc.id) ?? 0,
+  }));
+
+  const totalSize = docs.reduce((acc, doc) => acc + doc.fileSize, 0);
 
   return (
     <div className="space-y-6">
@@ -42,7 +62,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
             )}
           </div>
           <p className="text-zinc-400 mt-1">
-            {documents.length} document{documents.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
+            {docs.length} document{docs.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
             {filterLabel && (
               <a href="/dashboard/documents" className="ml-2 text-xs text-green-400 hover:text-green-300 transition-colors">
                 Clear filter
@@ -58,7 +78,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
         </a>
       </div>
 
-      <DocumentsClient documents={documents} initialFilter={typeFilter} />
+      <DocumentsClient documents={docs} initialFilter={typeFilter} />
     </div>
   );
 }

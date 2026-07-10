@@ -28,6 +28,9 @@ interface Document {
   fileSize: number;
   fileUrl: string;
   createdAt: Date | string;
+  charCount?: number;
+  wordCount?: number;
+  chunkCount?: number;
 }
 
 export function DocumentsClient({ documents, initialFilter }: { documents: Document[]; initialFilter?: string | null }) {
@@ -203,6 +206,11 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
                   <div className="min-w-0">
                     <p className="font-medium text-white truncate">{doc.title}</p>
                     <p className="text-xs text-zinc-500 truncate md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
+                    {doc.charCount != null && doc.charCount > 0 && (
+                      <p className="text-xs text-zinc-600 mt-0.5">
+                        {doc.charCount.toLocaleString()} chars · {doc.wordCount?.toLocaleString()} words · {doc.chunkCount} chunks
+                      </p>
+                    )}
                   </div>
                 </div>
 
