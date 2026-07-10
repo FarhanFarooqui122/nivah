@@ -44,6 +44,8 @@ model DocumentChunk {
 
   charCount   Int
 
+  embedding   Json?
+
   createdAt   DateTime @default(now())
 
   @@index([documentId])

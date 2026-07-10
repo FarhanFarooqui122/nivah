@@ -32,6 +32,7 @@ export async function GET(
     content: string;
     chunkIndex: number;
     charCount: number;
+    embedding: number[] | null;
     createdAt: Date;
   }[]>`
     SELECT * FROM "DocumentChunk"
