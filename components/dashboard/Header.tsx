@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Bell, Moon, LogOut, User, Settings, Search, Command } from "lucide-react";
+import { Menu, Bell, Moon, Sun, LogOut, User, Settings, Search, Command } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
+import { useTheme } from "@/lib/theme-context";
 
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -14,6 +15,7 @@ export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user } = useUser();
   const { toggleMobile } = useSidebar();
+  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
 
   const pages = [
@@ -83,10 +85,11 @@ export function Header() {
           </button>
 
           <button
+            onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
-            aria-label="Toggle theme"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
           >
-            <Moon className="w-5 h-5" />
+            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
 
           <div className="relative">
