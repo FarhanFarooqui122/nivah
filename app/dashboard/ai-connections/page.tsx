@@ -4,7 +4,7 @@ import { AIConnectionCard } from "@/components/DashboardComponents";
 import {
   ChatGPTLogo, ClaudeLogo, GeminiLogo,
   PerplexityLogo, LlamaLogo, CopilotLogo,
-  NivahLogo, SearchIcon, BotIcon, DatabaseIcon, FolderIcon,
+  SearchIcon, BotIcon, DatabaseIcon,
 } from "@/components/Icons";
 
 export default async function AIConnectionsPage() {

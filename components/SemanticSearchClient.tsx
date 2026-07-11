@@ -31,35 +31,6 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(() => {
-    const q = searchParams.get("q");
-    const docId = searchParams.get("documentId");
-    if (q) {
-      setQuery(q);
-      if (docId) setDocumentFilter(docId);
-      doSearch(q, docId || undefined);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "/" && !e.ctrlKey && !e.metaKey && document.activeElement !== inputRef.current) {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
-
-  const updateUrl = (q: string, docId: string) => {
-    const params = new URLSearchParams();
-    if (q.trim()) params.set("q", q.trim());
-    if (docId) params.set("documentId", docId);
-    const str = params.toString();
-    router.replace(`/dashboard/semantic-search${str ? `?${str}` : ""}`, { scroll: false });
-  };
-
   const doSearch = useCallback(async (q: string, docId?: string) => {
     const trimmed = q.trim();
     if (!trimmed) {
@@ -97,6 +68,35 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
     }
   }, []);
 
+  const updateUrl = useCallback((q: string, docId: string) => {
+    const params = new URLSearchParams();
+    if (q.trim()) params.set("q", q.trim());
+    if (docId) params.set("documentId", docId);
+    const str = params.toString();
+    router.replace(`/dashboard/semantic-search${str ? `?${str}` : ""}`, { scroll: false });
+  }, [router]);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    const docId = searchParams.get("documentId");
+    if (q) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      doSearch(q, docId || undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey && document.activeElement !== inputRef.current) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
   const handleChange = useCallback(
     (value: string) => {
       setQuery(value);
@@ -106,7 +106,7 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
         updateUrl(value, documentFilter);
       }, 300);
     },
-    [doSearch, documentFilter]
+    [doSearch, documentFilter, updateUrl]
   );
 
   const handleSubmit = useCallback(
@@ -116,7 +116,7 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
       doSearch(query, documentFilter || undefined);
       updateUrl(query, documentFilter);
     },
-    [query, doSearch, documentFilter]
+    [query, doSearch, documentFilter, updateUrl]
   );
 
   const handleDocFilterChange = (docId: string) => {

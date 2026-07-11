@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { cn, formatBytes, formatDate } from "@/lib/utils";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
-import { SearchIcon, FileIcon } from "@/components/Icons";
+import { SearchIcon } from "@/components/Icons";
 
 interface DocumentResult {
   id: string;

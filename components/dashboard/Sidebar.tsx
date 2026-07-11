@@ -8,7 +8,6 @@ import {
   Upload,
   Bot,
   Settings,
-  HelpCircle,
   ChevronLeft,
   ChevronRight,
   FolderGit2,

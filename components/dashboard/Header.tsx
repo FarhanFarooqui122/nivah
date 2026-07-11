@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Bell, Moon, Sun, LogOut, User, Settings, Search, Command } from "lucide-react";
+import { Menu, Bell, Moon, LogOut, User, Settings, Search, Command } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton, useUser } from "@clerk/nextjs";
@@ -11,7 +11,7 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
   const pathname = usePathname();
 
   const pages = [
@@ -77,9 +77,6 @@ export function Header() {
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-              3
-            </span>
           </button>
 
           <button

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { PLANS } from "@/lib/plans";
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -92,18 +93,18 @@ export default async function SettingsPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Current Plan</span>
-            <span className="text-white font-medium">Free</span>
+            <span className="text-white font-medium">{PLANS.FREE.name}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Storage Limit</span>
-            <span className="text-white font-medium">500 MB</span>
+            <span className="text-white font-medium">{PLANS.FREE.storageLabel}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">AI Connections</span>
-            <span className="text-white font-medium">3 max</span>
+            <span className="text-white font-medium">{PLANS.FREE.maxAiConnections} max</span>
           </div>
-          <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-xl transition-colors">
-            Upgrade to Pro — $9/mo
+          <button className="mt-4 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-2.5 rounded-xl transition-all">
+            Upgrade to {PLANS.PRO.name} — ${PLANS.PRO.price}/mo
           </button>
         </div>
       </section>

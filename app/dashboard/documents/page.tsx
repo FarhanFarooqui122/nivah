@@ -1,9 +1,10 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DocumentsClient } from "@/components/DocumentsClient";
-import { formatBytes, formatRelativeTime } from "@/lib/utils";
+import { formatBytes } from "@/lib/utils";
 
 const FILTER_LABELS: Record<string, string> = {
   pdf: "PDF",
@@ -77,18 +78,18 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
           <p className="text-zinc-400 mt-1">
             {docs.length} document{docs.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
             {filterLabel && (
-              <a href="/dashboard/documents" className="ml-2 text-xs text-green-400 hover:text-green-300 transition-colors">
+              <Link href="/dashboard/documents" className="ml-2 text-xs text-green-400 hover:text-green-300 transition-colors">
                 Clear filter
-              </a>
+              </Link>
             )}
           </p>
         </div>
-        <a
+        <Link
           href="/dashboard/upload"
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
         >
           + Upload
-        </a>
+        </Link>
       </div>
 
       <DocumentsClient documents={docs} initialFilter={typeFilter} />

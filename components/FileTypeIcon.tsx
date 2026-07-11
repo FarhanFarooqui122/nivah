@@ -8,7 +8,6 @@ import {
   PresentationIcon,
   DocumentIcon,
 } from "@/components/Icons";
-import { type ReactNode } from "react";
 
 export function FileTypeIcon({ fileType, className = "w-5 h-5" }: { fileType: string; className?: string }) {
   const type = fileType.toLowerCase();
