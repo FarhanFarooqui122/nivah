@@ -29,6 +29,33 @@ export function DocumentDetailClient({
   const router = useRouter();
   const [reindexing, setReindexing] = useState(false);
   const [reindexMsg, setReindexMsg] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(document.title);
+  const [saving, setSaving] = useState(false);
+
+  const saveTitle = async () => {
+    const trimmed = titleDraft.trim();
+    if (!trimmed || trimmed === document.title) {
+      setTitleDraft(document.title);
+      setEditing(false);
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/documents/${document.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: trimmed }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      setEditing(false);
+      router.refresh();
+    } catch {
+      setTitleDraft(document.title);
+      setEditing(false);
+    }
+    setSaving(false);
+  };
 
   const handleReindex = async () => {
     if (!confirm("Re-index this document? This will delete and regenerate all chunks and embeddings.")) return;
@@ -67,7 +94,28 @@ export function DocumentDetailClient({
           <ArrowLeftIcon className="w-5 h-5" />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-white truncate">{document.title}</h1>
+          {editing ? (
+            <input
+              autoFocus
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              onBlur={saveTitle}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveTitle();
+                if (e.key === "Escape") { setTitleDraft(document.title); setEditing(false); }
+              }}
+              disabled={saving}
+              className="text-2xl font-bold text-white bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1 w-full outline-none focus:border-green-500"
+            />
+          ) : (
+            <h1
+              className="text-2xl font-bold text-white truncate cursor-pointer hover:text-green-400 transition-colors"
+              onClick={() => { setTitleDraft(document.title); setEditing(true); }}
+              title="Click to rename"
+            >
+              {document.title}
+            </h1>
+          )}
           <p className="text-sm text-zinc-400 mt-1">{document.fileName}</p>
         </div>
       </div>
