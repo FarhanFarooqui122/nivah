@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn, formatBytes, formatDate } from "@/lib/utils";
@@ -34,6 +34,8 @@ interface Document {
   embeddedCount?: number;
 }
 
+const PAGE_SIZE = 20;
+
 export function DocumentsClient({ documents, initialFilter }: { documents: Document[]; initialFilter?: string | null }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -45,6 +47,7 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
   const [deleting, setDeleting] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   const filtered = useMemo(() => {
     let result = [...documents];
@@ -72,6 +75,14 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
     });
     return result;
   }, [documents, search, sortBy, filterType]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(0);
+  }, [search, filterType]);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedDocs);
@@ -166,7 +177,14 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {paginated.length === 0 && filtered.length > 0 ? (
+        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
+          <p className="text-zinc-400 font-medium">No documents on this page</p>
+          <button onClick={() => setPage(0)} className="mt-4 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors">
+            Go to first page
+          </button>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="border border-zinc-800 rounded-2xl p-12 text-center">
           {search ? (
             <SearchIcon className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
@@ -184,6 +202,7 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
           )}
         </div>
       ) : (
+        <>
         <div className="border border-zinc-800 rounded-2xl overflow-hidden">
           <div className="hidden md:grid grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-3 bg-zinc-900/50 text-xs font-medium text-zinc-500 uppercase tracking-wider">
             <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="rounded border-zinc-600 accent-green-600" /></div>
@@ -194,7 +213,7 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
           </div>
 
           <div className="divide-y divide-zinc-800">
-            {filtered.map((doc) => (
+            {paginated.map((doc) => (
               <div key={doc.id} className={cn("grid grid-cols-[40px_1fr] md:grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-4 items-center hover:bg-zinc-900/50 transition-colors group", deleting === doc.id && "opacity-50")}>
                 <div>
                   <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="rounded border-zinc-600 accent-green-600" />
@@ -236,6 +255,43 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
             ))}
           </div>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50">
+            <span className="text-sm text-zinc-500">
+              Page {page + 1} of {totalPages} ({filtered.length} documents)
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPage(i)}
+                  className={cn(
+                    "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
+                    i === page ? "bg-green-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
+                  )}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       {selectedDocs.size > 0 && (
