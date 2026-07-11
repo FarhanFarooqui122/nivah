@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { PLANS } from "@/lib/plans";
+import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -114,9 +115,7 @@ export default async function SettingsPage() {
         <p className="text-sm text-zinc-400 mb-4">
           Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <button className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors">
-          Delete Account
-        </button>
+        <DeleteAccountButton />
       </section>
     </div>
   );
