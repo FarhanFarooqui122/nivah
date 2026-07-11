@@ -37,3 +37,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### API Routes
 - `POST /api/documents/semantic-search` — accepts `{ q, topK?, documentId? }`, returns `{ results: [...] }`
 - `POST /api/documents/[id]/reindex` — deletes all chunks for a document and regenerates them with fresh embeddings
+- `PATCH /api/documents/[id]` — updates document title
+- `POST /api/user/delete` — deletes Clerk user + Prisma user (cascades to docs/chunks)
+- `POST /api/documents/export` — returns markdown for selected document IDs
+
+### Infrastructure
+- **Tests**: Vitest — `npm test` / `npm run test:watch`. Tests in `lib/*.test.ts`.
+- **Sidebar**: `SidebarContext` (`lib/sidebar-context.tsx`) — mobile overlay via hamburger, desktop collapse via chevron
+- **Theme**: `ThemeContext` (`lib/theme-context.tsx`) — light/dark toggle, persisted to localStorage, inline `<script>` prevents flash
+- **Plans config**: `lib/plans.ts` — single source of truth for Free/Pro tiers (storage, AI connections, pricing)
+- **Pagination**: Client-side 20/page in `DocumentsClient`, resets on search/filter change
+
+### Known Issues
+- Middleware uses deprecated `middleware.ts` convention — should migrate to `proxy`
+- Semantic search is purely in-memory (no pgvector) — won't scale beyond ~10K chunks
