@@ -19,7 +19,7 @@ export default async function DashboardLayout({
     <SidebarProvider>
       <div className="min-h-screen bg-zinc-950 text-white flex">
         <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 lg:max-w-[calc(100vw-16rem)]">
+        <div className="flex-1 flex flex-col min-w-0">
           <Header />
           <main className="flex-1 p-6 md:p-8 overflow-auto">
             <div className="max-w-7xl mx-auto w-full">
