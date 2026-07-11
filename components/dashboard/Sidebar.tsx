@@ -15,9 +15,10 @@ import {
   Zap,
   Shield,
   Search,
+  X,
 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/lib/sidebar-context";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -30,32 +31,36 @@ const navigation = [
 ];
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { mobileOpen, collapsed, closeMobile, toggleCollapsed } = useSidebar();
   const pathname = usePathname();
 
-  return (
-    <aside
-      className={cn(
-        "bg-zinc-900 border-r border-zinc-800 transition-all duration-300 flex flex-col",
-        collapsed ? "w-20" : "w-64"
-      )}
-    >
+  const inner = (
+    <>
       <div className="flex h-16 items-center justify-between px-4 border-b border-zinc-800">
         {!collapsed && (
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-white">Nivah</span>
           </Link>
         )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={closeMobile}
+            className="lg:hidden p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <button
+            onClick={toggleCollapsed}
+            className="hidden lg:block p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       <nav className="flex-1 py-4 px-2 overflow-y-auto" aria-label="Main navigation">
@@ -66,6 +71,7 @@ export function Sidebar() {
               <li key={item.name}>
                 <Link
                   href={item.href}
+                  onClick={closeMobile}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
                     "group relative overflow-hidden",
@@ -149,6 +155,28 @@ export function Sidebar() {
           </div>
         </div>
       )}
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      <aside
+        className={cn(
+          "hidden lg:flex bg-zinc-900 border-r border-zinc-800 transition-all duration-300 flex-col",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        {inner}
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={closeMobile} />
+          <aside className="relative bg-zinc-900 border-r border-zinc-800 w-64 flex flex-col">
+            {inner}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

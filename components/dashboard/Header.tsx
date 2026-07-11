@@ -6,12 +6,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/lib/sidebar-context";
 
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user } = useUser();
+  const { toggleMobile } = useSidebar();
   const pathname = usePathname();
 
   const pages = [
@@ -36,6 +38,7 @@ export function Header() {
         <div className="flex items-center gap-4 flex-1">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 text-zinc-400"
+            onClick={toggleMobile}
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
