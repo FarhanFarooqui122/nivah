@@ -3,6 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { PLANS } from "@/lib/plans";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { LogoutButton } from "@/components/LogoutButton";
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -108,6 +109,14 @@ export default async function SettingsPage() {
             Upgrade to {PLANS.PRO.name} — ${PLANS.PRO.price}/mo
           </button>
         </div>
+      </section>
+
+      <section className="border border-zinc-800 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-2">Session</h2>
+        <p className="text-sm text-zinc-400 mb-4">
+          Sign out of your account on this device.
+        </p>
+        <LogoutButton />
       </section>
 
       <section className="border border-red-500/20 rounded-2xl p-6 bg-red-500/5">
