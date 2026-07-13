@@ -31,10 +31,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ### Pages
 - `/dashboard/semantic-search` — query persisted in URL params (`?q=`), debounced auto-search, `/` keyboard shortcut, document filter dropdown, clickable results linking to detail page, retry button
+- `/dashboard/ask` — "Ask Nivah" grounded RAG chat: question input, generated answer, source citations linking to `/dashboard/documents/[id]`
 - `/dashboard/documents` — document list with "Needs re-index" badge when `embeddedCount < chunkCount`
 - `/dashboard/documents/[id]` — detail page with metadata, chunk/embedding stats, re-index button, content preview
 
 ### API Routes
+- `POST /api/ask` — grounded RAG: accepts `{ question }`, retrieves top 5 chunks via semantic search, sends to `gemini-3.1-flash-lite`, returns `{ answer, sources }`
 - `POST /api/documents/semantic-search` — accepts `{ q, topK?, documentId? }`, returns `{ results: [...] }`
 - `POST /api/documents/[id]/reindex` — deletes all chunks for a document and regenerates them with fresh embeddings
 - `PATCH /api/documents/[id]` — updates document title
