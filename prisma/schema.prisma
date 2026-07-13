@@ -12,7 +12,8 @@ model User {
   clerkId   String   @unique
   createdAt DateTime @default(now())
 
-  documents Document[]
+  documents   Document[]
+  chatSessions ChatSession[]
 }
 
 model Document {
@@ -49,4 +50,29 @@ model DocumentChunk {
   createdAt   DateTime @default(now())
 
   @@index([documentId])
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  title     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages  ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String
+  content   String   @db.Text
+  sources   Json?
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
 }

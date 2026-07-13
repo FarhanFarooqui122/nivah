@@ -44,9 +44,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const { question } = await request.json();
+  const { question, sessionId } = await request.json();
   if (!question || typeof question !== "string" || !question.trim()) {
     return NextResponse.json({ error: "Question is required" }, { status: 400 });
+  }
+
+  let session;
+  if (sessionId) {
+    session = await prisma.chatSession.findUnique({ where: { id: sessionId } });
+    if (!session || session.userId !== user.id) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
   }
 
   const queryEmbedding = await generateEmbedding(question.trim());
@@ -85,9 +93,25 @@ export async function POST(request: NextRequest) {
     .slice(0, TOP_K);
 
   if (scored.length === 0) {
+    const noAnswer = "I couldn't find that information in your documents.";
+
+    if (!session) {
+      session = await prisma.chatSession.create({
+        data: { title: question.trim().slice(0, 80), userId: user.id },
+      });
+    }
+
+    await prisma.chatMessage.createMany({
+      data: [
+        { role: "USER", content: question.trim(), sessionId: session.id },
+        { role: "ASSISTANT", content: noAnswer, sessionId: session.id },
+      ],
+    });
+
     return NextResponse.json({
-      answer: "I couldn't find that information in your documents.",
+      answer: noAnswer,
       sources: [],
+      sessionId: session.id,
     });
   }
 
@@ -128,5 +152,23 @@ export async function POST(request: NextRequest) {
       similarity: s.similarity,
     }));
 
-  return NextResponse.json({ answer, sources });
+  if (!session) {
+    session = await prisma.chatSession.create({
+      data: { title: question.trim().slice(0, 80), userId: user.id },
+    });
+  }
+
+  await prisma.chatMessage.createMany({
+    data: [
+      { role: "USER", content: question.trim(), sessionId: session.id },
+      {
+        role: "ASSISTANT",
+        content: answer,
+        sources: sources,
+        sessionId: session.id,
+      },
+    ],
+  });
+
+  return NextResponse.json({ answer, sources, sessionId: session.id });
 }
