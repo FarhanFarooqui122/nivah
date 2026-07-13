@@ -10,6 +10,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - PostgreSQL via Neon
 - Prisma v7.8 — model delegates not available at runtime; all DocumentChunk operations use raw SQL (`$executeRaw` / `$queryRaw`)
 - `prisma/add-index-embedding.sql` — partial index on `DocumentChunk(documentId) WHERE embedding IS NOT NULL`
+- `ChatSession` — id, title, userId, createdAt, updatedAt
+- `ChatMessage` — id, role (USER/ASSISTANT), content, sources (Json), sessionId, createdAt
 
 ### Auth
 - Clerk for authentication, `prisma.User` linked via `clerkId`
@@ -31,12 +33,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ### Pages
 - `/dashboard/semantic-search` — query persisted in URL params (`?q=`), debounced auto-search, `/` keyboard shortcut, document filter dropdown, clickable results linking to detail page, retry button
-- `/dashboard/ask` — "Ask Nivah" grounded RAG chat: question input, generated answer, source citations linking to `/dashboard/documents/[id]`
+- `/dashboard/ask` — "Ask Nivah" grounded RAG chat: question input, generated answer, source citations linking to `/dashboard/documents/[id]`, persistent chat history with session management
 - `/dashboard/documents` — document list with "Needs re-index" badge when `embeddedCount < chunkCount`
 - `/dashboard/documents/[id]` — detail page with metadata, chunk/embedding stats, re-index button, content preview
 
 ### API Routes
-- `POST /api/ask` — grounded RAG: accepts `{ question }`, retrieves top 5 chunks via semantic search, sends to `gemini-3.1-flash-lite`, returns `{ answer, sources }`
+- `POST /api/ask` — grounded RAG: accepts `{ question, sessionId? }`, retrieves top 5 chunks via semantic search, sends to `gemini-3.1-flash-lite`, returns `{ answer, sources, sessionId }`
+- `GET /api/chat/sessions` — list user's chat sessions (sorted by most recent)
+- `POST /api/chat/sessions` — create a new session
+- `DELETE /api/chat/sessions/[id]` — delete a session
+- `GET /api/chat/sessions/[id]/messages` — load messages for a session
 - `POST /api/documents/semantic-search` — accepts `{ q, topK?, documentId? }`, returns `{ results: [...] }`
 - `POST /api/documents/[id]/reindex` — deletes all chunks for a document and regenerates them with fresh embeddings
 - `PATCH /api/documents/[id]` — updates document title
