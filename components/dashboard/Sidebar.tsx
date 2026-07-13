@@ -16,6 +16,7 @@ import {
   Shield,
   Search,
   X,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
@@ -24,6 +25,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Search", href: "/dashboard/search", icon: Search },
   { name: "Semantic Search", href: "/dashboard/semantic-search", icon: Search },
+  { name: "Ask Nivah", href: "/dashboard/ask", icon: MessageCircle },
   { name: "Documents", href: "/dashboard/documents", icon: FolderOpen },
   { name: "Upload", href: "/dashboard/upload", icon: Upload },
   { name: "AI Connections", href: "/dashboard/ai-connections", icon: Bot },
