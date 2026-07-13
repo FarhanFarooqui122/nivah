@@ -34,12 +34,13 @@ function buildContext(
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -171,4 +172,11 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json({ answer, sources, sessionId: session.id });
+  } catch (error) {
+    console.error("[Ask Nivah] Unhandled error:", error instanceof Error ? error.message : error);
+    return NextResponse.json(
+      { error: "Internal server error. Please try again." },
+      { status: 500 },
+    );
+  }
 }

@@ -109,7 +109,7 @@ export function AskNivahClient() {
   }, []);
 
   const deleteSession = useCallback(
-    async (e: React.MouseEvent, sessionId: string) => {
+    async (e: React.MouseEvent | React.KeyboardEvent, sessionId: string) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -233,13 +233,16 @@ export function AskNivahClient() {
               >
                 <MessageSquare className="w-4 h-4 flex-shrink-0" />
                 <span className="text-sm truncate flex-1">{session.title}</span>
-                <button
+                <span
                   onClick={(e) => deleteSession(e, session.id)}
-                  className="p-1 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-all"
+                  className="p-1 rounded-lg cursor-pointer opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-all"
+                  role="button"
+                  tabIndex={0}
                   aria-label="Delete session"
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { deleteSession(e, session.id); } }}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                </span>
               </button>
             ))}
           </div>
