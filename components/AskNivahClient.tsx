@@ -48,8 +48,10 @@ export function AskNivahClient() {
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [sessionsLoaded, setSessionsLoaded] = useState(false);
 
   const loadSessions = useCallback(async () => {
+    if (sessionsLoaded) return;
     try {
       const res = await fetch("/api/chat/sessions");
       if (res.ok) {
@@ -60,10 +62,12 @@ export function AskNivahClient() {
       // ignore
     } finally {
       setSessionsLoading(false);
+      setSessionsLoaded(true);
     }
-  }, []);
+  }, [sessionsLoaded]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSessions();
   }, [loadSessions]);
 
