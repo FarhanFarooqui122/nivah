@@ -27,7 +27,7 @@ function buildContext(
 ): string {
   return chunks
     .map(
-      (c, i) =>
+      (c) =>
         `Document:\n${c.title}\n\nContent:\n${c.content}\n---`,
     )
     .join("\n\n");
