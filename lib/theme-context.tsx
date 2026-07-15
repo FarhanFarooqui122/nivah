@@ -7,6 +7,7 @@ type Theme = "dark" | "light";
 interface ThemeContextValue {
   theme: Theme;
   toggleTheme: () => void;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -16,18 +17,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof document === "undefined") return "dark";
     return (document.documentElement.getAttribute("data-theme") as Theme) || "dark";
   });
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("nivah-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );

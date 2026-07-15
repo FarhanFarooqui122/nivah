@@ -15,7 +15,7 @@ export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user } = useUser();
   const { toggleMobile } = useSidebar();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
 
   const pages = [
@@ -84,13 +84,15 @@ export function Header() {
             <Bell className="w-5 h-5" />
           </button>
 
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          >
-            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
+          {mounted && (
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+          )}
 
           <div className="relative">
             <button
