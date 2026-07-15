@@ -4,7 +4,7 @@ import { AIConnectionCard } from "@/components/DashboardComponents";
 import {
   ChatGPTLogo, ClaudeLogo, GeminiLogo,
   PerplexityLogo, LlamaLogo, CopilotLogo,
-  SearchIcon, BotIcon, DatabaseIcon,
+  BotIcon, DatabaseIcon,
 } from "@/components/Icons";
 
 export default async function AIConnectionsPage() {
@@ -50,7 +50,6 @@ export default async function AIConnectionsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { name: "Cross-AI Memory", desc: "Unified context across all AIs", icon: <BotIcon className="w-5 h-5 text-purple-400" /> },
-            { name: "Semantic Search", desc: "Search across all connected AIs", icon: <SearchIcon className="w-5 h-5 text-blue-400" /> },
             { name: "AI Workspace Sync", desc: "Sync workspaces in real-time", icon: <DatabaseIcon className="w-5 h-5 text-green-400" /> },
           ].map((item) => (
             <div key={item.name} className="p-4 rounded-xl bg-zinc-900 border border-zinc-800">
