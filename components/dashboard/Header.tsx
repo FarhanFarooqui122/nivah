@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Menu, Bell, Moon, Sun, LogOut, User, Settings, Search, Command, Plus, Check, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { SignOutButton, SignInButton, useUser, useSessionList } from "@clerk/nextjs";
+import { SignOutButton, useUser, useSessionList } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
 import { useTheme } from "@/lib/theme-context";
@@ -159,12 +159,16 @@ export function Header() {
                 )}
 
                 <div className="border-t border-zinc-800">
-                  <SignInButton mode="modal">
-                    <button className="w-full flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
-                      <Plus className="w-4 h-4" />
-                      Add account
-                    </button>
-                  </SignInButton>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      window.location.href = "/sign-in";
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add account
+                  </button>
                 </div>
 
                 <Link
