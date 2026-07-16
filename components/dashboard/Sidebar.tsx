@@ -39,11 +39,16 @@ export function Sidebar() {
   const { mobileOpen, collapsed, closeMobile, toggleCollapsed } = useSidebar();
   const pathname = usePathname();
   const [workspaceList, setWorkspaceList] = useState<{ id: string; name: string }[]>([]);
+  const [recentChats, setRecentChats] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
     fetch("/api/workspaces")
       .then((res) => res.json())
       .then((data) => setWorkspaceList(data.workspaces || []))
+      .catch(() => {});
+    fetch("/api/chat/sessions")
+      .then((res) => res.json())
+      .then((data) => setRecentChats((data.sessions || []).slice(0, 5)))
       .catch(() => {});
   }, []);
 
@@ -133,6 +138,41 @@ export function Sidebar() {
                     >
                       <Layers className="w-4 h-4 flex-shrink-0" />
                       <span className="font-medium text-sm truncate">{ws.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {!collapsed && recentChats.length > 0 && (
+          <div className="mt-6 pt-4 border-t border-zinc-800">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                Recent Chats
+              </p>
+              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-green-400 hover:text-green-300 transition-colors">
+                View all
+              </Link>
+            </div>
+            <ul className="space-y-0.5" role="list">
+              {recentChats.map((chat) => {
+                const isActive = pathname === `/dashboard/ask?session=${chat.id}`;
+                return (
+                  <li key={chat.id}>
+                    <Link
+                      href={`/dashboard/ask?session=${chat.id}`}
+                      onClick={closeMobile}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
+                        isActive
+                          ? "bg-gradient-to-r from-green-500/20 to-emerald-600/20 text-white border border-green-500/30"
+                          : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                      )}
+                    >
+                      <MessageCircle className="w-4 h-4 flex-shrink-0" />
+                      <span className="font-medium text-sm truncate">{chat.title}</span>
                     </Link>
                   </li>
                 );

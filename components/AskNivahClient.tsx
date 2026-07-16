@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   SendHorizonal,
   FileText,
@@ -39,6 +40,7 @@ interface ChatSessionSummary {
 }
 
 export function AskNivahClient() {
+  const searchParams = useSearchParams();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,31 +51,6 @@ export function AskNivahClient() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
-
-  const loadSessions = useCallback(async () => {
-    if (sessionsLoaded) return;
-    try {
-      const res = await fetch("/api/chat/sessions");
-      if (res.ok) {
-        const data = await res.json();
-        setSessions(data.sessions);
-      }
-    } catch {
-      // ignore
-    } finally {
-      setSessionsLoading(false);
-      setSessionsLoaded(true);
-    }
-  }, [sessionsLoaded]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadSessions();
-  }, [loadSessions]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
 
   const loadSession = useCallback(
     async (sessionId: string) => {
@@ -104,6 +81,35 @@ export function AskNivahClient() {
     },
     [],
   );
+
+  const loadSessions = useCallback(async () => {
+    if (sessionsLoaded) return;
+    try {
+      const res = await fetch("/api/chat/sessions");
+      if (res.ok) {
+        const data = await res.json();
+        setSessions(data.sessions);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setSessionsLoading(false);
+      setSessionsLoaded(true);
+    }
+  }, [sessionsLoaded]);
+
+  useEffect(() => {
+    const sessionId = searchParams.get("session");
+    if (sessionId) {
+      loadSession(sessionId);
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadSessions();
+  }, [loadSessions, loadSession, searchParams]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   const newChat = useCallback(() => {
     setCurrentSessionId(null);
