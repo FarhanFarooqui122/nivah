@@ -56,6 +56,10 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
   const [exporting, setExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [aiAction, setAiAction] = useState<string>("");
+  const [aiRunning, setAiRunning] = useState(false);
+  const [aiResult, setAiResult] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...documents];
@@ -126,6 +130,29 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
     router.refresh();
   };
 
+  const handleAiAction = async (action: string) => {
+    setAiAction(action);
+    setAiRunning(true);
+    setAiResult(null);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/documents/ai-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, documentIds: Array.from(selectedDocs) }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAiResult(data.output);
+      } else {
+        setAiError(data.error || "AI action failed");
+      }
+    } catch {
+      setAiError("AI action failed");
+    }
+    setAiRunning(false);
+  };
+
   const handleExport = async () => {
     setExporting(true);
     setExportMsg(null);
@@ -187,11 +214,74 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         </div>
       </div>
 
-      {selectedDocs.size > 0 && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl">
+      {selectedDocs.size > 0 && !aiResult && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl flex-wrap">
           <span className="text-sm text-green-400">{selectedDocs.size} selected</span>
-          <button onClick={handleBulkDelete} className="ml-auto text-sm text-red-400 hover:text-red-300 transition-colors">Delete selected</button>
+          <div className="flex items-center gap-2 ml-auto">
+            <select
+              value={aiAction}
+              onChange={(e) => handleAiAction(e.target.value)}
+              disabled={aiRunning}
+              className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-1.5 text-white text-sm focus:border-green-500 focus:outline-none disabled:opacity-50"
+            >
+              <option value="">AI Actions</option>
+              <option value="summarize">Summarize</option>
+              <option value="compare">Compare</option>
+              <option value="extract-key-points">Extract Key Points</option>
+              <option value="study-notes">Study Notes</option>
+              <option value="faq">Generate FAQ</option>
+            </select>
+          </div>
+          <button onClick={handleBulkDelete} className="text-sm text-red-400 hover:text-red-300 transition-colors">Delete selected</button>
           <button onClick={() => setSelectedDocs(new Set())} className="text-sm text-zinc-400 hover:text-white transition-colors">Clear</button>
+        </div>
+      )}
+
+      {aiRunning && (
+        <div className="border border-green-500/30 rounded-2xl p-8 text-center bg-green-900/10">
+          <svg className="w-8 h-8 animate-spin text-green-500 mx-auto" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+            <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
+          </svg>
+          <p className="text-zinc-400 mt-3 text-sm">Generating AI output...</p>
+        </div>
+      )}
+
+      {aiError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
+          <p className="text-red-400 text-sm">{aiError}</p>
+          <button onClick={() => { setAiError(null); setAiResult(null); }} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
+        </div>
+      )}
+
+      {aiResult && (
+        <div className="border border-green-500/30 rounded-2xl bg-green-900/10 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-green-500/20">
+            <h3 className="font-semibold text-white flex items-center gap-2">
+              <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2a10 10 0 1010 10 10 10 0 00-10-10z" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              AI Result
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { navigator.clipboard.writeText(aiResult); }}
+                className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
+              >
+                Copy
+              </button>
+              <button
+                onClick={() => { setAiResult(null); setAiError(null); setAiAction(""); }}
+                className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+          <div className="p-5 max-h-96 overflow-y-auto">
+            <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">{aiResult}</pre>
+          </div>
         </div>
       )}
 
@@ -315,7 +405,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         </>
       )}
 
-      {selectedDocs.size > 0 && (
+      {selectedDocs.size > 0 && !aiResult && (
         <div className="flex items-center justify-between px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl">
           <span className="text-sm text-green-400">{selectedDocs.size} documents selected</span>
           <div className="flex items-center gap-3">
