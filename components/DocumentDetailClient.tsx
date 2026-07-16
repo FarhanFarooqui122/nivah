@@ -19,6 +19,7 @@ interface Document {
   fileSize: number;
   fileUrl: string;
   textContent: string | null;
+  summary: string | null;
   createdAt: string;
   workspaceId?: string | null;
 }
@@ -41,6 +42,9 @@ export function DocumentDetailClient({
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>(document.workspaceId || "");
   const [savingWorkspace, setSavingWorkspace] = useState(false);
+  const [summary, setSummary] = useState<string | null>(document.summary);
+  const [summarizing, setSummarizing] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/workspaces")
@@ -65,6 +69,24 @@ export function DocumentDetailClient({
       console.error("Failed to update workspace:", error);
     }
     setSavingWorkspace(false);
+  };
+
+  const handleSummarize = async () => {
+    setSummarizing(true);
+    setSummaryError(null);
+    try {
+      const res = await fetch(`/api/documents/${document.id}/summarize`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setSummary(data.summary);
+        router.refresh();
+      } else {
+        setSummaryError(data.error || "Failed to generate summary");
+      }
+    } catch {
+      setSummaryError("Failed to generate summary");
+    }
+    setSummarizing(false);
   };
 
   const saveTitle = async () => {
@@ -199,7 +221,7 @@ export function DocumentDetailClient({
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <a
           href={document.fileUrl}
           target="_blank"
@@ -209,6 +231,14 @@ export function DocumentDetailClient({
           Download file
         </a>
         <button
+          onClick={handleSummarize}
+          disabled={summarizing || !document.textContent}
+          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+        >
+          <RefreshIcon className={`w-4 h-4 ${summarizing ? "animate-spin" : ""}`} />
+          {summarizing ? "Generating..." : summary ? "Regenerate Summary" : "Generate Summary"}
+        </button>
+        <button
           onClick={handleReindex}
           disabled={reindexing}
           className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
@@ -217,6 +247,29 @@ export function DocumentDetailClient({
           {reindexing ? "Re-indexing..." : "Re-index"}
         </button>
       </div>
+
+      {summaryError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
+          <p className="text-red-400 text-sm">{summaryError}</p>
+        </div>
+      )}
+
+      {summary && (
+        <div className="p-5 rounded-2xl border border-green-500/30 bg-green-500/5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              AI Summary
+            </h2>
+          </div>
+          <p className="text-zinc-300 leading-relaxed text-sm whitespace-pre-wrap">{summary}</p>
+        </div>
+      )}
 
       {reindexMsg && (
         <div className={`p-4 rounded-2xl border ${reindexMsg.includes("failed") ? "border-red-500/30 bg-red-500/5" : "border-green-500/30 bg-green-500/5"}`}>

@@ -42,6 +42,7 @@ export default async function DocumentDetailPage(props: { params: Promise<{ id: 
         fileSize: document.fileSize,
         fileUrl: document.fileUrl,
         textContent: document.textContent,
+        summary: document.summary,
         createdAt: document.createdAt.toISOString(),
         workspaceId: document.workspaceId,
       }}
