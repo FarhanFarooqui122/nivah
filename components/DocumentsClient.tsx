@@ -20,6 +20,11 @@ const FILTER_OPTIONS = [
   { value: "image", label: "Images" },
 ] as const;
 
+interface Workspace {
+  id: string;
+  name: string;
+}
+
 interface Document {
   id: string;
   title: string;
@@ -32,17 +37,20 @@ interface Document {
   wordCount?: number;
   chunkCount?: number;
   embeddedCount?: number;
+  workspaceName?: string | null;
+  workspaceId?: string | null;
 }
 
 const PAGE_SIZE = 20;
 
-export function DocumentsClient({ documents, initialFilter }: { documents: Document[]; initialFilter?: string | null }) {
+export function DocumentsClient({ documents, initialFilter, workspaces = [] }: { documents: Document[]; initialFilter?: string | null; workspaces?: Workspace[] }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "name" | "size">("date");
   const [filterType, setFilterType] = useState<string>(
     initialFilter && FILTER_OPTIONS.some((o) => o.value === initialFilter) ? initialFilter : "all"
   );
+  const [filterWorkspace, setFilterWorkspace] = useState<string>("all");
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -66,6 +74,9 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
         }
       });
     }
+    if (filterWorkspace !== "all") {
+      result = result.filter((doc) => doc.workspaceId === filterWorkspace);
+    }
     result.sort((a, b) => {
       switch (sortBy) {
         case "name": return a.title.localeCompare(b.title);
@@ -80,9 +91,8 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(0);
-  }, [search, filterType]);
+  }, [search, filterType, filterWorkspace]);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedDocs);
@@ -156,6 +166,14 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {workspaces.length > 0 && (
+            <select value={filterWorkspace} onChange={(e) => setFilterWorkspace(e.target.value)} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+              <option value="all">All Workspaces</option>
+              {workspaces.map((w) => (
+                <option key={w.id} value={w.id}>{w.name}</option>
+              ))}
+            </select>
+          )}
           <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
             {FILTER_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -235,6 +253,9 @@ export function DocumentsClient({ documents, initialFilter }: { documents: Docum
                           <span className="text-yellow-500 text-[10px] font-medium">Needs re-index</span>
                         )}
                       </p>
+                    )}
+                    {doc.workspaceName && (
+                      <p className="text-xs text-zinc-600 mt-0.5">Workspace: {doc.workspaceName}</p>
                     )}
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,6 +18,7 @@ import {
   Search,
   X,
   MessageCircle,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
@@ -27,6 +29,7 @@ const navigation = [
   { name: "Semantic Search", href: "/dashboard/semantic-search", icon: Search },
   { name: "Ask Nivah", href: "/dashboard/ask", icon: MessageCircle },
   { name: "Documents", href: "/dashboard/documents", icon: FolderOpen },
+  { name: "Workspaces", href: "/dashboard/workspaces", icon: Layers },
   { name: "Upload", href: "/dashboard/upload", icon: Upload },
   { name: "AI Connections", href: "/dashboard/ai-connections", icon: Bot },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -35,6 +38,14 @@ const navigation = [
 export function Sidebar() {
   const { mobileOpen, collapsed, closeMobile, toggleCollapsed } = useSidebar();
   const pathname = usePathname();
+  const [workspaceList, setWorkspaceList] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/workspaces")
+      .then((res) => res.json())
+      .then((data) => setWorkspaceList(data.workspaces || []))
+      .catch(() => {});
+  }, []);
 
   const inner = (
     <>
@@ -95,14 +106,48 @@ export function Sidebar() {
           })}
         </ul>
 
+        {!collapsed && workspaceList.length > 0 && (
+          <div className="mt-6 pt-4 border-t border-zinc-800">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                Workspaces
+              </p>
+              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-green-400 hover:text-green-300 transition-colors">
+                Manage
+              </Link>
+            </div>
+            <ul className="space-y-0.5" role="list">
+              {workspaceList.slice(0, 5).map((ws) => {
+                const isActive = pathname === `/dashboard/workspaces/${ws.id}`;
+                return (
+                  <li key={ws.id}>
+                    <Link
+                      href={`/dashboard/workspaces/${ws.id}`}
+                      onClick={closeMobile}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
+                        isActive
+                          ? "bg-gradient-to-r from-green-500/20 to-emerald-600/20 text-white border border-green-500/30"
+                          : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                      )}
+                    >
+                      <Layers className="w-4 h-4 flex-shrink-0" />
+                      <span className="font-medium text-sm truncate">{ws.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
         {!collapsed && (
-          <div className="mt-8 pt-6 border-t border-zinc-800">
+          <div className="mt-6 pt-4 border-t border-zinc-800">
             <p className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
               Coming Soon
             </p>
             <ul className="space-y-1" role="list">
               {[
-                { name: "AI Workspace Sync", icon: Zap, href: "/dashboard/ai-sync", comingSoon: true },
                 { name: "Cross-AI Memory", icon: Database, href: "/dashboard/cross-ai", comingSoon: true },
                 { name: "Team Workspaces", icon: FolderGit2, href: "/dashboard/teams", comingSoon: true },
                 { name: "Enterprise Security", icon: Shield, href: "/dashboard/security", comingSoon: true },

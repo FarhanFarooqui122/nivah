@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ArrowLeftIcon, RefreshIcon } from "@/components/Icons";
+
+interface Workspace {
+  id: string;
+  name: string;
+}
 
 interface Document {
   id: string;
@@ -15,6 +20,7 @@ interface Document {
   fileUrl: string;
   textContent: string | null;
   createdAt: string;
+  workspaceId?: string | null;
 }
 
 export function DocumentDetailClient({
@@ -32,6 +38,34 @@ export function DocumentDetailClient({
   const [editing, setEditing] = useState(false);
   const [titleDraft, setTitleDraft] = useState(document.title);
   const [saving, setSaving] = useState(false);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>(document.workspaceId || "");
+  const [savingWorkspace, setSavingWorkspace] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/workspaces")
+      .then((res) => res.json())
+      .then((data) => setWorkspaces(data.workspaces || []))
+      .catch(() => {});
+  }, []);
+
+  const saveWorkspace = async (workspaceId: string) => {
+    setSavingWorkspace(true);
+    try {
+      const res = await fetch(`/api/documents/${document.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: workspaceId || null }),
+      });
+      if (res.ok) {
+        setSelectedWorkspace(workspaceId);
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Failed to update workspace:", error);
+    }
+    setSavingWorkspace(false);
+  };
 
   const saveTitle = async () => {
     const trimmed = titleDraft.trim();
@@ -120,7 +154,7 @@ export function DocumentDetailClient({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
           <p className="text-xs text-zinc-500 uppercase tracking-wider">Type</p>
           <p className="text-white font-medium mt-1">{document.fileType.split("/").pop()?.toUpperCase() || "FILE"}</p>
@@ -141,6 +175,27 @@ export function DocumentDetailClient({
               <span className="text-xs text-yellow-400">Needs re-index</span>
             )}
           </p>
+        </div>
+        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Workspace</p>
+          <div className="mt-1">
+            {workspaces.length > 0 && (
+              <select
+                value={selectedWorkspace}
+                onChange={(e) => saveWorkspace(e.target.value)}
+                disabled={savingWorkspace}
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-white text-sm w-full focus:border-green-500 focus:outline-none disabled:opacity-50"
+              >
+                <option value="">None</option>
+                {workspaces.map((w) => (
+                  <option key={w.id} value={w.id}>{w.name}</option>
+                ))}
+              </select>
+            )}
+            {workspaces.length === 0 && (
+              <p className="text-white font-medium text-sm">None</p>
+            )}
+          </div>
         </div>
       </div>
 

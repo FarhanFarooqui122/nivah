@@ -20,14 +20,35 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
-  const { title } = await request.json();
-  if (!title || typeof title !== "string" || !title.trim()) {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  const body = await request.json();
+  const { title, workspaceId } = body;
+
+  const data: Record<string, unknown> = {};
+
+  if (title !== undefined) {
+    if (typeof title !== "string" || !title.trim()) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+    data.title = title.trim();
+  }
+
+  if (workspaceId !== undefined) {
+    if (workspaceId === null) {
+      data.workspaceId = null;
+    } else {
+      const workspace = await prisma.workspace.findFirst({
+        where: { id: workspaceId, userId: user.id },
+      });
+      if (!workspace) {
+        return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+      }
+      data.workspaceId = workspaceId;
+    }
   }
 
   const updated = await prisma.document.update({
     where: { id },
-    data: { title: title.trim() },
+    data,
   });
 
   return NextResponse.json({ document: updated });

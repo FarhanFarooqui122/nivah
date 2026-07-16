@@ -52,10 +52,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Infrastructure
 - **Tests**: Vitest — `npm test` / `npm run test:watch`. Tests in `lib/*.test.ts`.
 - **Sidebar**: `SidebarContext` (`lib/sidebar-context.tsx`) — mobile overlay via hamburger, desktop collapse via chevron
-- **Theme**: `ThemeContext` (`lib/theme-context.tsx`) — light/dark toggle, persisted to localStorage, inline `<script>` prevents flash
+- **Theme**: `ThemeContext` (`lib/theme-context.tsx`) — light/dark toggle, persisted to localStorage, inline `<script>` prevents flash, `mounted` state prevents hydration mismatch
 - **Plans config**: `lib/plans.ts` — single source of truth for Free/Pro tiers (storage, AI connections, pricing)
 - **Pagination**: Client-side 20/page in `DocumentsClient`, resets on search/filter change
 
 ### Known Issues
 - Middleware uses deprecated `middleware.ts` convention — should migrate to `proxy`
 - Semantic search is purely in-memory (no pgvector) — won't scale beyond ~10K chunks
+
+### Today's Changes (2026-07-15)
+- **Fix Ask Nivah lint**: Removed unused `i` parameter in `buildContext` (`app/api/ask/route.ts:30`)
+- **Fix Ask Nivah useEffect lint**: Added ref guard to prevent setState in effect (`components/AskNivahClient.tsx`)
+- **UI**: Removed "Semantic Search" from AI Connections "Coming Soon" section (`app/dashboard/ai-connections/page.tsx`)
+- **Fix theme hydration mismatch**: Added `mounted` state to `ThemeContext`; Header only renders theme toggle after client mount (`lib/theme-context.tsx`, `components/dashboard/Header.tsx`)

@@ -43,6 +43,7 @@ export default async function DocumentDetailPage(props: { params: Promise<{ id: 
         fileUrl: document.fileUrl,
         textContent: document.textContent,
         createdAt: document.createdAt.toISOString(),
+        workspaceId: document.workspaceId,
       }}
       chunkCount={chunks.length}
       embeddedCount={embeddedCount}

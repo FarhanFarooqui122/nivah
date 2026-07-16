@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const title = (formData.get("title") as string) || file?.name?.replace(/\.[^/.]+$/, "") || "Untitled";
+    const workspaceId = formData.get("workspaceId") as string | null;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -29,6 +30,15 @@ export async function POST(request: NextRequest) {
 
     if (file.size > 50 * 1024 * 1024) {
       return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 400 });
+    }
+
+    if (workspaceId) {
+      const workspace = await prisma.workspace.findFirst({
+        where: { id: workspaceId, userId: user.id },
+      });
+      if (!workspace) {
+        return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+      }
     }
 
     const bytes = await file.arrayBuffer();
@@ -54,6 +64,7 @@ export async function POST(request: NextRequest) {
         fileUrl,
         textContent,
         userId: user.id,
+        workspaceId: workspaceId || null,
       },
     });
 

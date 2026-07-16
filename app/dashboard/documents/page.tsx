@@ -13,7 +13,7 @@ const FILTER_LABELS: Record<string, string> = {
   image: "Images",
 };
 
-export default async function DocumentsPage(props: { searchParams: Promise<{ type?: string }> }) {
+export default async function DocumentsPage(props: { searchParams: Promise<{ type?: string; workspace?: string }> }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
@@ -22,10 +22,13 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
 
   const searchParams = await props.searchParams;
   const typeFilter = searchParams.type ?? null;
+  const workspaceFilter = searchParams.workspace ?? null;
   const filterLabel = typeFilter ? FILTER_LABELS[typeFilter] : null;
 
+  const workspaceWhere = workspaceFilter ? { workspaceId: workspaceFilter } : {};
+
   const documents = await prisma.document.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, ...workspaceWhere },
     orderBy: { createdAt: "desc" },
   });
 
@@ -53,12 +56,21 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
       embeddedCountMap.set(row.document_id, row.count);
     }
   }
+
+  const workspaces = await prisma.workspace.findMany({
+    where: { userId: user.id },
+    orderBy: { name: "asc" },
+  });
+  const workspaceMap = new Map(workspaces.map((w) => [w.id, w.name]));
+
   const docs = documents.map((doc) => ({
     ...doc,
     charCount: doc.textContent?.length ?? 0,
     wordCount: doc.textContent ? doc.textContent.trim().split(/\s+/).filter(Boolean).length : 0,
     chunkCount: chunkCountMap.get(doc.id) ?? 0,
     embeddedCount: embeddedCountMap.get(doc.id) ?? 0,
+    workspaceName: doc.workspaceId ? workspaceMap.get(doc.workspaceId) ?? null : null,
+    workspaceId: doc.workspaceId,
   }));
 
   const totalSize = docs.reduce((acc, doc) => acc + doc.fileSize, 0);
@@ -92,7 +104,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
         </Link>
       </div>
 
-      <DocumentsClient documents={docs} initialFilter={typeFilter} />
+      <DocumentsClient documents={docs} initialFilter={typeFilter} workspaces={workspaces} />
     </div>
   );
 }

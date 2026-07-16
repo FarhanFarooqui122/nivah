@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
@@ -8,12 +8,26 @@ import { UploadIcon, FileIcon, PdfIcon, ImageIcon, SpreadsheetIcon, DocumentIcon
 
 const ACCEPTED_STRINGS = ".pdf,.docx,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.webp";
 
+interface Workspace {
+  id: string;
+  name: string;
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/api/workspaces")
+      .then((res) => res.json())
+      .then((data) => setWorkspaces(data.workspaces || []))
+      .catch(() => {});
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -54,6 +68,7 @@ export default function UploadPage() {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("title", file.name.replace(/\.[^/.]+$/, ""));
+        if (selectedWorkspace) formData.append("workspaceId", selectedWorkspace);
 
         const xhr = new XMLHttpRequest();
 
@@ -118,6 +133,22 @@ export default function UploadPage() {
           <p className="text-zinc-600 text-sm mt-4">PDF, DOCX, TXT, MD, CSV, JSON, PNG, JPG, WEBP — up to 50MB</p>
         </div>
       </div>
+
+      {workspaces.length > 0 && (
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-zinc-400">Assign to workspace:</label>
+          <select
+            value={selectedWorkspace}
+            onChange={(e) => setSelectedWorkspace(e.target.value)}
+            className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none"
+          >
+            <option value="">No workspace</option>
+            {workspaces.map((w) => (
+              <option key={w.id} value={w.id}>{w.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {files.length > 0 && (
         <div className="border border-zinc-800 rounded-2xl p-6">
