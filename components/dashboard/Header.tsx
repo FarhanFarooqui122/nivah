@@ -186,7 +186,7 @@ export function Header() {
                   Profile
                 </Link>
                 <hr className="my-1 border-zinc-800" />
-                <SignOutButton redirectUrl="/">
+                <SignOutButton redirectUrl="/sign-in">
                   <button className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-zinc-800 hover:text-red-300 transition-colors">
                     <LogOut className="w-4 h-4" />
                     Sign out
