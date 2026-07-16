@@ -16,5 +16,11 @@ export default async function SemanticSearchPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  return <SemanticSearchClient documents={documents} />;
+  const workspaces = await prisma.workspace.findMany({
+    where: { userId: user.id },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
+  return <SemanticSearchClient documents={documents} workspaces={workspaces} />;
 }

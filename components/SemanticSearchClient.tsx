@@ -18,7 +18,12 @@ interface DocumentOption {
   title: string;
 }
 
-export function SemanticSearchClient({ documents }: { documents: DocumentOption[] }) {
+interface WorkspaceOption {
+  id: string;
+  name: string;
+}
+
+export function SemanticSearchClient({ documents, workspaces = [] }: { documents: DocumentOption[]; workspaces?: WorkspaceOption[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,10 +33,11 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [documentFilter, setDocumentFilter] = useState(searchParams.get("documentId") || "");
+  const [workspaceFilter, setWorkspaceFilter] = useState(searchParams.get("workspaceId") || "");
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const doSearch = useCallback(async (q: string, docId?: string) => {
+  const doSearch = useCallback(async (q: string, docId?: string, wsId?: string) => {
     const trimmed = q.trim();
     if (!trimmed) {
       setResults([]);
@@ -45,6 +51,7 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
     try {
       const body: Record<string, unknown> = { q: trimmed };
       if (docId) body.documentId = docId;
+      if (wsId) body.workspaceId = wsId;
 
       const res = await fetch("/api/documents/semantic-search", {
         method: "POST",
@@ -68,10 +75,11 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
     }
   }, []);
 
-  const updateUrl = useCallback((q: string, docId: string) => {
+  const updateUrl = useCallback((q: string, docId: string, wsId: string) => {
     const params = new URLSearchParams();
     if (q.trim()) params.set("q", q.trim());
     if (docId) params.set("documentId", docId);
+    if (wsId) params.set("workspaceId", wsId);
     const str = params.toString();
     router.replace(`/dashboard/semantic-search${str ? `?${str}` : ""}`, { scroll: false });
   }, [router]);
@@ -79,9 +87,9 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
   useEffect(() => {
     const q = searchParams.get("q");
     const docId = searchParams.get("documentId");
+    const wsId = searchParams.get("workspaceId");
     if (q) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      doSearch(q, docId || undefined);
+      doSearch(q, docId || undefined, wsId || undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -102,33 +110,42 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
       setQuery(value);
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        doSearch(value, documentFilter || undefined);
-        updateUrl(value, documentFilter);
+        doSearch(value, documentFilter || undefined, workspaceFilter || undefined);
+        updateUrl(value, documentFilter, workspaceFilter);
       }, 300);
     },
-    [doSearch, documentFilter, updateUrl]
+    [doSearch, documentFilter, workspaceFilter, updateUrl]
   );
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (debounceRef.current) clearTimeout(debounceRef.current);
-      doSearch(query, documentFilter || undefined);
-      updateUrl(query, documentFilter);
+      doSearch(query, documentFilter || undefined, workspaceFilter || undefined);
+      updateUrl(query, documentFilter, workspaceFilter);
     },
-    [query, doSearch, documentFilter, updateUrl]
+    [query, doSearch, documentFilter, workspaceFilter, updateUrl]
   );
 
   const handleDocFilterChange = (docId: string) => {
     setDocumentFilter(docId);
     if (query.trim()) {
-      doSearch(query, docId || undefined);
-      updateUrl(query, docId);
+      doSearch(query, docId || undefined, workspaceFilter || undefined);
+      updateUrl(query, docId, workspaceFilter);
+    }
+  };
+
+  const handleWorkspaceFilterChange = (wsId: string) => {
+    setWorkspaceFilter(wsId);
+    setDocumentFilter("");
+    if (query.trim()) {
+      doSearch(query, documentFilter || undefined, wsId || undefined);
+      updateUrl(query, documentFilter, wsId);
     }
   };
 
   const retry = () => {
-    doSearch(query, documentFilter || undefined);
+    doSearch(query, documentFilter || undefined, workspaceFilter || undefined);
   };
 
   const snippet = (text: string, maxLen = 250): string => {
@@ -154,18 +171,32 @@ export function SemanticSearchClient({ documents }: { documents: DocumentOption[
             Find documents by meaning, not just keywords
           </p>
         </div>
-        <div className="relative">
-          <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
-          <select
-            value={documentFilter}
-            onChange={(e) => handleDocFilterChange(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-xl pl-9 pr-4 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none appearance-none cursor-pointer"
-          >
-            <option value="">All documents</option>
-            {documents.map((doc) => (
-              <option key={doc.id} value={doc.id}>{doc.title}</option>
-            ))}
-          </select>
+        <div className="flex items-center gap-2">
+          {workspaces.length > 0 && (
+            <select
+              value={workspaceFilter}
+              onChange={(e) => handleWorkspaceFilterChange(e.target.value)}
+              className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none cursor-pointer"
+            >
+              <option value="">All Workspaces</option>
+              {workspaces.map((ws) => (
+                <option key={ws.id} value={ws.id}>{ws.name}</option>
+              ))}
+            </select>
+          )}
+          <div className="relative">
+            <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+            <select
+              value={documentFilter}
+              onChange={(e) => handleDocFilterChange(e.target.value)}
+              className="bg-zinc-900 border border-zinc-700 rounded-xl pl-9 pr-4 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none appearance-none cursor-pointer"
+            >
+              <option value="">All documents</option>
+              {documents.map((doc) => (
+                <option key={doc.id} value={doc.id}>{doc.title}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

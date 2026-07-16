@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
 import { cosineSimilarity } from "@/lib/cosine-similarity";
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const { question, sessionId } = await request.json();
+  const { question, sessionId, workspaceId } = await request.json();
   if (!question || typeof question !== "string" || !question.trim()) {
     return NextResponse.json({ error: "Question is required" }, { status: 400 });
   }
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
     JOIN "Document" d ON d."id" = c."documentId"
     WHERE d."userId" = ${user.id}
       AND c."embedding" IS NOT NULL
+      ${workspaceId ? Prisma.sql`AND d."workspaceId" = ${workspaceId}` : Prisma.empty}
   `;
 
   const scored = chunks

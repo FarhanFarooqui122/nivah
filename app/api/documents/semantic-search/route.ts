@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const { q, topK, documentId } = await request.json();
+  const { q, topK, documentId, workspaceId } = await request.json();
   if (!q || typeof q !== "string" || !q.trim()) {
     return NextResponse.json({ error: "Query required" }, { status: 400 });
   }
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
     WHERE d."userId" = ${user.id}
       AND c."embedding" IS NOT NULL
       ${documentId ? Prisma.sql`AND c."documentId" = ${documentId}` : Prisma.empty}
+      ${workspaceId ? Prisma.sql`AND d."workspaceId" = ${workspaceId}` : Prisma.empty}
   `;
 
   const scored = chunks
