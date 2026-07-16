@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Menu, Bell, Moon, Sun, LogOut, User, Settings, Search, Command, Plus, Check, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { SignOutButton, useUser, useSessionList } from "@clerk/nextjs";
+import { SignOutButton, useUser, useSessionList, useClerk } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
 import { useTheme } from "@/lib/theme-context";
@@ -16,6 +16,7 @@ export function Header() {
   const [showAccounts, setShowAccounts] = useState(false);
   const { user } = useUser();
   const { sessions, isLoaded: sessionsLoaded, setActive } = useSessionList();
+  const clerk = useClerk();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
@@ -162,7 +163,7 @@ export function Header() {
                   <button
                     onClick={() => {
                       setUserMenuOpen(false);
-                      window.location.href = "/sign-in";
+                      clerk.openSignIn();
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
