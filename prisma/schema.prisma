@@ -15,6 +15,7 @@ model User {
   documents   Document[]
   chatSessions ChatSession[]
   workspaces  Workspace[]
+  studyContent StudyContent[]
 }
 
 model Workspace {
@@ -95,4 +96,17 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@index([sessionId])
+}
+
+model StudyContent {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId  String?
+  type        String
+  content     Json
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([documentId])
 }

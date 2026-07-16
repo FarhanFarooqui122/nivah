@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 import { ArrowLeftIcon, RefreshIcon } from "@/components/Icons";
+import { StudyModeClient } from "@/components/StudyModeClient";
 
 interface Workspace {
   id: string;
@@ -45,6 +47,7 @@ export function DocumentDetailClient({
   const [summary, setSummary] = useState<string | null>(document.summary);
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [showStudy, setShowStudy] = useState(false);
 
   useEffect(() => {
     fetch("/api/workspaces")
@@ -277,7 +280,30 @@ export function DocumentDetailClient({
         </div>
       )}
 
-      {document.textContent && (
+      <div className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-800 rounded-xl w-fit">
+        <button
+          onClick={() => setShowStudy(false)}
+          className={cn(
+            "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+            !showStudy ? "bg-green-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+          )}
+        >
+          Content
+        </button>
+        <button
+          onClick={() => setShowStudy(true)}
+          className={cn(
+            "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+            showStudy ? "bg-green-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+          )}
+        >
+          Study Mode
+        </button>
+      </div>
+
+      {showStudy ? (
+        <StudyModeClient documentId={document.id} />
+      ) : document.textContent ? (
         <div>
           <h2 className="text-lg font-semibold text-white mb-3">Content Preview</h2>
           <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
@@ -289,7 +315,7 @@ export function DocumentDetailClient({
             </pre>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
