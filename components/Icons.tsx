@@ -69,7 +69,7 @@ export function NivahLogo({ className = "w-6 h-6" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-label="Nivah">
       <rect x="2" y="2" width="20" height="20" rx="6" fill="#16a34a" />
-      <path d="M7 17V7l5 7 5-7v10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 17V7L17 17V7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

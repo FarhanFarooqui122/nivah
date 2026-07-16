@@ -17,13 +17,15 @@ export default function CustomSignIn() {
           </p>
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
             {[
-              { icon: "🔍", text: "Semantic search across all your documents" },
-              { icon: "🤖", text: "Ask questions and get grounded AI answers" },
-              { icon: "📁", text: "Organize with workspaces and projects" },
-              { icon: "📚", text: "Generate summaries, flashcards & quizzes" },
+              { text: "Semantic search across all your documents" },
+              { text: "Ask questions and get grounded AI answers" },
+              { text: "Organize with workspaces and projects" },
+              { text: "Generate summaries, flashcards & quizzes" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-zinc-300">
-                <span className="text-2xl">{item.icon}</span>
+                <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                  <NivahLogo className="w-4 h-4" />
+                </div>
                 <span>{item.text}</span>
               </div>
             ))}
