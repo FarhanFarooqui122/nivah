@@ -1,60 +1,82 @@
 # Nivah
 
-AI-powered cloud storage and document intelligence platform.
+**AI-powered document intelligence platform.** Upload documents, search by meaning, ask questions with grounded AI answers, generate study materials, and keep everything organized in workspaces.
+
+**Live:** https://nivah-one.vercel.app
+
+---
 
 ## Features
 
-- Authentication
-- File Uploads
-- Folder Management
-- File Sharing
-- Semantic Search
-- AI Summaries
-- Chat with Documents
+- **Semantic Search** — Vector embeddings (Gemini) for meaning-based document search
+- **Ask Nivah** — Grounded RAG chat with source citations
+- **Document Upload** — PDF, DOCX, TXT, MD, images with automatic text extraction & OCR fallback
+- **Study Mode** — AI-generated flashcards, quizzes, MCQs, and short notes from any document
+- **AI Summaries** — One-click document summarization
+- **AI Actions** — Compare documents, extract key points, generate FAQs
+- **Workspaces** — Organize documents into workspaces with scoped search
+- **Notifications** — Real-time bell with upload/summary/re-index alerts
+- **Settings** — Dark mode toggle, email notification preferences, auto-sync
+- **Chat History** — Persistent session management across conversations
+- **Authentication** — Clerk-powered (email/password, Google SSO, GitHub)
 
 ## Tech Stack
 
-- Next.js
-- TypeScript
-- PostgreSQL
-- Prisma
-- Neon
-- Clerk
-
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (Turbopack) |
+| Language | TypeScript |
+| Database | PostgreSQL via Neon |
+| ORM | Prisma 7 |
+| Auth | Clerk |
+| AI | Google Gemini (`gemini-embedding-001`, `gemini-3.1-flash-lite`) |
+| Embeddings | In-memory cosine similarity |
+| OCR | Tesseract.js + pdfjs-dist |
+| File Storage | PostgreSQL BYTEA |
+| Deployment | Vercel (auto-deploy on push) |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.local.example .env.local  # fill in your keys
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Required Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Neon PostgreSQL connection string |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key |
+| `CLERK_SECRET_KEY` | Clerk secret key |
+| `GOOGLE_API_KEY` | Google Gemini API key |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+app/
+├── (auth)/           # Custom sign-in/sign-up pages
+├── api/              # API routes (ask, documents, chat, notifications, etc.)
+├── dashboard/        # Dashboard pages (documents, search, settings, etc.)
+components/
+├── dashboard/        # Sidebar, Header
+├── Icons.tsx         # SVG icon components
+lib/
+├── prisma.ts         # Prisma client
+├── embeddings.ts     # Gemini embedding
+├── chunker.ts        # Text chunking
+├── cosine-similarity.ts
+├── extract-text.ts   # File text extraction + OCR
+├── notifications.ts  # Notification helper
+├── theme-context.tsx # Dark/light theme
+├── sidebar-context.tsx
+└── plans.ts          # Free/Pro plan config
+prisma/
+├── schema.prisma
+└── migrations/
+```
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
