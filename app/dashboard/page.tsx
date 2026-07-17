@@ -55,8 +55,10 @@ export default async function DashboardPage() {
   let user = await prisma.user.findUnique({ where: { clerkId: userId } });
 
   if (!user) {
-    user = await prisma.user.create({
-      data: { clerkId: userId, email },
+    user = await prisma.user.upsert({
+      where: { email },
+      update: { clerkId: userId },
+      create: { clerkId: userId, email },
     });
   }
 
