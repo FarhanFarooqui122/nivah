@@ -1,19 +1,19 @@
 "use client";
 
-import { SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 import { NivahLogo } from "@/components/Icons";
 
-export default function CustomSignUp() {
+export default function CustomSignIn() {
   return (
     <div className="min-h-screen bg-zinc-950 flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600/10 via-zinc-950 to-green-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent" />
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600/10 via-zinc-950 to-emerald-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent" />
         <div className="relative z-10 max-w-md text-center">
           <NivahLogo className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl font-bold text-white mb-4">Join Nivah</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Welcome back to Nivah</h1>
           <p className="text-zinc-400 text-lg">
-            Create your AI-powered knowledge base. Organize documents,
-            search by meaning, and chat with your files.
+            Your AI-powered knowledge base and document intelligence platform.
+            Organize, search, and chat with your documents.
           </p>
           <div className="mt-12 space-y-5 text-left max-w-sm mx-auto">
             {[
@@ -39,7 +39,7 @@ export default function CustomSignUp() {
               ), text: "Generate summaries, flashcards & quizzes" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-zinc-300">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400">
                   {item.icon}
                 </div>
                 <span className="text-sm">{item.text}</span>
@@ -53,14 +53,14 @@ export default function CustomSignUp() {
         <div className="w-full max-w-md">
           <div className="lg:hidden text-center mb-8">
             <NivahLogo className="w-12 h-12 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-white">Create your account</h1>
-            <p className="text-zinc-400 mt-2">Join Nivah and start building your knowledge base</p>
+            <h1 className="text-3xl font-bold text-white">Welcome back</h1>
+            <p className="text-zinc-400 mt-2">Sign in to continue to Nivah</p>
           </div>
 
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
-            <SignUp
+            <SignIn
               routing="path"
-              path="/sign-up"
+              path="/sign-in"
               appearance={{
                 elements: {
                   formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white rounded-xl px-4 py-3 font-medium transition-colors w-full",
@@ -77,13 +77,6 @@ export default function CustomSignUp() {
               }}
             />
           </div>
-
-          <p className="text-center text-zinc-500 text-sm mt-6">
-            Already have an account?{" "}
-            <a href="/sign-in" className="text-green-400 hover:text-green-300 font-medium transition-colors">
-              Sign in
-            </a>
-          </p>
         </div>
       </div>
     </div>
