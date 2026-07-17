@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Bell, Moon, Sun, LogOut, User, Settings, Search, Command, Plus, Check, ChevronRight } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, User, Settings, Search, Command } from "lucide-react";
+import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { SignOutButton, useUser, useSessionList, useClerk } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/lib/sidebar-context";
 import { useTheme } from "@/lib/theme-context";
@@ -12,11 +13,8 @@ import { useTheme } from "@/lib/theme-context";
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [showAccounts, setShowAccounts] = useState(false);
   const { user } = useUser();
-  const { sessions, isLoaded: sessionsLoaded, setActive } = useSessionList();
-  const clerk = useClerk();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
@@ -79,13 +77,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            className="relative p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-          </button>
+          <NotificationsDropdown />
 
           {mounted && (
             <button
@@ -113,78 +105,24 @@ export function Header() {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50 py-1">
+              <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50 py-1">
                 <div className="px-4 py-3 border-b border-zinc-800">
                   <p className="font-medium text-white truncate">{user?.fullName || "User"}</p>
                   <p className="text-xs text-zinc-400 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
                 </div>
-
-                {sessionsLoaded && sessions && sessions.length > 1 && (
-                  <>
-                    <div className="px-3 pt-2 pb-1">
-                      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Switch Account</p>
-                    </div>
-                    <div className="max-h-48 overflow-y-auto">
-                      {sessions.map((s) => {
-                        const isActive = s.status === "active";
-                        const sessionUser = s.user;
-                        return (
-                          <button
-                            key={s.id}
-                            onClick={() => {
-                              if (isActive) return;
-                              setActive({ session: s.id });
-                              setUserMenuOpen(false);
-                            }}
-                            className={cn(
-                              "w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors",
-                              isActive ? "text-white" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-                            )}
-                          >
-                            <div className={cn(
-                              "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0",
-                              isActive ? "bg-green-600 text-white" : "bg-zinc-700 text-zinc-300"
-                            )}>
-                              {sessionUser?.firstName?.[0] || sessionUser?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() || "?"}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm truncate">{sessionUser?.fullName || sessionUser?.emailAddresses?.[0]?.emailAddress || "Account"}</p>
-                              <p className="text-xs text-zinc-500 truncate">{sessionUser?.emailAddresses?.[0]?.emailAddress}</p>
-                            </div>
-                            {isActive && <Check className="w-4 h-4 text-green-400 flex-shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-
-                <div className="border-t border-zinc-800">
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      clerk.openSignIn();
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add account
-                  </button>
-                </div>
-
-                <Link
-                  href="/dashboard/settings"
-                  className="flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </Link>
                 <Link
                   href="/dashboard/profile"
                   className="flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                 >
                   <User className="w-4 h-4" />
                   Profile
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  className="flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
                 </Link>
                 <hr className="my-1 border-zinc-800" />
                 <SignOutButton redirectUrl="/sign-in">

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { chunkText } from "@/lib/chunker";
 import { generateEmbedding } from "@/lib/embeddings";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(
   _request: Request,
@@ -54,6 +55,14 @@ export async function POST(
       `;
     }
   }
+
+  await createNotification(
+    user.id,
+    "reindex_complete",
+    `Re-indexed "${document.title}"`,
+    `${chunks.length} chunks regenerated with fresh embeddings`,
+    `/dashboard/documents/${document.id}`
+  );
 
   return NextResponse.json({
     success: true,

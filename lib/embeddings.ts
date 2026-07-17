@@ -7,9 +7,6 @@ export const ai = new GoogleGenAI({
 export async function generateEmbedding(text: string): Promise<number[] | null> {
   if (!text || text.trim().length === 0) return null;
 
-  console.log("[Embedding] Starting");
-  console.log(`[Embedding] Input length: ${text.length} characters`);
-
   try {
     const result = await ai.models.embedContent({
       model: "gemini-embedding-001",
@@ -17,8 +14,6 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
     });
 
     const values = result.embeddings?.[0]?.values ?? [];
-
-    console.log(`[Embedding] Success — Vector length: ${values.length}`);
 
     return values;
   } catch (error) {

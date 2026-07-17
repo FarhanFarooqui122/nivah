@@ -6,8 +6,6 @@ export async function extractText(
   const type = mimeType.toLowerCase();
   const ext = fileName.toLowerCase().split(".").pop() || "";
 
-  console.log("MIME TYPE:", mimeType);
-
   try {
     if (type === "application/pdf" || ext === "pdf") {
       const { PDFParse } = await import("pdf-parse");
@@ -19,14 +17,12 @@ export async function extractText(
       const result = await parser.getText();
       parser.destroy();
       const extracted = result.text?.trim() || null;
-      console.log("[extractText] PDF extraction result length:", extracted?.length);
 
       const MIN_TEXT_LENGTH = 20;
       if (extracted && extracted.length >= MIN_TEXT_LENGTH) {
         return extracted;
       }
 
-      console.log("[extractText] PDF text insufficient, falling back to OCR...");
       return await ocrPdf(buffer);
     }
 
@@ -37,7 +33,6 @@ export async function extractText(
     ) {
       const { extractRawText } = await import("mammoth");
       const result = await extractRawText({ buffer });
-      console.log("[extractText] DOCX extraction result length:", result.value?.length);
       return result.value || null;
     }
 
@@ -55,8 +50,6 @@ export async function extractText(
       type === "image/jpg" ||
       type === "image/webp"
     ) {
-      console.log("OCR STARTED");
-
       const path = await import("path");
       const workerScript = path.join(process.cwd(), "node_modules", "tesseract.js", "src", "worker-script", "node", "index.js");
 
@@ -66,13 +59,7 @@ export async function extractText(
       const { data } = await worker.recognize(buffer);
       await worker.terminate();
 
-      console.log("OCR DATA KEYS:", Object.keys(data));
-      console.log("OCR TEXT RAW:", JSON.stringify(data.text));
-      console.log("OCR CONFIDENCE:", data.confidence);
-      console.log("OCR BLOCKS:", JSON.stringify(data.blocks));
-
       const text = data.text?.trim() || null;
-      console.log("OCR RESULT:", text);
 
       return text;
     }

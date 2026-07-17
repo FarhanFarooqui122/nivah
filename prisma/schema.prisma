@@ -10,12 +10,15 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   clerkId   String   @unique
+  emailNotifications Boolean @default(true)
+  autoSyncAiMemory   Boolean @default(true)
   createdAt DateTime @default(now())
 
-  documents   Document[]
+  documents    Document[]
   chatSessions ChatSession[]
-  workspaces  Workspace[]
+  workspaces   Workspace[]
   studyContent StudyContent[]
+  notifications Notification[]
 }
 
 model Workspace {
@@ -39,6 +42,7 @@ model Document {
   fileType    String
   fileSize    Int
   fileUrl     String
+  fileBlob    Bytes?
   textContent String?
   summary     String?
   createdAt   DateTime @default(now())
@@ -96,6 +100,20 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@index([sessionId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String?
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
 }
 
 model StudyContent {

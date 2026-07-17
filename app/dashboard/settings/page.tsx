@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { PLANS } from "@/lib/plans";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { LogoutButton } from "@/components/LogoutButton";
+import { SettingsToggles } from "@/components/SettingsToggles";
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -59,35 +60,10 @@ export default async function SettingsPage() {
 
       <section className="border border-zinc-800 rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Preferences</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <p className="text-white font-medium">Dark Mode</p>
-              <p className="text-sm text-zinc-500">Always on — we believe in dark energy</p>
-            </div>
-            <div className="w-12 h-6 bg-green-600 rounded-full p-1 cursor-pointer">
-              <div className="w-4 h-4 bg-white rounded-full ml-auto" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between py-3 border-t border-zinc-800">
-            <div>
-              <p className="text-white font-medium">Email Notifications</p>
-              <p className="text-sm text-zinc-500">Receive updates about your documents</p>
-            </div>
-            <div className="w-12 h-6 bg-zinc-700 rounded-full p-1 cursor-pointer">
-              <div className="w-4 h-4 bg-zinc-400 rounded-full" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between py-3 border-t border-zinc-800">
-            <div>
-              <p className="text-white font-medium">Auto-sync AI Memory</p>
-              <p className="text-sm text-zinc-500">Automatically sync connected AIs</p>
-            </div>
-            <div className="w-12 h-6 bg-green-600 rounded-full p-1 cursor-pointer">
-              <div className="w-4 h-4 bg-white rounded-full ml-auto" />
-            </div>
-          </div>
-        </div>
+        <SettingsToggles
+          initialEmailNotifications={user?.emailNotifications ?? true}
+          initialAutoSyncAiMemory={user?.autoSyncAiMemory ?? true}
+        />
       </section>
 
       <section className="border border-zinc-800 rounded-2xl p-6">

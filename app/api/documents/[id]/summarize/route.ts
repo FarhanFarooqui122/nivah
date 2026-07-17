@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { ai } from "@/lib/embeddings";
 import { NextRequest, NextResponse } from "next/server";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(
   _request: NextRequest,
@@ -59,6 +60,14 @@ Write a concise summary (2-4 paragraphs) that captures the essential information
       where: { id },
       data: { summary },
     });
+
+    await createNotification(
+      user.id,
+      "summary_ready",
+      `Summary ready for "${document.title}"`,
+      null,
+      `/dashboard/documents/${document.id}`
+    );
 
     return NextResponse.json({ summary });
   } catch (error) {

@@ -1,11 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { extractText } from "@/lib/extract-text";
 import { chunkText } from "@/lib/chunker";
 import { generateEmbedding } from "@/lib/embeddings";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -44,15 +43,6 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
-    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const filePath = path.join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${fileName}`;
-
     const textContent = await extractText(buffer, file.type, file.name);
 
     const document = await prisma.document.create({
@@ -61,15 +51,24 @@ export async function POST(request: NextRequest) {
         fileName: file.name,
         fileType: file.type || "application/octet-stream",
         fileSize: file.size,
-        fileUrl,
+        fileUrl: "",
+        fileBlob: buffer,
         textContent,
         userId: user.id,
         workspaceId: workspaceId || null,
       },
     });
 
+    await prisma.document.update({
+      where: { id: document.id },
+      data: { fileUrl: `/api/documents/${document.id}/file` },
+    });
+    document.fileUrl = `/api/documents/${document.id}/file`;
+
+    let chunkCount = 0;
     if (textContent && textContent.length > 0) {
       const chunks = chunkText(textContent);
+      chunkCount = chunks.length;
 
       const embeddings = await Promise.all(
         chunks.map((chunk) => generateEmbedding(chunk.content))
@@ -92,6 +91,14 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    await createNotification(
+      user.id,
+      "upload_complete",
+      `"${document.title}" uploaded`,
+      `Successfully uploaded and indexed ${chunkCount} chunks`,
+      `/dashboard/documents/${document.id}`
+    );
 
     return NextResponse.json({ document }, { status: 201 });
   } catch (error) {
