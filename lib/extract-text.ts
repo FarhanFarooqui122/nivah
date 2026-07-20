@@ -8,15 +8,14 @@ export async function extractText(
 
   try {
     if (type === "application/pdf" || ext === "pdf") {
-      const { PDFParse } = await import("pdf-parse");
-      const { GlobalWorkerOptions } = await import("pdfjs-dist/legacy/build/pdf.mjs");
-      const { createRequire } = await import("module");
       try {
-        const req = createRequire(import.meta.url);
-        GlobalWorkerOptions.workerSrc = req.resolve("pdfjs-dist/legacy/build/pdf.worker.mjs");
+        // @ts-expect-error — no types for the worker module
+        const pdfjsWorker = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
+        (globalThis as any).pdfjsWorker = pdfjsWorker;
       } catch {
-        // fallback: let pdfjs use its default worker resolution
+        // worker preload failed — will rely on pdf-parse default
       }
+      const { PDFParse } = await import("pdf-parse");
       const parser = new PDFParse({
         data: new Uint8Array(buffer),
         verbosity: 0,
