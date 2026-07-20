@@ -109,7 +109,7 @@ async function ocrPdf(buffer: Buffer): Promise<string | null> {
       const viewport = page.getViewport({ scale: 2.0 });
       const canvas = createCanvas(viewport.width, viewport.height);
       const ctx = canvas.getContext("2d");
-      await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport }).promise;
+      await page.render({ canvas: canvas as unknown as HTMLCanvasElement, viewport }).promise;
       const pngBuf = canvas.toBuffer("image/png");
       const { data: ocrData } = await worker.recognize(pngBuf);
       const pageText = ocrData.text?.trim();
