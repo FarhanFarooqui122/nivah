@@ -13,9 +13,8 @@ export async function extractText(
         data: new Uint8Array(buffer),
         verbosity: 0,
       });
-      await parser.load();
       const result = await parser.getText();
-      parser.destroy();
+      await parser.destroy();
       const extracted = result.text?.trim() || null;
 
       const MIN_TEXT_LENGTH = 20;

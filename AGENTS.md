@@ -105,6 +105,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Remove route conflict**: Deleted Clerk's default `app/sign-in/[[...sign-in]]` and `app/sign-up/[[...sign-up]]` catch-all routes
 - **Fix build error**: Removed duplicate `toggleMobile` line in `components/dashboard/Header.tsx`
 
+### Today's Changes (2026-07-20)
+- **Fix PDF text extraction**: Removed `parser.load()` and fixed `parser.destroy()` call — `pdf-parse` v2.4.5 has no public `load()` method, causing all PDF uploads to silently fail text extraction and produce zero chunks (`lib/extract-text.ts:16-17`)
+
 ### Today's Changes (2026-07-17)
 - **Cloud storage**: Replaced local filesystem with BYTEA storage in PostgreSQL; removed R2/S3 dependency (`lib/storage.ts` deleted)
 - **File serving**: Created `GET /api/documents/[id]/file` to serve stored binaries
