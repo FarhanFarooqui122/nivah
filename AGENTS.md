@@ -107,6 +107,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ### Today's Changes (2026-07-20)
 - **Fix PDF text extraction**: Removed `parser.load()` and fixed `parser.destroy()` call — `pdf-parse` v2.4.5 has no public `load()` method, causing all PDF uploads to silently fail text extraction and produce zero chunks (`lib/extract-text.ts:16-17`)
+- **Fix pdfjs worker on Vercel**: Added `pdf-parse` to `serverExternalPackages` in `next.config.ts` so its bundled `pdfjs-dist` worker file is available at runtime on the serverless function; also resolve and set `GlobalWorkerOptions.workerSrc` explicitly before extraction (`next.config.ts:4`, `lib/extract-text.ts:12-16`)
 
 ### Today's Changes (2026-07-17)
 - **Cloud storage**: Replaced local filesystem with BYTEA storage in PostgreSQL; removed R2/S3 dependency (`lib/storage.ts` deleted)
