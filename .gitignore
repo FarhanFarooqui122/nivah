@@ -43,3 +43,6 @@ next-env.d.ts
 /app/generated/prisma
 
 .vercel
+
+# agent instructions (local only, not for GitHub)
+/AGENTS.md
