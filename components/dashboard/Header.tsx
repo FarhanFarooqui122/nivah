@@ -13,7 +13,6 @@ import { useTheme } from "@/lib/theme-context";
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [showAccounts, setShowAccounts] = useState(false);
   const { user } = useUser();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();

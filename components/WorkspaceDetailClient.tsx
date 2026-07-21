@@ -2,10 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, FolderOpen, Search, Upload, ExternalLink } from "lucide-react";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
-import { formatBytes, formatDate } from "@/lib/utils";
+import { formatBytes } from "@/lib/utils";
 
 interface Document {
   id: string;
@@ -35,7 +34,6 @@ export function WorkspaceDetailClient({
   workspace: Workspace;
   documents: Document[];
 }) {
-  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
