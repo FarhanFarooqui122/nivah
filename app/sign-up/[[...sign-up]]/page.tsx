@@ -1,6 +1,7 @@
 "use client";
 
 import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
 import { NivahLogo } from "@/components/Icons";
 
 export default function CustomSignUp() {
@@ -80,9 +81,9 @@ export default function CustomSignUp() {
 
           <p className="text-center text-zinc-500 text-sm mt-6">
             Already have an account?{" "}
-            <a href="/sign-in" className="text-green-400 hover:text-green-300 font-medium transition-colors">
+            <Link href="/sign-in" className="text-green-400 hover:text-green-300 font-medium transition-colors">
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
