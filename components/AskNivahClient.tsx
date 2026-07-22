@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -101,11 +101,39 @@ export function AskNivahClient() {
   useEffect(() => {
     const sessionId = searchParams.get("session");
     if (sessionId) {
-      loadSession(sessionId);
+      startTransition(() => {
+        setShowHistory(false);
+        setCurrentSessionId(sessionId);
+        setMessages([]);
+        setLoading(true);
+      });
+      fetch(`/api/chat/sessions/${sessionId}/messages`)
+        .then((res) => res.json())
+        .then((data) => {
+          const loaded: Message[] = (data.messages || []).map(
+            (m: { id: string; role: string; content: string; sources: Source[] | null }) => ({
+              id: m.id,
+              type: m.role === "USER" ? "question" : "answer",
+              content: m.content,
+              sources: m.sources ?? undefined,
+            }),
+          );
+          setMessages(loaded);
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadSessions();
-  }, [loadSessions, loadSession, searchParams]);
+    if (!sessionsLoaded) {
+      fetch("/api/chat/sessions")
+        .then((res) => res.json())
+        .then((data) => setSessions(data.sessions))
+        .catch(() => {})
+        .finally(() => {
+          setSessionsLoading(false);
+          setSessionsLoaded(true);
+        });
+    }
+  }, [searchParams, sessionsLoaded]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

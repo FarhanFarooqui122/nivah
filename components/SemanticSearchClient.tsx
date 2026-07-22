@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon, FileIcon, FilterIcon } from "@/components/Icons";
 
@@ -89,7 +89,26 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
     const docId = searchParams.get("documentId");
     const wsId = searchParams.get("workspaceId");
     if (q) {
-      doSearch(q, docId || undefined, wsId || undefined);
+      startTransition(() => {
+        setLoading(true);
+        setError(null);
+      });
+      fetch("/api/documents/semantic-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q, ...(docId && { documentId: docId }), ...(wsId && { workspaceId: wsId }) }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) throw new Error(data.error);
+          setResults(data.results || []);
+          setHasSearched(true);
+        })
+        .catch((e) => {
+          setError(e instanceof Error ? e.message : "Search failed");
+          setResults([]);
+        })
+        .finally(() => setLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
