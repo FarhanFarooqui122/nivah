@@ -11,7 +11,7 @@ export async function extractText(
       try {
         // @ts-expect-error — no types for the worker module
         const pdfjsWorker = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
-        (globalThis as any).pdfjsWorker = pdfjsWorker;
+        (globalThis as { pdfjsWorker?: unknown }).pdfjsWorker = pdfjsWorker;
       } catch {
         // worker preload failed — will rely on pdf-parse default
       }
