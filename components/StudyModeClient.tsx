@@ -50,6 +50,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>({});
   const [mcqSubmitted, setMcqSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
     fetch(`/api/study?documentId=${documentId}`)
@@ -153,8 +154,6 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     if (!data) return null;
     const items = data.content as QuizItem[];
     if (!Array.isArray(items) || items.length === 0) return null;
-
-    const [expanded, setExpanded] = useState<number | null>(null);
 
     return (
       <div className="space-y-4">
@@ -402,7 +401,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         {TABS.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => { setActiveTab(tab.key); setFlipped(false); setMcqAnswers({}); setMcqSubmitted(false); }}
+            onClick={() => { setActiveTab(tab.key); setFlipped(false); setMcqAnswers({}); setMcqSubmitted(false); setExpanded(null); }}
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
