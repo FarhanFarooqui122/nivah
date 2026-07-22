@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Bell, Check, X, Loader2 } from "lucide-react";
 
@@ -35,9 +35,13 @@ export function NotificationsDropdown() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (open) fetchNotifications();
-  }, [open, fetchNotifications]);
+  const handleToggle = () => {
+    setOpen((prev) => {
+      const next = !prev;
+      if (next) fetchNotifications();
+      return next;
+    });
+  };
 
   const markAsRead = async (id: string) => {
     try {
@@ -57,22 +61,39 @@ export function NotificationsDropdown() {
     );
   };
 
-  const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "just now";
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  };
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  const timeStrings = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const n of notifications) {
+      const diff = now - new Date(n.createdAt).getTime();
+      const mins = Math.floor(diff / 60000);
+      let label: string;
+      if (mins < 1) label = "just now";
+      else if (mins < 60) label = `${mins}m ago`;
+      else {
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) label = `${hours}h ago`;
+        else {
+          const days = Math.floor(hours / 24);
+          label = `${days}d ago`;
+        }
+      }
+      map[n.id] = label;
+    }
+    return map;
+  }, [notifications, now]);
 
   return (
     <div className="relative">
       <button
         className="relative p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
-        onClick={() => setOpen(!open)}
+        onClick={handleToggle}
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5" />
@@ -134,7 +155,7 @@ export function NotificationsDropdown() {
                           )}
                         </>
                       )}
-                      <p className="text-xs text-zinc-600 mt-1">{timeAgo(n.createdAt)}</p>
+                      <p className="text-xs text-zinc-600 mt-1">{timeStrings[n.id]}</p>
                     </div>
                     {!n.read && (
                       <button
