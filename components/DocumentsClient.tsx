@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn, formatBytes, formatDate } from "@/lib/utils";
@@ -89,14 +89,10 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       }
     });
     return result;
-  }, [documents, search, sortBy, filterType]);
+  }, [documents, search, sortBy, filterType, filterWorkspace]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-  useEffect(() => {
-    setPage(0);
-  }, [search, filterType, filterWorkspace]);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedDocs);
@@ -187,21 +183,21 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               type="search"
               placeholder="Search documents..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
               className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all"
             />
           </div>
         </div>
         <div className="flex items-center gap-2">
           {workspaces.length > 0 && (
-            <select value={filterWorkspace} onChange={(e) => setFilterWorkspace(e.target.value)} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+            <select value={filterWorkspace} onChange={(e) => { setFilterWorkspace(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
               <option value="all">All Workspaces</option>
               {workspaces.map((w) => (
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
           )}
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
             {FILTER_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
