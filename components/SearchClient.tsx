@@ -162,9 +162,7 @@ export function SearchClient() {
             {results.map((doc) => (
               <a
                 key={doc.id}
-                href={doc.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={`/dashboard/documents/${doc.id}`}
                 className="block p-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 hover:border-zinc-700 transition-all group"
               >
                 <div className="flex items-start gap-4">
