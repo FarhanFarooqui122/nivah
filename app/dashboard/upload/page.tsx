@@ -21,6 +21,7 @@ export default function UploadPage() {
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>("");
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/workspaces")
@@ -59,6 +60,7 @@ export default function UploadPage() {
   const handleUpload = async () => {
     if (files.length === 0) return;
     setUploading(true);
+    setUploadError(null);
 
     try {
       for (let i = 0; i < files.length; i++) {
@@ -99,7 +101,7 @@ export default function UploadPage() {
       router.refresh();
       router.push("/dashboard/documents");
     } catch (error) {
-      console.error("Upload failed:", error);
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -147,6 +149,19 @@ export default function UploadPage() {
               <option key={w.id} value={w.id}>{w.name}</option>
             ))}
           </select>
+        </div>
+      )}
+
+      {uploadError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
+          <p className="text-red-400 text-sm flex items-center gap-2">
+            <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {uploadError}
+          </p>
         </div>
       )}
 
