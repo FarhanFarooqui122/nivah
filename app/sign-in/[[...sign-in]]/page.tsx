@@ -2,20 +2,64 @@
 
 import { SignIn } from "@clerk/nextjs";
 import { NivahLogo } from "@/components/Icons";
+import { motion } from "framer-motion";
 
 export default function CustomSignIn() {
   return (
     <div className="min-h-screen bg-zinc-950 flex">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600/10 via-zinc-950 to-emerald-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent" />
-        <div className="relative z-10 max-w-md text-center">
-          <NivahLogo className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl font-bold text-white mb-4">Welcome back to Nivah</h1>
-          <p className="text-zinc-400 text-lg">
+        <motion.div
+          className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-500/10 rounded-full blur-3xl"
+          animate={{ x: [0, 30, -20, 0], y: [0, -30, 20, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"
+          animate={{ x: [0, -20, 30, 0], y: [0, 20, -30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 right-1/3 w-32 h-32 bg-green-400/5 rounded-full blur-3xl"
+          animate={{ x: [0, 15, -10, 0], y: [0, -15, 10, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="relative z-10 max-w-md text-center"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <NivahLogo className="w-16 h-16 mx-auto mb-6" />
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl font-bold text-white mb-4"
+          >
+            Welcome back to Nivah
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-zinc-400 text-lg"
+          >
             Your AI-powered knowledge base and document intelligence platform.
             Organize, search, and chat with your documents.
-          </p>
-          <div className="mt-12 space-y-5 text-left max-w-sm mx-auto">
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-12 space-y-5 text-left max-w-sm mx-auto"
+          >
             {[
               { icon: (
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,18 +82,29 @@ export default function CustomSignIn() {
                 </svg>
               ), text: "Generate summaries, flashcards & quizzes" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 text-zinc-300">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+                className="flex items-center gap-3 text-zinc-300"
+              >
                 <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400">
                   {item.icon}
                 </div>
                 <span className="text-sm">{item.text}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full lg:w-1/2 flex items-center justify-center p-8"
+      >
         <div className="w-full max-w-md">
           <div className="lg:hidden text-center mb-8">
             <NivahLogo className="w-12 h-12 mx-auto mb-4" />
@@ -57,7 +112,12 @@ export default function CustomSignIn() {
             <p className="text-zinc-400 mt-2">Sign in to continue to Nivah</p>
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+            className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8"
+          >
             <SignIn
               routing="path"
               path="/sign-in"
@@ -76,9 +136,9 @@ export default function CustomSignIn() {
                 },
               }}
             />
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
