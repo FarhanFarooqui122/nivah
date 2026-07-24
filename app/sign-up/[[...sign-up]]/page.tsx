@@ -4,27 +4,17 @@ import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { NivahLogo } from "@/components/Icons";
 import { motion } from "framer-motion";
+import { GradientOrb, BrandPattern, SparkleIcon } from "@/components/DecorativeElements";
 
 export default function CustomSignUp() {
   return (
     <div className="min-h-screen bg-zinc-950 flex">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600/10 via-zinc-950 to-green-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
+        <BrandPattern />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent" />
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"
-          animate={{ x: [0, 30, -20, 0], y: [0, -30, 20, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-green-500/10 rounded-full blur-3xl"
-          animate={{ x: [0, -20, 30, 0], y: [0, 20, -30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/3 right-1/3 w-32 h-32 bg-emerald-400/5 rounded-full blur-3xl"
-          animate={{ x: [0, 15, -10, 0], y: [0, -15, 10, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <GradientOrb className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        <GradientOrb className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-green-500/10 rounded-full blur-3xl" />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -36,7 +26,16 @@ export default function CustomSignUp() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <NivahLogo className="w-16 h-16 mx-auto mb-6" />
+            <div className="relative inline-block">
+              <NivahLogo className="w-16 h-16 mx-auto mb-6" />
+              <motion.div
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -top-1 -right-1"
+              >
+                <SparkleIcon className="w-5 h-5 text-emerald-400" />
+              </motion.div>
+            </div>
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
@@ -44,13 +43,13 @@ export default function CustomSignUp() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl font-bold text-white mb-4"
           >
-            Join Nivah
+            Join <span className="gradient-text">Nivah</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-zinc-400 text-lg"
+            className="text-zinc-400 text-lg leading-relaxed"
           >
             Create your AI-powered knowledge base. Organize documents,
             search by meaning, and chat with your files.
@@ -88,9 +87,9 @@ export default function CustomSignUp() {
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-                className="flex items-center gap-3 text-zinc-300"
+                className="flex items-center gap-3 text-zinc-300 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 group-hover:border-emerald-500/30 transition-all">
                   {item.icon}
                 </div>
                 <span className="text-sm">{item.text}</span>
@@ -104,9 +103,11 @@ export default function CustomSignUp() {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full lg:w-1/2 flex items-center justify-center p-8"
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 relative"
       >
-        <div className="w-full max-w-md">
+        <BrandPattern />
+
+        <div className="w-full max-w-md relative z-10">
           <div className="lg:hidden text-center mb-8">
             <NivahLogo className="w-12 h-12 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white">Create your account</h1>
@@ -114,25 +115,25 @@ export default function CustomSignUp() {
           </div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.97, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-            className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8"
+            className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8 shadow-glass"
           >
             <SignUp
               routing="path"
               path="/sign-up"
               appearance={{
                 elements: {
-                  formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white rounded-xl px-4 py-3 font-medium transition-colors w-full",
+                  formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white rounded-xl px-4 py-3 font-medium transition-all duration-200 w-full",
                   card: "bg-transparent shadow-none border-none",
                   headerTitle: "text-2xl font-bold text-white",
                   headerSubtitle: "text-zinc-400",
                   dividerText: "text-zinc-500",
                   formFieldLabel: "text-zinc-300 font-medium",
-                  formFieldInput: "bg-zinc-800 border-zinc-700 focus:border-green-500 focus:ring-green-500/20 rounded-xl",
-                  formFieldAction: "text-green-400 hover:text-green-300",
-                  socialButtonsBlockButton: "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 rounded-xl",
+                  formFieldInput: "bg-zinc-800 border-zinc-700 focus:border-green-500 focus:ring-green-500/20 rounded-xl transition-all duration-200",
+                  formFieldAction: "text-green-400 hover:text-green-300 transition-colors",
+                  socialButtonsBlockButton: "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 rounded-xl transition-all duration-200",
                   alternativeMethods: "space-y-3",
                 },
               }}

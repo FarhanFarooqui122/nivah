@@ -1,11 +1,38 @@
-import { Loader2 } from "lucide-react";
+import { SkeletonCard, SkeletonTableRow } from "@/components/Skeleton";
 
 export default function DashboardLoading() {
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="flex flex-col items-center gap-3">
-        <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
-        <p className="text-zinc-400 text-sm">Loading...</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="space-y-2">
+        <div className="h-9 w-40 bg-zinc-800/50 rounded-lg animate-pulse" />
+        <div className="h-5 w-64 bg-zinc-800/50 rounded-lg animate-pulse" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="border border-zinc-800 rounded-2xl p-6">
+            <div className="h-6 w-40 bg-zinc-800/50 rounded-lg animate-pulse mb-5" />
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonTableRow key={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="border border-zinc-800 rounded-2xl p-6">
+          <div className="h-6 w-40 bg-zinc-800/50 rounded-lg animate-pulse mb-5" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonTableRow key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

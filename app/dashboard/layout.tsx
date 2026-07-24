@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { SidebarProvider } from "@/lib/sidebar-context";
+import { PageTransition } from "@/components/PageTransition";
 
 export default async function DashboardLayout({
   children,
@@ -23,7 +24,9 @@ export default async function DashboardLayout({
           <Header />
           <main className="flex-1 p-6 md:p-8 overflow-auto">
             <div className="max-w-7xl mx-auto w-full">
-              {children}
+              <PageTransition>
+                {children}
+              </PageTransition>
             </div>
           </main>
         </div>
