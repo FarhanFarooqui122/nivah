@@ -7,7 +7,6 @@ import {
   SendHorizonal,
   FileText,
   Bot,
-  Sparkles,
   User,
   Plus,
   History,
@@ -15,8 +14,8 @@ import {
   ChevronLeft,
   MessageSquare,
 } from "lucide-react";
-import { NivahLogo } from "@/components/Icons";
 import { cn } from "@/lib/utils";
+import { NivahMascot } from "@/components/NivahMascot";
 
 interface Source {
   documentId: string;
@@ -320,8 +319,8 @@ export function AskNivahClient() {
         <div className="flex-1 overflow-y-auto space-y-4 pr-1">
           {!hasMessages && !loading && (
             <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <NivahLogo className="w-8 h-8" />
+              <div className="mx-auto mb-6">
+                <NivahMascot size="lg" emotion={question ? "listening" : "idle"} inputRef={inputRef} />
               </div>
               <p className="text-zinc-500 text-lg font-medium">Ask anything about your documents</p>
               <p className="text-zinc-600 mt-2 text-sm max-w-md mx-auto">
@@ -350,8 +349,8 @@ export function AskNivahClient() {
               {msg.type === "answer" && (
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-zinc-800 border border-zinc-700 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                      <Sparkles className="w-5 h-5 text-green-400" />
+                    <div className="flex-shrink-0 mt-1">
+                      <NivahMascot size="sm" emotion="happy" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl rounded-tl-sm p-5">
@@ -401,8 +400,8 @@ export function AskNivahClient() {
 
           {loading && (
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 bg-zinc-800 border border-zinc-700 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                <Sparkles className="w-5 h-5 text-green-400" />
+              <div className="flex-shrink-0 mt-1">
+                <NivahMascot size="sm" emotion="thinking" />
               </div>
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl rounded-tl-sm p-5">
                 <div className="flex items-center gap-2">
@@ -418,35 +417,42 @@ export function AskNivahClient() {
         </div>
 
         <form onSubmit={handleSubmit} className="relative mt-4 flex-shrink-0">
-          <textarea
-            ref={inputRef}
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a question..."
-            rows={2}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-3.5 pr-14 text-white text-base placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all resize-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
-          <button
-            type="submit"
-            disabled={loading || !question.trim()}
-            className="absolute right-2.5 bottom-2.5 p-2.5 rounded-xl transition-all bg-green-600 hover:bg-green-700 text-white disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed"
-            aria-label="Ask"
-          >
-            {loading ? (
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
-                <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
-              </svg>
-            ) : (
-              <SendHorizonal className="w-4 h-4" />
-            )}
-          </button>
+          <div className="flex items-end gap-3">
+            <div className="hidden sm:block flex-shrink-0 pb-1.5">
+              <NivahMascot size="sm" emotion={loading ? "thinking" : question ? "listening" : "idle"} inputRef={inputRef} />
+            </div>
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Ask a question..."
+                rows={2}
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-3.5 pr-14 text-white text-base placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+              />
+              <button
+                type="submit"
+                disabled={loading || !question.trim()}
+                className="absolute right-2.5 bottom-2.5 p-2.5 rounded-xl transition-all bg-green-600 hover:bg-green-700 text-white disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed"
+                aria-label="Ask"
+              >
+                {loading ? (
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                    <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
+                  </svg>
+                ) : (
+                  <SendHorizonal className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          </div>
         </form>
 
         <p className="text-xs text-zinc-600 text-center mt-1.5 flex-shrink-0">
