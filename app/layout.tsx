@@ -23,7 +23,9 @@ export default function RootLayout({
         </head>
         <body>
           <ThemeWrapper>
-            {children}
+            <main className="animate-fade-in">
+              {children}
+            </main>
           </ThemeWrapper>
         </body>
       </html>
