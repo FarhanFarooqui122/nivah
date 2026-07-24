@@ -8,7 +8,7 @@ import {
   UploadIcon, PdfIcon, SettingsIcon,
 } from "@/components/Icons";
 import { formatRelativeTime } from "@/lib/utils";
-import { AnimatedSection, StaggerItem } from "@/components/AnimatedSection";
+import { AnimatedSection } from "@/components/AnimatedSection";
 import Link from "next/link";
 
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
