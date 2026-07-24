@@ -16,6 +16,26 @@
 
 ---
 
+## About Nivah
+
+Nivah is a smart document assistant that helps you manage, search, and understand your files using AI.
+
+Instead of flipping through folders or guessing file names, you can just describe what you're looking for — like *"the quarterly report about marketing spend"* — and Nivah finds it by meaning, not just keywords. You can also ask questions about your documents and get answers with sources, generate flashcards or quizzes to study, and keep everything organized in workspaces.
+
+Think of Nivah as your personal AI research assistant that actually knows what's inside your documents.
+
+### Why use Nivah?
+
+- **Stop searching, start finding** — Traditional search only matches exact words. Nivah understands the meaning behind your query, so you find what you need even if you don't remember the exact wording.
+- **Ask questions, get answers** — Instead of reading through pages of text, just ask. Nivah reads your documents and gives you a direct answer with the source attached.
+- **Study smarter** — Turn any document into flashcards, quizzes, or study notes automatically. Great for students and researchers.
+- **Everything in one place** — Upload PDFs, Word docs, images, and text files. Nivah extracts and indexes everything so you can search across all your files.
+- **No cloud storage fees** — Files are stored in the database itself. No need for S3, R2, or any external file storage service.
+- **Privacy-first** — Your documents stay in your own database. You control the data.
+- **Free to start** — No credit card required. Upload documents, search semantically, and chat with your documents right away.
+
+---
+
 ## Features
 
 ### 📄 Document Management
