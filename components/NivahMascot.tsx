@@ -169,11 +169,11 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
           <>
             <circle cx={s.w * 0.82} cy={s.h * 0.18} r={2.5 * sc} fill="#22c55e" opacity="0.7">
               <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" values={s.h * 0.18;s.h * 0.12;s.h * 0.18} dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="cy" values={`${s.h * 0.18};${s.h * 0.12};${s.h * 0.18}`} dur="1.5s" repeatCount="indefinite" />
             </circle>
             <circle cx={s.w * 0.9} cy={s.h * 0.1} r={1.8 * sc} fill="#22c55e" opacity="0.5">
               <animate attributeName="opacity" values="0.5;0;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s" />
-              <animate attributeName="cy" values={s.h * 0.1;s.h * 0.04;s.h * 0.1} dur="1.5s" repeatCount="indefinite" begin="0.3s" />
+              <animate attributeName="cy" values={`${s.h * 0.1};${s.h * 0.04};${s.h * 0.1}`} dur="1.5s" repeatCount="indefinite" begin="0.3s" />
             </circle>
             <circle cx={s.w * 0.95} cy={s.h * 0.05} r={1.2 * sc} fill="#22c55e" opacity="0.3">
               <animate attributeName="opacity" values="0.3;0;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s" />
