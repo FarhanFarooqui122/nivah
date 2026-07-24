@@ -8,6 +8,7 @@ import {
   UploadIcon, PdfIcon, SettingsIcon,
 } from "@/components/Icons";
 import { formatRelativeTime } from "@/lib/utils";
+import { AnimatedSection, StaggerItem } from "@/components/AnimatedSection";
 import Link from "next/link";
 
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
@@ -126,19 +127,23 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="text-zinc-400 mt-1">
-          Welcome back, {clerkUser?.firstName || email.split("@")[0]}
-        </p>
-      </div>
+      <AnimatedSection>
+        <div>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-zinc-400 mt-1">
+            Welcome back, {clerkUser?.firstName || email.split("@")[0]}
+          </p>
+        </div>
+      </AnimatedSection>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Documents" value={totalDocuments} icon={<FileIcon className="w-6 h-6" />} color="green" href="/dashboard/documents" />
-        <StatCard title="Images Indexed" value={totalImages} icon={<ImageIcon className="w-6 h-6" />} color="blue" />
-        <StatCard title="Words Indexed" value={formatNumber(totalWords)} icon={<DocumentIcon className="w-6 h-6" />} color="purple" />
-        <StatCard title="Context Exports" value="Coming Soon" icon={<CopyIcon className="w-6 h-6" />} color="orange" />
-      </div>
+      <AnimatedSection delay={0.1}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard title="Total Documents" value={totalDocuments} icon={<FileIcon className="w-6 h-6" />} color="green" href="/dashboard/documents" index={0} />
+          <StatCard title="Images Indexed" value={totalImages} icon={<ImageIcon className="w-6 h-6" />} color="blue" index={1} />
+          <StatCard title="Words Indexed" value={formatNumber(totalWords)} icon={<DocumentIcon className="w-6 h-6" />} color="purple" index={2} />
+          <StatCard title="Context Exports" value="Coming Soon" icon={<CopyIcon className="w-6 h-6" />} color="orange" index={3} />
+        </div>
+      </AnimatedSection>
 
       {!hasDocuments ? (
         <div className="flex flex-col items-center justify-center py-16 text-center border border-zinc-800 rounded-2xl">
@@ -152,6 +157,7 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            <AnimatedSection direction="left" delay={0.2}>
             <div className="border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-5">Knowledge Insights</h2>
               <div className="space-y-5">
@@ -209,7 +215,9 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
+            </AnimatedSection>
 
+            <AnimatedSection direction="left" delay={0.3}>
             <div className="border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-5">Top Knowledge Sources</h2>
               {topDocuments.length === 0 ? (
@@ -241,7 +249,9 @@ export default async function DashboardPage() {
                 </div>
               )}
             </div>
+            </AnimatedSection>
 
+            <AnimatedSection direction="left" delay={0.4}>
             <div className="border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -263,8 +273,10 @@ export default async function DashboardPage() {
                 </Link>
               </div>
             </div>
+            </AnimatedSection>
           </div>
 
+          <AnimatedSection direction="right" delay={0.2}>
           <div className="space-y-6">
             <div className="border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-5">Storage Breakdown</h2>
@@ -320,6 +332,7 @@ export default async function DashboardPage() {
               </div>
             </div>
           </div>
+          </AnimatedSection>
         </div>
       )}
     </div>
