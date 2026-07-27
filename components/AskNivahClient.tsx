@@ -234,7 +234,7 @@ export function AskNivahClient() {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-10rem)]">
+    <div className="flex gap-4 h-full min-h-0">
       {showHistory && (
         <div className="w-72 flex-shrink-0 bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-zinc-800">
