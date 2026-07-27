@@ -9,19 +9,14 @@ import { ai } from "@/lib/embeddings";
 const TOP_K = 5;
 const MIN_SCORE = 0.3;
 
-const SYSTEM_PROMPT = `You are Nivah.
+const SYSTEM_PROMPT = `You are Nivah, a helpful AI assistant with access to the user's documents.
 
-Answer ONLY using the supplied document context.
-
-If the answer is not contained in the context, say:
-
+When you are given document context, base your answers on those documents and cite them.
+When greeting you or having a general conversation, respond naturally.
+If the user asks about their documents but no relevant context is available, say:
 "I couldn't find that information in your documents."
 
-Do not invent facts.
-Do not hallucinate.
-Do not use outside knowledge.
-
-Always stay grounded in the provided context.`;
+Do not invent facts or hallucinate.`;
 
 function buildContext(
   chunks: { content: string; title: string }[],
@@ -95,29 +90,6 @@ export async function POST(request: NextRequest) {
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, TOP_K);
 
-  if (scored.length === 0) {
-    const noAnswer = "I couldn't find that information in your documents.";
-
-    if (!session) {
-      session = await prisma.chatSession.create({
-        data: { title: question.trim().slice(0, 80), userId: user.id },
-      });
-    }
-
-    await prisma.chatMessage.createMany({
-      data: [
-        { role: "USER", content: question.trim(), sessionId: session.id },
-        { role: "ASSISTANT", content: noAnswer, sessionId: session.id },
-      ],
-    });
-
-    return NextResponse.json({
-      answer: noAnswer,
-      sources: [],
-      sessionId: session.id,
-    });
-  }
-
   const context = buildContext(scored);
 
   const prompt = `Context:\n\n${context}\n\nQuestion:\n${question.trim()}`;
@@ -129,7 +101,7 @@ export async function POST(request: NextRequest) {
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.2,
+        temperature: 0.5,
       },
     });
 
