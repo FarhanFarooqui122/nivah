@@ -48,7 +48,7 @@ export function AskNivahClient() {
   const [showHistory, setShowHistory] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
 
   const loadSession = useCallback(
@@ -135,8 +135,13 @@ export function AskNivahClient() {
   }, [searchParams, sessionsLoaded]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+    const container = containerRef.current;
+    if (!container) return;
+    const msgs = container.querySelectorAll("[data-message]");
+    if (msgs.length > 0) {
+      (msgs[msgs.length - 1] as HTMLElement).scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [messages]);
 
   const newChat = useCallback(() => {
     setCurrentSessionId(null);
@@ -316,7 +321,7 @@ export function AskNivahClient() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div ref={containerRef} className="flex-1 overflow-y-auto space-y-4 pr-1">
           {!hasMessages && !loading && (
             <div className="border border-zinc-800 rounded-2xl p-12 text-center">
               <div className="mx-auto mb-6">
@@ -334,7 +339,7 @@ export function AskNivahClient() {
           )}
 
           {messages.map((msg) => (
-            <div key={msg.id}>
+            <div key={msg.id} data-message>
               {msg.type === "question" && (
                 <div className="flex items-start gap-3 justify-end">
                   <div className="bg-green-600/10 border border-green-600/20 rounded-2xl rounded-tr-sm px-5 py-3 max-w-[80%]">
@@ -413,7 +418,6 @@ export function AskNivahClient() {
             </div>
           )}
 
-          <div ref={bottomRef} />
         </div>
 
         <form onSubmit={handleSubmit} className="relative mt-4 flex-shrink-0">
