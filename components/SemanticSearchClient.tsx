@@ -36,12 +36,15 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   const [workspaceFilter, setWorkspaceFilter] = useState(searchParams.get("workspaceId") || "");
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const requestSeq = useRef(0);
 
   const doSearch = useCallback(async (q: string, docId?: string, wsId?: string) => {
+    const seq = ++requestSeq.current;
     const trimmed = q.trim();
     if (!trimmed) {
       setResults([]);
       setHasSearched(false);
+      setLoading(false);
       return;
     }
 
@@ -59,6 +62,8 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
         body: JSON.stringify(body),
       });
 
+      if (seq !== requestSeq.current) return;
+
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || `Search failed: ${res.status}`);
@@ -68,10 +73,11 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
       setResults(data.results || []);
       setHasSearched(true);
     } catch (e) {
+      if (seq !== requestSeq.current) return;
       setError(e instanceof Error ? e.message : "Search failed");
       setResults([]);
     } finally {
-      setLoading(false);
+      if (seq === requestSeq.current) setLoading(false);
     }
   }, []);
 
@@ -90,27 +96,16 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
     const wsId = searchParams.get("workspaceId");
     if (q) {
       startTransition(() => {
-        setLoading(true);
-        setError(null);
+        doSearch(q, docId || undefined, wsId || undefined);
       });
-      fetch("/api/documents/semantic-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ q, ...(docId && { documentId: docId }), ...(wsId && { workspaceId: wsId }) }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) throw new Error(data.error);
-          setResults(data.results || []);
-          setHasSearched(true);
-        })
-        .catch((e) => {
-          setError(e instanceof Error ? e.message : "Search failed");
-          setResults([]);
-        })
-        .finally(() => setLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -155,11 +150,11 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   };
 
   const handleWorkspaceFilterChange = (wsId: string) => {
-    setWorkspaceFilter(wsId);
     setDocumentFilter("");
+    setWorkspaceFilter(wsId);
     if (query.trim()) {
-      doSearch(query, documentFilter || undefined, wsId || undefined);
-      updateUrl(query, documentFilter, wsId);
+      doSearch(query, "", wsId || undefined);
+      updateUrl(query, "", wsId);
     }
   };
 

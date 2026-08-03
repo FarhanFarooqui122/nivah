@@ -30,6 +30,16 @@ export async function GET(
   const documents = await prisma.document.findMany({
     where: { workspaceId: id, userId: user.id },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      fileName: true,
+      fileType: true,
+      fileSize: true,
+      fileUrl: true,
+      createdAt: true,
+      workspaceId: true,
+    },
   });
 
   const chunkRows = await prisma.$queryRaw<{ document_id: string; count: number }[]>`

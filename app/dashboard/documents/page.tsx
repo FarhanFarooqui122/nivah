@@ -30,6 +30,17 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
   const documents = await prisma.document.findMany({
     where: { userId: user.id, ...workspaceWhere },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      fileName: true,
+      fileType: true,
+      fileSize: true,
+      fileUrl: true,
+      createdAt: true,
+      workspaceId: true,
+      textContent: true,
+    },
   });
 
   const chunkCountMap = new Map<string, number>();
@@ -64,7 +75,13 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
   const workspaceMap = new Map(workspaces.map((w) => [w.id, w.name]));
 
   const docs = documents.map((doc) => ({
-    ...doc,
+    id: doc.id,
+    title: doc.title,
+    fileName: doc.fileName,
+    fileType: doc.fileType,
+    fileSize: doc.fileSize,
+    fileUrl: doc.fileUrl,
+    createdAt: doc.createdAt,
     charCount: doc.textContent?.length ?? 0,
     wordCount: doc.textContent ? doc.textContent.trim().split(/\s+/).filter(Boolean).length : 0,
     chunkCount: chunkCountMap.get(doc.id) ?? 0,
