@@ -50,6 +50,7 @@ export function AskNivahClient() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
+  const requestedSessionRef = useRef<string | null>(null);
 
   const loadSession = useCallback(
     async (sessionId: string) => {
@@ -57,9 +58,11 @@ export function AskNivahClient() {
       setCurrentSessionId(sessionId);
       setMessages([]);
       setLoading(true);
+      requestedSessionRef.current = sessionId;
 
       try {
         const res = await fetch(`/api/chat/sessions/${sessionId}/messages`);
+        if (requestedSessionRef.current !== sessionId) return;
         if (res.ok) {
           const data = await res.json();
           const loaded: Message[] = data.messages.map(
@@ -75,14 +78,16 @@ export function AskNivahClient() {
       } catch {
         // ignore
       } finally {
-        setLoading(false);
+        if (requestedSessionRef.current === sessionId) {
+          setLoading(false);
+        }
       }
     },
     [],
   );
 
-  const loadSessions = useCallback(async () => {
-    if (sessionsLoaded) return;
+  const loadSessions = useCallback(async (force = false) => {
+    if (!force && sessionsLoaded) return;
     try {
       const res = await fetch("/api/chat/sessions");
       if (res.ok) {
@@ -100,6 +105,7 @@ export function AskNivahClient() {
   useEffect(() => {
     const sessionId = searchParams.get("session");
     if (sessionId) {
+      requestedSessionRef.current = sessionId;
       startTransition(() => {
         setShowHistory(false);
         setCurrentSessionId(sessionId);
@@ -109,6 +115,7 @@ export function AskNivahClient() {
       fetch(`/api/chat/sessions/${sessionId}/messages`)
         .then((res) => res.json())
         .then((data) => {
+          if (requestedSessionRef.current !== sessionId) return;
           const loaded: Message[] = (data.messages || []).map(
             (m: { id: string; role: string; content: string; sources: Source[] | null }) => ({
               id: m.id,
@@ -120,7 +127,9 @@ export function AskNivahClient() {
           setMessages(loaded);
         })
         .catch(() => {})
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (requestedSessionRef.current === sessionId) setLoading(false);
+        });
     }
     if (!sessionsLoaded) {
       fetch("/api/chat/sessions")
@@ -214,7 +223,7 @@ export function AskNivahClient() {
       };
 
       setMessages((prev) => [...prev, answerMsg]);
-      loadSessions();
+      loadSessions(true);
     } catch (e) {
       const errorMsg: Message = {
         id: crypto.randomUUID(),

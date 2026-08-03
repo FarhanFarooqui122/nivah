@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user } = useUser();
   const { toggleMobile } = useSidebar();
@@ -30,9 +31,11 @@ export function Header() {
     { name: "Help & Docs", href: "/dashboard/help", keywords: "support guide" },
   ];
 
+  const query = searchQuery.trim().toLowerCase();
   const filteredPages = pages.filter((page) =>
-    page.name.toLowerCase().includes(searchOpen ? "" : "") ||
-    page.keywords.toLowerCase().includes(searchOpen ? "" : "")
+    !query ||
+    page.name.toLowerCase().includes(query) ||
+    page.keywords.toLowerCase().includes(query)
   );
 
   return (
@@ -60,6 +63,8 @@ export function Header() {
               type="search"
               placeholder="Search Nivah... (⌘K)"
               className="w-full h-10 pl-10 pr-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchOpen(true)}
               onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
             />
@@ -72,19 +77,23 @@ export function Header() {
                   transition={{ duration: 0.15, ease: "easeOut" }}
                   className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50"
                 >
-                  {filteredPages.map((page) => (
-                    <Link
-                      key={page.name}
-                      href={page.href}
-                      className={cn(
-                        "flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors",
-                        pathname === page.href && "bg-green-500/10 text-green-400"
-                      )}
-                    >
-                      <Command className="w-4 h-4 text-zinc-500" />
-                      <span className="font-medium">{page.name}</span>
-                    </Link>
-                  ))}
+                  {filteredPages.length === 0 ? (
+                    <p className="px-4 py-3 text-sm text-zinc-500">No pages match &ldquo;{searchQuery}&rdquo;</p>
+                  ) : (
+                    filteredPages.map((page) => (
+                      <Link
+                        key={page.name}
+                        href={page.href}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors",
+                          pathname === page.href && "bg-green-500/10 text-green-400"
+                        )}
+                      >
+                        <Command className="w-4 h-4 text-zinc-500" />
+                        <span className="font-medium">{page.name}</span>
+                      </Link>
+                    ))
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

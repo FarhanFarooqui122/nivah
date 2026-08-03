@@ -36,11 +36,9 @@ export function NotificationsDropdown() {
   }, []);
 
   const handleToggle = () => {
-    setOpen((prev) => {
-      const next = !prev;
-      if (next) fetchNotifications();
-      return next;
-    });
+    const next = !open;
+    setOpen(next);
+    if (next) fetchNotifications();
   };
 
   const markAsRead = async (id: string) => {

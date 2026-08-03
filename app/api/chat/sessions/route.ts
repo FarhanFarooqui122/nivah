@@ -39,11 +39,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const { title } = await request.json();
+  let title: unknown;
+  try {
+    const body = await request.json();
+    title = body?.title;
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
   const session = await prisma.chatSession.create({
     data: {
-      title: title || "New Chat",
+      title: typeof title === "string" && title.trim() ? title.trim().slice(0, 80) : "New Chat",
       userId: user.id,
     },
   });

@@ -145,6 +145,11 @@ export async function POST(request: NextRequest) {
     ],
   });
 
+  await prisma.chatSession.update({
+    where: { id: session.id },
+    data: { updatedAt: new Date() },
+  });
+
   return NextResponse.json({ answer, sources, sessionId: session.id });
   } catch (error) {
     console.error("[Ask Nivah] Unhandled error:", error instanceof Error ? error.message : error);

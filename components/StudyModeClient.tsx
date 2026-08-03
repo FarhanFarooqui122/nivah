@@ -54,7 +54,12 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
   useEffect(() => {
     fetch(`/api/study?documentId=${documentId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load study content (${res.status})`);
+        }
+        return res.json();
+      })
       .then((data) => {
         const map: Record<string, StudyContentItem> = {};
         for (const item of data.content || []) {
@@ -62,7 +67,9 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         }
         setStudyContent(map);
       })
-      .catch(() => {});
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Failed to load study content");
+      });
   }, [documentId]);
 
   const generate = useCallback(async (type: StudyTab) => {

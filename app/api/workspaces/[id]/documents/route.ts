@@ -42,6 +42,10 @@ export async function GET(
     },
   });
 
+  if (documents.length === 0) {
+    return NextResponse.json({ documents: [] });
+  }
+
   const chunkRows = await prisma.$queryRaw<{ document_id: string; count: number }[]>`
     SELECT "documentId" AS document_id, COUNT(*)::int AS count
     FROM "DocumentChunk"

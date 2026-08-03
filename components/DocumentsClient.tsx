@@ -202,7 +202,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "date" | "name" | "size")} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as "date" | "name" | "size"); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
             <option value="date">Newest</option>
             <option value="name">Name</option>
             <option value="size">Size</option>

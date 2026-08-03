@@ -18,7 +18,7 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
-  const [armWave, setArmWave] = useState(0);
+  const [tick, setTick] = useState(0);
 
   const sizes = {
     sm: { w: 64, h: 80, s: 1 },
@@ -51,14 +51,9 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
   }, [isTyping, forcedEmotion, emotion]);
 
   useEffect(() => {
-    if (emotion === "happy" || emotion === "laughing" || emotion === "celebrating") {
-      const interval = setInterval(() => {
-        setArmWave((prev) => (prev + 1) % 3);
-      }, 300);
-      return () => clearInterval(interval);
-    }
-    setArmWave(0);
-  }, [emotion]);
+    const interval = setInterval(() => setTick((prev) => prev + 1), 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const trackMouse = useCallback((e: MouseEvent) => {
     if (!containerRef.current || focused) return;
@@ -119,8 +114,10 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
     };
   }, [inputRef, isTyping]);
 
-  const bodyY = emotion === "laughing" ? 1 : emotion === "celebrating" ? -1 : 0;
-  const bodyRotate = emotion === "happy" ? 2 : emotion === "laughing" ? -2 : 0;
+  const armWave = emotion === "happy" || emotion === "laughing" || emotion === "celebrating"
+    ? Math.floor(tick / 3) % 3
+    : 0;
+  const wobble = emotion === "celebrating" || emotion === "listening" ? tick : 0;
 
   const leftArmAngle = emotion === "idle" ? 30 : emotion === "listening" ? 20 : emotion === "thinking" ? 50 : emotion === "happy" ? -20 + armWave * 15 : emotion === "laughing" ? -30 + armWave * 20 : emotion === "celebrating" ? -60 + armWave * 30 : 30;
   const rightArmAngle = emotion === "idle" ? -30 : emotion === "listening" ? -20 : emotion === "thinking" ? -40 : emotion === "happy" ? 20 - armWave * 15 : emotion === "laughing" ? 30 - armWave * 20 : emotion === "celebrating" ? 60 - armWave * 30 : -30;
@@ -193,25 +190,25 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
         )}
 
         {/* Left leg */}
-        <g transform={`translate(${s.w * 0.35}, ${s.h * 0.72}) rotate(${leftLegAngle + (emotion === "celebrating" ? Math.sin(Date.now() / 200) * 10 : 0)})`}>
+        <g transform={`translate(${s.w * 0.35}, ${s.h * 0.72}) rotate(${leftLegAngle + (emotion === "celebrating" ? Math.sin(wobble / 2) * 10 : 0)})`}>
           <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1.2 * sc} opacity={0.8} />
           <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#22c55e" opacity={0.6} />
         </g>
 
         {/* Right leg */}
-        <g transform={`translate(${s.w * 0.65}, ${s.h * 0.72}) rotate(${rightLegAngle + (emotion === "celebrating" ? Math.sin(Date.now() / 200 + 1) * 10 : 0)})`}>
+        <g transform={`translate(${s.w * 0.65}, ${s.h * 0.72}) rotate(${rightLegAngle + (emotion === "celebrating" ? Math.sin(wobble / 2 + 1) * 10 : 0)})`}>
           <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1.2 * sc} opacity={0.8} />
           <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#22c55e" opacity={0.6} />
         </g>
 
         {/* Left arm */}
-        <g transform={`translate(${s.w * 0.12}, ${s.h * 0.42}) rotate(${leftArmAngle + (emotion === "listening" ? Math.sin(Date.now() / 300) * 3 : 0)})`}>
+        <g transform={`translate(${s.w * 0.12}, ${s.h * 0.42}) rotate(${leftArmAngle + (emotion === "listening" ? Math.sin(wobble / 3) * 3 : 0)})`}>
           <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1 * sc} opacity={0.8} />
           <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#22c55e" opacity={0.5} />
         </g>
 
         {/* Right arm */}
-        <g transform={`translate(${s.w * 0.88}, ${s.h * 0.42}) rotate(${rightArmAngle + (emotion === "listening" ? Math.sin(Date.now() / 300 + 1) * 3 : 0)})`}>
+        <g transform={`translate(${s.w * 0.88}, ${s.h * 0.42}) rotate(${rightArmAngle + (emotion === "listening" ? Math.sin(wobble / 3 + 1) * 3 : 0)})`}>
           <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1 * sc} opacity={0.8} />
           <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#22c55e" opacity={0.5} />
         </g>
