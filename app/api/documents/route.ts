@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { deleteDocumentForUser } from "@/lib/delete-document";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -49,15 +50,11 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Document ID required" }, { status: 400 });
   }
 
-  const doc = await prisma.document.findFirst({
-    where: { id, userId: user.id },
-  });
+  const deleted = await deleteDocumentForUser(user.id, id);
 
-  if (!doc) {
+  if (!deleted) {
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
-
-  await prisma.document.delete({ where: { id } });
 
   return NextResponse.json({ success: true });
 }

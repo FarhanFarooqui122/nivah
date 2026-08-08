@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-import { ArrowLeftIcon, RefreshIcon } from "@/components/Icons";
+import { ArrowLeftIcon, RefreshIcon, TrashIcon } from "@/components/Icons";
 import { StudyModeClient } from "@/components/StudyModeClient";
 
 interface Workspace {
@@ -48,6 +48,7 @@ export function DocumentDetailClient({
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [showStudy, setShowStudy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch("/api/workspaces")
@@ -133,6 +134,24 @@ export function DocumentDetailClient({
       setReindexMsg("Re-index failed");
     }
     setReindexing(false);
+  };
+
+  const handleDelete = async () => {
+    if (!confirm(`Delete "${document.title}"? This permanently removes the file, chunks, and study content.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/documents/${document.id}`, { method: "DELETE" });
+      if (res.ok) {
+        router.push("/dashboard/documents");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Delete failed");
+        setDeleting(false);
+      }
+    } catch {
+      alert("Delete failed");
+      setDeleting(false);
+    }
   };
 
   const formatBytes = (bytes: number) => {
@@ -248,6 +267,14 @@ export function DocumentDetailClient({
         >
           <RefreshIcon className={`w-4 h-4 ${reindexing ? "animate-spin" : ""}`} />
           {reindexing ? "Re-indexing..." : "Re-index"}
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          className="px-4 py-2 bg-red-600/10 border border-red-500/30 text-red-400 hover:bg-red-600/20 hover:text-red-300 rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+        >
+          <TrashIcon className="w-4 h-4" />
+          {deleting ? "Deleting..." : "Delete"}
         </button>
       </div>
 
