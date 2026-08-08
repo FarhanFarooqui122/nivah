@@ -5,6 +5,7 @@ import { extractText } from "@/lib/extract-text";
 import { chunkText } from "@/lib/chunker";
 import { generateEmbedding } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -27,8 +28,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-      return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 400 });
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File too large (max ${MAX_FILE_SIZE_MB}MB)` },
+        { status: 400 },
+      );
     }
 
     if (workspaceId) {

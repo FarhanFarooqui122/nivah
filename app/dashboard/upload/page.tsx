@@ -3,10 +3,17 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
 import { UploadIcon, FileIcon, PdfIcon, ImageIcon, SpreadsheetIcon, DocumentIcon } from "@/components/Icons";
 
 const ACCEPTED_STRINGS = ".pdf,.docx,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.webp";
+
+function splitBySize(files: File[]) {
+  const accepted = files.filter((f) => f.size <= MAX_FILE_SIZE);
+  const rejected = files.filter((f) => f.size > MAX_FILE_SIZE);
+  return { accepted, rejected };
+}
 
 interface Workspace {
   id: string;
@@ -44,12 +51,21 @@ export default function UploadPage() {
     e.preventDefault();
     setDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles((prev) => [...prev, ...droppedFiles]);
+    const { accepted, rejected } = splitBySize(droppedFiles);
+    if (rejected.length > 0) {
+      setUploadError(rejected.map((f) => `"${f.name}" is too large (max ${MAX_FILE_SIZE_MB}MB)`).join(" "));
+    }
+    if (accepted.length > 0) setFiles((prev) => [...prev, ...accepted]);
   }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+      const selected = Array.from(e.target.files!);
+      const { accepted, rejected } = splitBySize(selected);
+      if (rejected.length > 0) {
+        setUploadError(rejected.map((f) => `"${f.name}" is too large (max ${MAX_FILE_SIZE_MB}MB)`).join(" "));
+      }
+      if (accepted.length > 0) setFiles((prev) => [...prev, ...accepted]);
     }
   };
 
@@ -85,9 +101,14 @@ export default function UploadPage() {
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               resolve();
-          } else {
-          reject(new Error(`Upload failed: ${xhr.status}`));
-          }
+            } else {
+              let message = `Upload failed: ${xhr.status}`;
+              try {
+                const data = JSON.parse(xhr.responseText);
+                if (data?.error) message = data.error;
+              } catch {}
+              reject(new Error(message));
+            }
           };
           xhr.onerror = () => reject(new Error("Upload failed"));
           xhr.open("POST", "/api/documents/upload");
@@ -132,7 +153,7 @@ export default function UploadPage() {
           </div>
           <p className="text-lg font-medium text-white">{dragging ? "Drop files here" : "Drag & drop files here"}</p>
           <p className="text-zinc-500 mt-2">or click to browse</p>
-          <p className="text-zinc-600 text-sm mt-4">PDF, DOCX, TXT, MD, CSV, JSON, PNG, JPG, WEBP — up to 50MB</p>
+          <p className="text-zinc-600 text-sm mt-4">PDF, DOCX, TXT, MD, CSV, JSON, PNG, JPG, WEBP — up to {MAX_FILE_SIZE_MB}MB</p>
         </div>
       </div>
 
