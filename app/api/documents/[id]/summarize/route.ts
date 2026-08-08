@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { ai } from "@/lib/embeddings";
-import { NextRequest, NextResponse } from "next/server";
 import { createNotification } from "@/lib/notifications";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   _request: NextRequest,
@@ -18,6 +19,9 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    const limited = checkRateLimit(`summarize:${user.id}`, RATE_LIMITS.summarize.limit, RATE_LIMITS.summarize.windowMs);
+    if (limited) return limited;
 
     const { id } = await params;
 

@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -12,6 +13,9 @@ export async function GET(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  const limited = checkRateLimit(`study:${user.id}`, RATE_LIMITS.study.limit, RATE_LIMITS.study.windowMs);
+  if (limited) return limited;
 
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get("documentId");

@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
 import { cosineSimilarity } from "@/lib/cosine-similarity";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const MIN_SCORE = 0.3;
 const DEFAULT_TOP_K = 10;
@@ -19,6 +20,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    const limited = checkRateLimit(`semantic-search:${user.id}`, RATE_LIMITS.semanticSearch.limit, RATE_LIMITS.semanticSearch.windowMs);
+    if (limited) return limited;
 
     let body: { q?: string; topK?: number; documentId?: string; workspaceId?: string };
     try {

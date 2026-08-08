@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { ai } from "@/lib/embeddings";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 const ACTION_PROMPTS: Record<string, string> = {
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    const limited = checkRateLimit(`ai-actions:${user.id}`, RATE_LIMITS.aiActions.limit, RATE_LIMITS.aiActions.windowMs);
+    if (limited) return limited;
 
     const { action, documentIds } = await request.json();
 

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
 import { cosineSimilarity } from "@/lib/cosine-similarity";
 import { ai } from "@/lib/embeddings";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const TOP_K = 5;
 const MIN_SCORE = 0.3;
@@ -40,6 +41,9 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  const limited = checkRateLimit(`ask:${user.id}`, RATE_LIMITS.ask.limit, RATE_LIMITS.ask.windowMs);
+  if (limited) return limited;
 
   const { question, sessionId, workspaceId } = await request.json();
   if (!question || typeof question !== "string" || !question.trim()) {
