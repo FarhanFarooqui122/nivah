@@ -8,11 +8,11 @@ import { GradientOrb, BrandPattern, SparkleIcon } from "@/components/DecorativeE
 export default function CustomSignIn() {
   return (
     <div className="min-h-screen bg-zinc-950 flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600/10 via-zinc-950 to-emerald-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600/10 via-zinc-950 to-indigo-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
         <BrandPattern />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent" />
-        <GradientOrb className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
-        <GradientOrb className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-transparent to-transparent" />
+        <GradientOrb className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
+        <GradientOrb className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -32,7 +32,7 @@ export default function CustomSignIn() {
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -top-1 -right-1"
               >
-                <SparkleIcon className="w-5 h-5 text-green-400" />
+                <SparkleIcon className="w-5 h-5 text-purple-400" />
               </motion.div>
             </div>
           </motion.div>
@@ -88,7 +88,7 @@ export default function CustomSignIn() {
                 transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
                 className="flex items-center gap-3 text-zinc-300 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400 group-hover:bg-green-500/20 group-hover:border-green-500/30 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/30 transition-all">
                   {item.icon}
                 </div>
                 <span className="text-sm">{item.text}</span>
@@ -124,14 +124,14 @@ export default function CustomSignIn() {
               path="/sign-in"
               appearance={{
                 elements: {
-                  formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white rounded-xl px-4 py-3 font-medium transition-all duration-200 w-full",
+                  formButtonPrimary: "btn-primary rounded-xl px-4 py-3 font-medium transition-all duration-200 w-full",
                   card: "bg-transparent shadow-none border-none",
                   headerTitle: "text-2xl font-bold text-white",
                   headerSubtitle: "text-zinc-400",
                   dividerText: "text-zinc-500",
                   formFieldLabel: "text-zinc-300 font-medium",
-                  formFieldInput: "bg-zinc-800 border-zinc-700 focus:border-green-500 focus:ring-green-500/20 rounded-xl transition-all duration-200",
-                  formFieldAction: "text-green-400 hover:text-green-300 transition-colors",
+                  formFieldInput: "bg-zinc-800 border-zinc-700 focus:border-purple-500 focus:ring-purple-500/20 rounded-xl transition-all duration-200",
+                  formFieldAction: "text-purple-400 hover:text-purple-300 transition-colors",
                   socialButtonsBlockButton: "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 rounded-xl transition-all duration-200",
                   alternativeMethods: "space-y-3",
                 },

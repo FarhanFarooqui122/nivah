@@ -20,7 +20,7 @@ export function BrandPattern() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       <svg
-        className="absolute -top-40 -right-40 w-96 h-96 text-green-500/5"
+        className="absolute -top-40 -right-40 w-96 h-96 text-purple-500/5"
         viewBox="0 0 400 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export function BrandPattern() {
         </defs>
       </svg>
       <svg
-        className="absolute -bottom-40 -left-40 w-80 h-80 text-emerald-500/5"
+        className="absolute -bottom-40 -left-40 w-80 h-80 text-indigo-500/5"
         viewBox="0 0 400 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@ export function SparkleIcon({ className }: { className?: string }) {
 export function NivahAILogo() {
   return (
     <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="40" height="40" rx="10" className="fill-green-600" />
+      <rect width="40" height="40" rx="10" className="fill-purple-600" />
       <path d="M12 28V12H16L20 22L24 12H28V28H24V18.5L20.5 26H19.5L16 18.5V28H12Z" fill="white" />
     </svg>
   );

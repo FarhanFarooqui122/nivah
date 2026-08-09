@@ -29,7 +29,7 @@ export default function SignInError({
         </p>
         <button
           onClick={reset}
-          className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
+          className="px-6 py-2.5 btn-primary rounded-xl transition-colors"
         >
           Try again
         </button>
