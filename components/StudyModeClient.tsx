@@ -123,7 +123,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
         <div
           onClick={() => setFlipped(!flipped)}
-          className="cursor-pointer p-8 rounded-2xl border border-zinc-700 bg-zinc-900 min-h-[250px] flex items-center justify-center transition-all hover:border-green-500/50"
+          className="cursor-pointer p-8 rounded-2xl border border-zinc-700 bg-zinc-900 min-h-[250px] flex items-center justify-center transition-all hover:border-purple-500/50"
         >
           <div className="text-center">
             <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider">
@@ -229,7 +229,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             {!mcqSubmitted && Object.keys(mcqAnswers).length > 0 && (
               <button
                 onClick={() => setMcqSubmitted(true)}
-                className="px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-colors"
+                className="btn-primary rounded-lg px-3 py-1.5 text-xs"
               >
                 Submit
               </button>
@@ -357,7 +357,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     if (loading[activeTab]) {
       return (
         <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <Sparkles className="w-10 h-10 text-green-400 mx-auto mb-4 animate-pulse" />
+          <Sparkles className="w-10 h-10 text-purple-400 mx-auto mb-4 animate-pulse" />
           <p className="text-zinc-400">Generating {TABS.find((t) => t.key === activeTab)?.label?.toLowerCase()}...</p>
         </div>
       );
@@ -382,7 +382,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
           <p className="text-zinc-500 text-sm mt-1">Generate study material from this document</p>
           <button
             onClick={() => generate(activeTab)}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
+            className="mt-4 inline-flex items-center gap-2 btn-primary rounded-xl px-5 py-2.5"
           >
             <Sparkles className="w-4 h-4" />
             Generate {TABS.find((t) => t.key === activeTab)?.label}
@@ -412,7 +412,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
-                ? "bg-green-600 text-white"
+                ? "bg-purple-600 text-white"
                 : "text-zinc-400 hover:text-white hover:bg-zinc-800",
             )}
           >

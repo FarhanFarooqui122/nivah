@@ -30,7 +30,7 @@ export function ProfileClient({ stats }: { stats: ProfileStats }) {
 
       <div className="border border-zinc-800 rounded-2xl p-6 bg-zinc-900/50">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold text-white">
+          <div className="w-16 h-16 gradient-brand rounded-2xl flex items-center justify-center text-2xl font-bold text-white">
             {user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex-1 min-w-0">
@@ -55,7 +55,7 @@ export function ProfileClient({ stats }: { stats: ProfileStats }) {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <FileText className="w-5 h-5 text-green-400 mb-2" />
+          <FileText className="w-5 h-5 text-purple-400 mb-2" />
           <p className="text-2xl font-bold text-white">{stats.documents}</p>
           <p className="text-xs text-zinc-500 mt-1">Documents</p>
         </div>

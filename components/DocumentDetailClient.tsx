@@ -183,11 +183,11 @@ export function DocumentDetailClient({
                 if (e.key === "Escape") { setTitleDraft(document.title); setEditing(false); }
               }}
               disabled={saving}
-              className="text-2xl font-bold text-white bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1 w-full outline-none focus:border-green-500"
+              className="text-2xl font-bold text-white bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1 w-full outline-none focus:border-purple-500"
             />
           ) : (
             <h1
-              className="text-2xl font-bold text-white truncate cursor-pointer hover:text-green-400 transition-colors"
+              className="text-2xl font-bold text-white truncate cursor-pointer hover:text-purple-400 transition-colors"
               onClick={() => { setTitleDraft(document.title); setEditing(true); }}
               title="Click to rename"
             >
@@ -228,7 +228,7 @@ export function DocumentDetailClient({
                 value={selectedWorkspace}
                 onChange={(e) => saveWorkspace(e.target.value)}
                 disabled={savingWorkspace}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-white text-sm w-full focus:border-green-500 focus:outline-none disabled:opacity-50"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-white text-sm w-full focus:border-purple-500 focus:outline-none disabled:opacity-50"
               >
                 <option value="">None</option>
                 {workspaces.map((w) => (
@@ -248,7 +248,7 @@ export function DocumentDetailClient({
           href={document.fileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors text-sm"
+          className="btn-primary rounded-xl px-4 py-2 text-sm"
         >
           Download file
         </a>
@@ -312,7 +312,7 @@ export function DocumentDetailClient({
           onClick={() => setShowStudy(false)}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            !showStudy ? "bg-green-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            !showStudy ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
           )}
         >
           Content
@@ -321,7 +321,7 @@ export function DocumentDetailClient({
           onClick={() => setShowStudy(true)}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            showStudy ? "bg-green-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            showStudy ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
           )}
         >
           Study Mode

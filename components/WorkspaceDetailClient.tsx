@@ -64,7 +64,7 @@ export function WorkspaceDetailClient({
         </div>
         <Link
           href="/dashboard/upload"
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+          className="btn-primary rounded-xl px-4 py-2"
         >
           <Upload className="w-4 h-4" />
           Upload
@@ -79,7 +79,7 @@ export function WorkspaceDetailClient({
             placeholder="Search documents..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all"
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
           />
         </div>
       )}
@@ -93,7 +93,7 @@ export function WorkspaceDetailClient({
           {!search && (
             <Link
               href="/dashboard/upload"
-              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
+              className="mt-4 inline-flex items-center gap-2 btn-primary rounded-xl px-5 py-2.5"
             >
               <Upload className="w-4 h-4" />
               Upload a document
@@ -116,7 +116,7 @@ export function WorkspaceDetailClient({
                     <FileTypeIcon fileType={doc.fileType} className="w-4.5 h-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <Link href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-green-400 transition-colors flex items-center gap-2">
+                    <Link href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-purple-400 transition-colors flex items-center gap-2">
                       {doc.title}
                       <ExternalLink className="w-3 h-3 text-zinc-500 flex-shrink-0" />
                     </Link>
@@ -135,7 +135,7 @@ export function WorkspaceDetailClient({
                     href={doc.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-green-400 hover:text-green-300 transition-colors"
+                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
                   >
                     Download
                   </a>

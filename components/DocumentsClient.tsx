@@ -184,25 +184,25 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               placeholder="Search documents..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all"
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
             />
           </div>
         </div>
         <div className="flex items-center gap-2">
           {workspaces.length > 0 && (
-            <select value={filterWorkspace} onChange={(e) => { setFilterWorkspace(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+            <select value={filterWorkspace} onChange={(e) => { setFilterWorkspace(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
               <option value="all">All Workspaces</option>
               {workspaces.map((w) => (
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
           )}
-          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
             {FILTER_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as "date" | "name" | "size"); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none">
+          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as "date" | "name" | "size"); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
             <option value="date">Newest</option>
             <option value="name">Name</option>
             <option value="size">Size</option>
@@ -211,14 +211,14 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       </div>
 
       {selectedDocs.size > 0 && !aiResult && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl flex-wrap">
-          <span className="text-sm text-green-400">{selectedDocs.size} selected</span>
+        <div className="flex items-center gap-3 px-4 py-3 bg-purple-900/20 border border-purple-500/30 rounded-xl flex-wrap">
+          <span className="text-sm text-purple-400">{selectedDocs.size} selected</span>
           <div className="flex items-center gap-2 ml-auto">
             <select
               value={aiAction}
               onChange={(e) => handleAiAction(e.target.value)}
               disabled={aiRunning}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-1.5 text-white text-sm focus:border-green-500 focus:outline-none disabled:opacity-50"
+              className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-1.5 text-white text-sm focus:border-purple-500 focus:outline-none disabled:opacity-50"
             >
               <option value="">AI Actions</option>
               <option value="summarize">Summarize</option>
@@ -234,8 +234,8 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       )}
 
       {aiRunning && (
-        <div className="border border-green-500/30 rounded-2xl p-8 text-center bg-green-900/10">
-          <svg className="w-8 h-8 animate-spin text-green-500 mx-auto" viewBox="0 0 24 24" fill="none">
+        <div className="border border-purple-500/30 rounded-2xl p-8 text-center bg-purple-900/10">
+          <svg className="w-8 h-8 animate-spin text-purple-500 mx-auto" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
             <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
           </svg>
@@ -251,10 +251,10 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       )}
 
       {aiResult && (
-        <div className="border border-green-500/30 rounded-2xl bg-green-900/10 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-green-500/20">
+        <div className="border border-purple-500/30 rounded-2xl bg-purple-900/10 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-purple-500/20">
             <h3 className="font-semibold text-white flex items-center gap-2">
-              <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2a10 10 0 1010 10 10 10 0 00-10-10z" />
                 <path d="M12 6v6l4 2" />
               </svg>
@@ -299,7 +299,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
             {search ? "No documents match your search" : "No documents uploaded yet"}
           </p>
           {!search && (
-            <Link href="/dashboard/upload" className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors">
+            <Link href="/dashboard/upload" className="mt-4 inline-flex items-center gap-2 btn-primary rounded-xl px-5 py-2.5">
               <UploadIcon className="w-4 h-4" />
               Upload your first document
             </Link>
@@ -309,7 +309,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         <>
         <div className="border border-zinc-800 rounded-2xl overflow-hidden">
           <div className="hidden md:grid grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-3 bg-zinc-900/50 text-xs font-medium text-zinc-500 uppercase tracking-wider">
-            <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="rounded border-zinc-600 accent-green-600" /></div>
+            <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="rounded border-zinc-600 accent-purple-600" /></div>
             <span>Name</span>
             <span>Type</span>
             <span>Size</span>
@@ -320,7 +320,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
             {paginated.map((doc) => (
               <div key={doc.id} className={cn("grid grid-cols-[40px_1fr] md:grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-4 items-center hover:bg-zinc-900/50 transition-colors group", deleting === doc.id && "opacity-50")}>
                 <div>
-                  <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="rounded border-zinc-600 accent-green-600" />
+                  <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="rounded border-zinc-600 accent-purple-600" />
                 </div>
 
                 <div className="flex items-center gap-3 min-w-0">
@@ -328,7 +328,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                     <FileTypeIcon fileType={doc.fileType} className="w-4.5 h-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <a href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-green-400 transition-colors">
+                    <a href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-purple-400 transition-colors">
                       {doc.title}
                     </a>
                     <p className="text-xs text-zinc-500 truncate md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
@@ -382,7 +382,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                   onClick={() => setPage(i)}
                   className={cn(
                     "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
-                    i === page ? "bg-green-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
+                    i === page ? "bg-purple-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
                   )}
                 >
                   {i + 1}
@@ -402,11 +402,11 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       )}
 
       {selectedDocs.size > 0 && !aiResult && (
-        <div className="flex items-center justify-between px-4 py-3 bg-green-900/20 border border-green-500/30 rounded-xl">
-          <span className="text-sm text-green-400">{selectedDocs.size} documents selected</span>
+        <div className="flex items-center justify-between px-4 py-3 bg-purple-900/20 border border-purple-500/30 rounded-xl">
+          <span className="text-sm text-purple-400">{selectedDocs.size} documents selected</span>
           <div className="flex items-center gap-3">
-            {exportMsg && <span className="text-sm text-green-400">{exportMsg}</span>}
-            <button onClick={handleExport} disabled={exporting} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50">
+            {exportMsg && <span className="text-sm text-purple-400">{exportMsg}</span>}
+            <button onClick={handleExport} disabled={exporting} className="btn-primary rounded-xl px-4 py-2 text-sm gap-1.5 disabled:opacity-50">
               <CopyIcon className="w-4 h-4" />
               {exporting ? "Exporting..." : "Export Context"}
             </button>

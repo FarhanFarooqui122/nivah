@@ -102,7 +102,7 @@ export function SearchClient() {
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Search documents..."
-          className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl pl-12 pr-14 py-4 text-white text-lg placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all"
+          className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl pl-12 pr-14 py-4 text-white text-lg placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
           aria-label="Search query"
         />
         <button
@@ -112,7 +112,7 @@ export function SearchClient() {
             "absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
             loading || !query.trim()
               ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700 text-white"
+              : "btn-primary"
           )}
         >
           {loading ? (
@@ -128,7 +128,7 @@ export function SearchClient() {
 
       {loading && (
         <div className="flex items-center justify-center py-16">
-          <svg className="w-8 h-8 animate-spin text-green-500" viewBox="0 0 24 24" fill="none">
+          <svg className="w-8 h-8 animate-spin text-purple-500" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
             <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
           </svg>

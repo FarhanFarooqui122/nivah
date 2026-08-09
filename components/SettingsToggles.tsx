@@ -56,7 +56,7 @@ export function SettingsToggles({
         <button
           onClick={toggleTheme}
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
-            theme === "dark" ? "bg-green-600" : "bg-zinc-700"
+            theme === "dark" ? "bg-purple-600" : "bg-zinc-700"
           }`}
         >
           <div
@@ -76,7 +76,7 @@ export function SettingsToggles({
           onClick={handleEmailToggle}
           disabled={savingEmail}
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
-            emailNotifications ? "bg-green-600" : "bg-zinc-700"
+            emailNotifications ? "bg-purple-600" : "bg-zinc-700"
           } ${savingEmail ? "opacity-50" : ""}`}
         >
           <div
@@ -96,7 +96,7 @@ export function SettingsToggles({
           onClick={handleSyncToggle}
           disabled={savingSync}
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
-            autoSyncAiMemory ? "bg-green-600" : "bg-zinc-700"
+            autoSyncAiMemory ? "bg-purple-600" : "bg-zinc-700"
           } ${savingSync ? "opacity-50" : ""}`}
         >
           <div

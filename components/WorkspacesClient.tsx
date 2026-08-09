@@ -94,7 +94,7 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+          className="btn-primary rounded-xl px-4 py-2"
         >
           <Plus className="w-4 h-4" />
           Create Workspace
@@ -102,25 +102,25 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
       </div>
 
       {showCreate && (
-        <div className="p-6 rounded-2xl border border-green-500/30 bg-green-900/10 space-y-4">
+        <div className="p-6 rounded-2xl border border-purple-500/30 bg-purple-900/10 space-y-4">
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Workspace name"
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description (optional)"
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
           <div className="flex items-center gap-3">
             <button
               onClick={handleCreate}
               disabled={creating || !name.trim()}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-xl font-medium transition-colors"
+              className="btn-primary rounded-xl px-4 py-2 disabled:opacity-50"
             >
               {creating ? "Creating..." : "Create"}
             </button>
@@ -150,16 +150,16 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
                     autoFocus
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:border-green-500 focus:outline-none"
+                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
                   />
                   <input
                     value={editDesc}
                     onChange={(e) => setEditDesc(e.target.value)}
                     placeholder="Description"
-                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:border-green-500 focus:outline-none"
+                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
                   />
                   <div className="flex items-center gap-2">
-                    <button onClick={() => saveEdit(workspace.id)} className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+                    <button onClick={() => saveEdit(workspace.id)} className="btn-primary rounded-lg px-3 py-1.5 text-sm">
                       Save
                     </button>
                     <button onClick={() => setEditing(null)} className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm font-medium transition-colors">
@@ -172,8 +172,8 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
                   <Link href={`/dashboard/workspaces/${workspace.id}`} className="block">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-xl flex items-center justify-center">
-                          <FolderOpen className="w-5 h-5 text-green-400" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center">
+                          <FolderOpen className="w-5 h-5 text-purple-400" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-white">{workspace.name}</h3>
