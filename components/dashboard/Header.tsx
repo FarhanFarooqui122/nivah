@@ -62,7 +62,7 @@ export function Header() {
             <input
               type="search"
               placeholder="Search Nivah... (⌘K)"
-              className="w-full h-10 pl-10 pr-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all"
+              className="w-full h-10 pl-10 pr-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchOpen(true)}
@@ -86,7 +86,7 @@ export function Header() {
                         href={page.href}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors",
-                          pathname === page.href && "bg-green-500/10 text-green-400"
+                          pathname === page.href && "bg-purple-500/10 text-purple-400"
                         )}
                       >
                         <Command className="w-4 h-4 text-zinc-500" />
@@ -125,8 +125,8 @@ export function Header() {
               aria-expanded={userMenuOpen}
             >
               <motion.div
-                animate={{ boxShadow: userMenuOpen ? "0 0 20px rgba(34,197,94,0.3)" : "0 0 0px rgba(34,197,94,0)" }}
-                className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center"
+                animate={{ boxShadow: userMenuOpen ? "0 0 20px rgba(124,58,237,0.3)" : "0 0 0px rgba(124,58,237,0)" }}
+                className="w-8 h-8 gradient-brand rounded-full flex items-center justify-center text-white text-sm font-semibold"
               >
                 {user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U"}
               </motion.div>

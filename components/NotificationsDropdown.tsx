@@ -111,7 +111,7 @@ export function NotificationsDropdown() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="text-xs text-green-400 hover:text-green-300 transition-colors flex items-center gap-1"
+                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
                 >
                   <Check className="w-3 h-3" />
                   Mark all read
@@ -134,7 +134,7 @@ export function NotificationsDropdown() {
                   <div
                     key={n.id}
                     className={`flex items-start gap-3 px-4 py-3 hover:bg-zinc-800/50 transition-colors ${
-                      !n.read ? "bg-green-500/5" : ""
+                      !n.read ? "bg-purple-500/5" : ""
                     }`}
                   >
                     <div className="flex-1 min-w-0">
