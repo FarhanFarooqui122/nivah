@@ -73,8 +73,8 @@ export function Sidebar() {
         {!collapsed && (
           <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-2">
             <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(34,197,94,0.3)" }}
-              className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
+              className="w-8 h-8 gradient-brand rounded-xl flex items-center justify-center"
             >
               <Zap className="w-5 h-5 text-white" />
             </motion.div>
@@ -120,7 +120,7 @@ export function Sidebar() {
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
                     "group relative overflow-hidden",
                     isActive
-                      ? "bg-gradient-to-r from-green-500/20 to-emerald-600/20 text-white border border-green-500/30 shadow-glow-green"
+                      ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30 shadow-glow-brand"
                       : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
                     collapsed && "justify-center"
                   )}
@@ -139,7 +139,7 @@ export function Sidebar() {
                       initial={{ opacity: 0, scaleY: 0 }}
                       animate={{ opacity: 1, scaleY: 1 }}
                       transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-green-500 rounded-r-full shadow-glow-green"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 gradient-brand rounded-r-full shadow-glow-brand"
                     />
                   )}
                 </Link>
@@ -159,7 +159,7 @@ export function Sidebar() {
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
                 Workspaces
               </p>
-              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-green-400 hover:text-green-300 transition-colors">
+              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
                 Manage
               </Link>
             </div>
@@ -179,7 +179,7 @@ export function Sidebar() {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
                         isActive
-                          ? "bg-gradient-to-r from-green-500/20 to-emerald-600/20 text-white border border-green-500/30"
+                          ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30"
                           : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                       )}
                     >
@@ -204,7 +204,7 @@ export function Sidebar() {
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
                 Recent Chats
               </p>
-              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-green-400 hover:text-green-300 transition-colors">
+              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
                 View all
               </Link>
             </div>
@@ -224,7 +224,7 @@ export function Sidebar() {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
                         isActive
-                          ? "bg-gradient-to-r from-green-500/20 to-emerald-600/20 text-white border border-green-500/30"
+                          ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30"
                           : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                       )}
                     >
@@ -284,12 +284,12 @@ export function Sidebar() {
             className="mt-8 pt-6 border-t border-zinc-800 px-3"
           >
             <motion.div
-              animate={{ boxShadow: ["0 0 20px rgba(34,197,94,0.1)", "0 0 40px rgba(34,197,94,0.2)", "0 0 20px rgba(34,197,94,0.1)"] }}
+              animate={{ boxShadow: ["0 0 20px rgba(124,58,237,0.1)", "0 0 40px rgba(124,58,237,0.2)", "0 0 20px rgba(124,58,237,0.1)"] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="bg-gradient-to-r from-green-500/10 to-emerald-600/10 border border-green-500/20 rounded-xl p-4"
+              className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-xl p-4"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -298,9 +298,9 @@ export function Sidebar() {
                 </div>
               </div>
               <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(34,197,94,0.3)" }}
+                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
                 whileTap={{ scale: 0.98 }}
-                className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 rounded-lg transition-colors cursor-pointer select-none"
+                className="mt-3 w-full btn-primary text-sm py-2 cursor-pointer select-none"
               >
                 Upgrade to Pro
               </motion.button>
@@ -333,7 +333,7 @@ export function Sidebar() {
   return (
     <>
       <motion.aside
-        animate={{ width: collapsed ? 80 : 256 }}
+        animate={{ width: collapsed ? 80 : 280 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="hidden lg:flex bg-zinc-900 border-r border-zinc-800 flex-col overflow-hidden"
       >
@@ -354,7 +354,7 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative bg-zinc-900 border-r border-zinc-800 w-64 flex flex-col"
+            className="relative bg-zinc-900/80 backdrop-blur-xl border-r border-zinc-800 w-72 flex flex-col"
           >
             {inner}
           </motion.aside>
