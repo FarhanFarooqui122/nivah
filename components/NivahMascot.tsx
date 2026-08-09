@@ -151,9 +151,9 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <radialGradient id="bodyGlow" cx="40%" cy="30%" r="70%">
-            <stop offset="0%" stopColor="#4ade80" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+<radialGradient id="bodyGlow" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="bodyFill" cx="45%" cy="35%" r="60%">
             <stop offset="0%" stopColor="#2d2d3f" />
@@ -164,15 +164,15 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
         {/* Thinking sparkles */}
         {emotion === "thinking" && (
           <>
-            <circle cx={s.w * 0.82} cy={s.h * 0.18} r={2.5 * sc} fill="#22c55e" opacity="0.7">
+            <circle cx={s.w * 0.82} cy={s.h * 0.18} r={2.5 * sc} fill="#a78bfa" opacity="0.7">
               <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite" />
               <animate attributeName="cy" values={`${s.h * 0.18};${s.h * 0.12};${s.h * 0.18}`} dur="1.5s" repeatCount="indefinite" />
             </circle>
-            <circle cx={s.w * 0.9} cy={s.h * 0.1} r={1.8 * sc} fill="#22c55e" opacity="0.5">
+            <circle cx={s.w * 0.9} cy={s.h * 0.1} r={1.8 * sc} fill="#a78bfa" opacity="0.5">
               <animate attributeName="opacity" values="0.5;0;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s" />
               <animate attributeName="cy" values={`${s.h * 0.1};${s.h * 0.04};${s.h * 0.1}`} dur="1.5s" repeatCount="indefinite" begin="0.3s" />
             </circle>
-            <circle cx={s.w * 0.95} cy={s.h * 0.05} r={1.2 * sc} fill="#22c55e" opacity="0.3">
+            <circle cx={s.w * 0.95} cy={s.h * 0.05} r={1.2 * sc} fill="#a78bfa" opacity="0.3">
               <animate attributeName="opacity" values="0.3;0;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s" />
             </circle>
           </>
@@ -183,7 +183,7 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
           <>
             {[0, 1, 2].map((i) => (
               <motion.g key={i} animate={{ rotate: [0, 360] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}>
-                <text x={s.w * (0.7 + i * 0.12)} y={s.h * (0.1 + i * 0.06)} fontSize={8 * sc} fill="#22c55e">✦</text>
+                <text x={s.w * (0.7 + i * 0.12)} y={s.h * (0.1 + i * 0.06)} fontSize={8 * sc} fill="#a78bfa">✦</text>
               </motion.g>
             ))}
           </>
@@ -191,26 +191,26 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
 
         {/* Left leg */}
         <g transform={`translate(${s.w * 0.35}, ${s.h * 0.72}) rotate(${leftLegAngle + (emotion === "celebrating" ? Math.sin(wobble / 2) * 10 : 0)})`}>
-          <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1.2 * sc} opacity={0.8} />
-          <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#22c55e" opacity={0.6} />
+          <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#a78bfa" strokeWidth={1.2 * sc} opacity={0.8} />
+          <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#a78bfa" opacity={0.6} />
         </g>
 
         {/* Right leg */}
         <g transform={`translate(${s.w * 0.65}, ${s.h * 0.72}) rotate(${rightLegAngle + (emotion === "celebrating" ? Math.sin(wobble / 2 + 1) * 10 : 0)})`}>
-          <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1.2 * sc} opacity={0.8} />
-          <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#22c55e" opacity={0.6} />
+          <rect x={-4 * sc} y={0} width={8 * sc} height={14 * sc} rx={4 * sc} fill="#1a1a2e" stroke="#a78bfa" strokeWidth={1.2 * sc} opacity={0.8} />
+          <ellipse cx={0} cy={16 * sc + legBounce * sc} rx={5 * sc} ry={3 * sc} fill="#a78bfa" opacity={0.6} />
         </g>
 
         {/* Left arm */}
         <g transform={`translate(${s.w * 0.12}, ${s.h * 0.42}) rotate(${leftArmAngle + (emotion === "listening" ? Math.sin(wobble / 3) * 3 : 0)})`}>
-          <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1 * sc} opacity={0.8} />
-          <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#22c55e" opacity={0.5} />
+          <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#a78bfa" strokeWidth={1 * sc} opacity={0.8} />
+          <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#a78bfa" opacity={0.5} />
         </g>
 
         {/* Right arm */}
         <g transform={`translate(${s.w * 0.88}, ${s.h * 0.42}) rotate(${rightArmAngle + (emotion === "listening" ? Math.sin(wobble / 3 + 1) * 3 : 0)})`}>
-          <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#22c55e" strokeWidth={1 * sc} opacity={0.8} />
-          <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#22c55e" opacity={0.5} />
+          <rect x={-3 * sc} y={0} width={6 * sc} height={16 * sc} rx={3 * sc} fill="#1a1a2e" stroke="#a78bfa" strokeWidth={1 * sc} opacity={0.8} />
+          <circle cx={0} cy={18 * sc} r={3.5 * sc} fill="#a78bfa" opacity={0.5} />
         </g>
 
         {/* Body glow */}
@@ -229,11 +229,11 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
 
         {/* Antenna */}
         <g>
-          <line x1={s.w * 0.5} y1={s.h * 0.25} x2={s.w * 0.5} y2={s.h * 0.08} stroke="#22c55e" strokeWidth={1.5 * sc} strokeLinecap="round" opacity={0.6}>
+          <line x1={s.w * 0.5} y1={s.h * 0.25} x2={s.w * 0.5} y2={s.h * 0.08} stroke="#a78bfa" strokeWidth={1.5 * sc} strokeLinecap="round" opacity={0.6}>
             {emotion === "happy" && <animateTransform attributeName="transform" type="rotate" values="0 50 20;-8 50 20;8 50 20;0 50 20" dur="0.6s" repeatCount="indefinite" />}
             {emotion === "celebrating" && <animateTransform attributeName="transform" type="rotate" values="0 50 20;-15 50 20;15 50 20;0 50 20" dur="0.4s" repeatCount="indefinite" />}
           </line>
-          <circle cx={s.w * 0.5} cy={s.h * 0.06} r={4 * sc} fill="#22c55e" opacity={0.85}>
+          <circle cx={s.w * 0.5} cy={s.h * 0.06} r={4 * sc} fill="#a78bfa" opacity={0.85}>
             {emotion === "thinking" && (
               <animate attributeName="opacity" values="0.85;0.3;0.85" dur="0.5s" repeatCount="indefinite" />
             )}
@@ -241,7 +241,7 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
               <animate attributeName="r" values="4;5;4" dur="0.3s" repeatCount="indefinite" />
             )}
           </circle>
-          <circle cx={s.w * 0.5} cy={s.h * 0.06} r={6 * sc} fill="none" stroke="#22c55e" strokeWidth={0.8 * sc} opacity={0.25} />
+          <circle cx={s.w * 0.5} cy={s.h * 0.06} r={6 * sc} fill="none" stroke="#a78bfa" strokeWidth={0.8 * sc} opacity={0.25} />
         </g>
 
         {/* Eyes */}
@@ -264,40 +264,40 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
         {/* Cheeks */}
         {(emotion === "idle" || emotion === "listening" || emotion === "thinking") && (
           <>
-            <ellipse cx={s.w * 0.22} cy={s.h * 0.56} rx={6 * sc} ry={3.5 * sc} fill="#22c55e" opacity={0.1} />
-            <ellipse cx={s.w * 0.78} cy={s.h * 0.56} rx={6 * sc} ry={3.5 * sc} fill="#22c55e" opacity={0.1} />
+            <ellipse cx={s.w * 0.22} cy={s.h * 0.56} rx={6 * sc} ry={3.5 * sc} fill="#a78bfa" opacity={0.1} />
+            <ellipse cx={s.w * 0.78} cy={s.h * 0.56} rx={6 * sc} ry={3.5 * sc} fill="#a78bfa" opacity={0.1} />
           </>
         )}
         {(emotion === "happy" || emotion === "laughing" || emotion === "celebrating") && (
           <>
-            <ellipse cx={s.w * 0.22} cy={s.h * 0.56} rx={7 * sc} ry={4.5 * sc} fill="#22c55e" opacity={0.18} />
-            <ellipse cx={s.w * 0.78} cy={s.h * 0.56} rx={7 * sc} ry={4.5 * sc} fill="#22c55e" opacity={0.18} />
+            <ellipse cx={s.w * 0.22} cy={s.h * 0.56} rx={7 * sc} ry={4.5 * sc} fill="#a78bfa" opacity={0.18} />
+            <ellipse cx={s.w * 0.78} cy={s.h * 0.56} rx={7 * sc} ry={4.5 * sc} fill="#a78bfa" opacity={0.18} />
           </>
         )}
 
         {/* Mouth */}
         {emotion === "idle" && (
-          <path d={`M${s.w * 0.38} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.64} ${s.w * 0.62} ${s.h * 0.6}`} fill="none" stroke="#22c55e" strokeWidth={1.8 * sc} strokeLinecap="round" />
+          <path d={`M${s.w * 0.38} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.64} ${s.w * 0.62} ${s.h * 0.6}`} fill="none" stroke="#a78bfa" strokeWidth={1.8 * sc} strokeLinecap="round" />
         )}
         {emotion === "listening" && (
-          <path d={`M${s.w * 0.38} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.57} ${s.w * 0.62} ${s.h * 0.6}`} fill="none" stroke="#22c55e" strokeWidth={1.8 * sc} strokeLinecap="round" />
+          <path d={`M${s.w * 0.38} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.57} ${s.w * 0.62} ${s.h * 0.6}`} fill="none" stroke="#a78bfa" strokeWidth={1.8 * sc} strokeLinecap="round" />
         )}
         {emotion === "thinking" && (
-          <circle cx={s.w / 2} cy={s.h * 0.62} r={2.5 * sc} fill="#22c55e" />
+          <circle cx={s.w / 2} cy={s.h * 0.62} r={2.5 * sc} fill="#a78bfa" />
         )}
         {emotion === "happy" && (
-          <path d={`M${s.w * 0.33} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.7} ${s.w * 0.67} ${s.h * 0.6}`} fill="none" stroke="#22c55e" strokeWidth={2 * sc} strokeLinecap="round" />
+          <path d={`M${s.w * 0.33} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.7} ${s.w * 0.67} ${s.h * 0.6}`} fill="none" stroke="#a78bfa" strokeWidth={2 * sc} strokeLinecap="round" />
         )}
         {emotion === "laughing" && (
-          <ellipse cx={s.w / 2} cy={s.h * 0.62} rx={12 * sc} ry={6 * sc} fill="#22c55e" opacity={0.8} />
+          <ellipse cx={s.w / 2} cy={s.h * 0.62} rx={12 * sc} ry={6 * sc} fill="#a78bfa" opacity={0.8} />
         )}
         {emotion === "celebrating" && (
-          <path d={`M${s.w * 0.33} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.7} ${s.w * 0.67} ${s.h * 0.6}`} fill="none" stroke="#22c55e" strokeWidth={2.2 * sc} strokeLinecap="round" />
+          <path d={`M${s.w * 0.33} ${s.h * 0.6} Q${s.w / 2} ${s.h * 0.7} ${s.w * 0.67} ${s.h * 0.6}`} fill="none" stroke="#a78bfa" strokeWidth={2.2 * sc} strokeLinecap="round" />
         )}
 
         {/* Blush overlay for happy/laughing/celebrating */}
         {(emotion === "happy" || emotion === "laughing" || emotion === "celebrating") && (
-          <ellipse cx={s.w / 2} cy={s.h * 0.64} rx={20 * sc} ry={8 * sc} fill="#22c55e" opacity={0.05} />
+          <ellipse cx={s.w / 2} cy={s.h * 0.64} rx={20 * sc} ry={8 * sc} fill="#a78bfa" opacity={0.05} />
         )}
       </svg>
 
@@ -311,7 +311,7 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-green-500"
+              className="w-1.5 h-1.5 rounded-full bg-purple-500"
               style={{
                 animation: `fadeIn 0.6s ease infinite ${i * 0.2}s`,
                 opacity: 0.3,
