@@ -138,7 +138,7 @@ export default async function DashboardPage() {
 
       <AnimatedSection delay={0.1}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Documents" value={totalDocuments} icon={<FileIcon className="w-6 h-6" />} color="green" href="/dashboard/documents" index={0} />
+          <StatCard title="Total Documents" value={totalDocuments} icon={<FileIcon className="w-6 h-6" />} color="purple" href="/dashboard/documents" index={0} />
           <StatCard title="Images Indexed" value={totalImages} icon={<ImageIcon className="w-6 h-6" />} color="blue" index={1} />
           <StatCard title="Words Indexed" value={formatNumber(totalWords)} icon={<DocumentIcon className="w-6 h-6" />} color="purple" index={2} />
           <StatCard title="Context Exports" value="Coming Soon" icon={<CopyIcon className="w-6 h-6" />} color="orange" index={3} />
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
           <FolderIcon className="w-16 h-16 text-zinc-600 mb-4" />
           <p className="text-zinc-400 font-medium text-lg">No documents yet</p>
           <p className="text-zinc-600 text-sm mt-1">Upload your first document to get started</p>
-          <Link href="/dashboard/upload" className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors text-sm">
+          <Link href="/dashboard/upload" className="mt-6 px-6 py-3 btn-primary rounded-xl transition-colors text-sm">
             Upload Document
           </Link>
         </div>
@@ -255,8 +255,8 @@ export default async function DashboardPage() {
             <div className="border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Link href="/dashboard/upload" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-800 transition-all">
-                  <UploadIcon className="w-6 h-6 text-green-400" />
+                <Link href="/dashboard/upload" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-800 transition-all">
+                  <UploadIcon className="w-6 h-6 text-purple-400" />
                   <span className="text-sm font-medium text-zinc-300">Upload</span>
                 </Link>
                 <Link href="/dashboard/documents" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 transition-all">
@@ -317,9 +317,9 @@ export default async function DashboardPage() {
                     <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
                   </div>
                 </Link>
-                <Link href="/dashboard/documents?type=image" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-green-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
+                <Link href="/dashboard/documents?type=image" className="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/30 hover:bg-zinc-800/80 transition-all cursor-pointer">
                   <div className="flex items-center gap-3">
-                    <div className="p-1.5 rounded-lg bg-green-500/20 text-green-400">
+                    <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400">
                       <ImageIcon className="w-4 h-4" />
                     </div>
                     <span className="text-sm font-medium text-zinc-300">Images</span>

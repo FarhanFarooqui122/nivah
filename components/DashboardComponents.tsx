@@ -36,7 +36,7 @@ export function StatCard({ title, value, icon, trend, color, href, index = 0 }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
-      whileHover={{ scale: 1.02, boxShadow: "0 0 25px rgba(34,197,94,0.15)" }}
+      whileHover={{ scale: 1.02, boxShadow: "0 0 25px rgba(124,58,237,0.15)" }}
       className={cn("p-6 rounded-2xl border transition-all hover:border-opacity-50", colorClasses[color])}
     >
       <div className="flex items-start justify-between">
@@ -99,7 +99,7 @@ export function StorageUsage({ used, total }: StorageUsageProps) {
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(percentage, 100)}%` }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-          className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full relative overflow-hidden"
+          className="h-full gradient-brand rounded-full relative overflow-hidden"
         >
           <div className="absolute inset-0 animate-shimmer" />
         </motion.div>
@@ -160,7 +160,7 @@ export function AIConnectionCard({ name, icon, status, description, onConnect, i
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={onConnect}
-              className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer select-none"
+              className="px-4 py-1.5 btn-primary text-sm cursor-pointer select-none"
             >
               Connect
             </motion.button>
