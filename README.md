@@ -271,7 +271,6 @@ nivah/
 
 ## Known Issues
 
-- **Middleware** — Uses deprecated `middleware.ts` convention; should migrate to `proxy`
 - **Semantic Search** — Purely in-memory (no pgvector) — won't scale beyond ~10K chunks
 - **AI Connections** — Page is purely cosmetic (no real OAuth integration)
 - **Large Uploads** — Files >10MB may hit Neon BYTEA limits or Vercel serverless function timeouts
