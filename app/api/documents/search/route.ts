@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -12,6 +13,9 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  const limited = checkRateLimit(`search:${user.id}`, RATE_LIMITS.search.limit, RATE_LIMITS.search.windowMs);
+  if (limited) return limited;
 
   try {
     const { q } = await request.json();

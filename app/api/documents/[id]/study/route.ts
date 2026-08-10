@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { ai } from "@/lib/embeddings";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const STUDY_PROMPTS: Record<string, string> = {
   flashcards: `You are an AI study assistant. Create flashcards from the following document content. Each flashcard should have a question on one side and an answer on the other.
@@ -61,6 +62,9 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    const limited = checkRateLimit(`study-content:${user.id}`, RATE_LIMITS.studyContent.limit, RATE_LIMITS.studyContent.windowMs);
+    if (limited) return limited;
 
     const { id } = await params;
     const { type } = await request.json();

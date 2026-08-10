@@ -274,7 +274,6 @@ nivah/
 - **Semantic Search** — Purely in-memory (no pgvector) — won't scale beyond ~10K chunks
 - **AI Connections** — Page is purely cosmetic (no real OAuth integration)
 - **Large Uploads** — Files >10MB may hit Neon BYTEA limits or Vercel serverless function timeouts
-- **Rate Limiting** — No rate limiting on API routes
 
 ---
 

@@ -6,6 +6,7 @@ import { chunkText } from "@/lib/chunker";
 import { generateEmbedding } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  const limited = checkRateLimit(`upload:${user.id}`, RATE_LIMITS.upload.limit, RATE_LIMITS.upload.windowMs);
+  if (limited) return limited;
 
   try {
     const formData = await request.formData();

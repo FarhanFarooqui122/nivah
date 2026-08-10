@@ -13,6 +13,11 @@ export const RATE_LIMITS = {
   aiActions: { limit: 10, windowMs: 60_000 },
   summarize: { limit: 10, windowMs: 60_000 },
   study: { limit: 120, windowMs: 60_000 },
+  upload: { limit: 10, windowMs: 60_000 },
+  search: { limit: 60, windowMs: 60_000 },
+  reindex: { limit: 10, windowMs: 60_000 },
+  studyContent: { limit: 20, windowMs: 60_000 },
+  export: { limit: 30, windowMs: 60_000 },
 } as const;
 
 function sweepExpired(now: number) {

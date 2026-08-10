@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { chunkText } from "@/lib/chunker";
 import { generateEmbedding } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(
   _request: Request,
@@ -18,6 +19,9 @@ export async function POST(
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  const limited = checkRateLimit(`reindex:${user.id}`, RATE_LIMITS.reindex.limit, RATE_LIMITS.reindex.windowMs);
+  if (limited) return limited;
 
   const { id } = await params;
 
