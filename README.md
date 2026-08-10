@@ -237,7 +237,6 @@ nivah/
 │   ├── prisma.ts               # Prisma client singleton
 │   ├── embeddings.ts           # Gemini embedding generation
 │   ├── chunker.ts              # Text chunking (1000 char, 200 overlap)
-│   ├── cosine-similarity.ts    # Cosine similarity computation
 │   ├── extract-text.ts         # File text extraction + OCR pipeline
 │   ├── notifications.ts        # Notification creation helper
 │   ├── theme-context.tsx        # Dark/light theme context
@@ -271,7 +270,7 @@ nivah/
 
 ## Known Issues
 
-- **Semantic Search** — Purely in-memory (no pgvector) — won't scale beyond ~10K chunks
+- **Semantic Search** — Uses pgvector `embeddingVector` column with Postgres-side cosine scan; no ANN index (pgvector caps HNSW/IVFFlat at 2000 dims, `gemini-embedding-001` outputs 3072) — fine to ~10K chunks, brute-force beyond that
 - **AI Connections** — Page is purely cosmetic (no real OAuth integration)
 - **Large Uploads** — Files >10MB may hit Neon BYTEA limits or Vercel serverless function timeouts
 

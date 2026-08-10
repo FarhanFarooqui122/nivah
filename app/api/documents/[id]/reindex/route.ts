@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { chunkText } from "@/lib/chunker";
-import { generateEmbedding } from "@/lib/embeddings";
+import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -49,8 +49,8 @@ export async function POST(
     const chunkId = `chunk_${id}_${chunk.chunkIndex}`;
     if (embedding) {
       await prisma.$executeRaw`
-        INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "createdAt")
-        VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, NOW())
+        INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
+        VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
       `;
     } else {
       await prisma.$executeRaw`

@@ -2,8 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { generateEmbedding } from "@/lib/embeddings";
-import { cosineSimilarity } from "@/lib/cosine-similarity";
+import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
 import { ai } from "@/lib/embeddings";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -66,32 +65,35 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const queryVector = toVectorLiteral(queryEmbedding);
+
   const chunks = await prisma.$queryRaw<{
     id: string;
     documentId: string;
     content: string;
     chunkIndex: number;
-    embedding: number[] | null;
     title: string;
+    similarity: number;
   }[]>`
-    SELECT c."id", c."documentId", c."content", c."chunkIndex", c."embedding", d."title"
+    SELECT c."id", c."documentId", c."content", c."chunkIndex", d."title",
+           1 - (c."embeddingVector" <=> ${queryVector}::vector) AS "similarity"
     FROM "DocumentChunk" c
     JOIN "Document" d ON d."id" = c."documentId"
     WHERE d."userId" = ${user.id}
-      AND c."embedding" IS NOT NULL
+      AND c."embeddingVector" IS NOT NULL
       ${workspaceId ? Prisma.sql`AND d."workspaceId" = ${workspaceId}` : Prisma.empty}
+    ORDER BY c."embeddingVector" <=> ${queryVector}::vector
+    LIMIT ${TOP_K}
   `;
 
   const scored = chunks
-    .filter((c) => c.embedding && c.embedding.length > 0)
+    .filter((c) => c.similarity >= MIN_SCORE)
     .map((c) => ({
       documentId: c.documentId,
       title: c.title,
       content: c.content,
-      similarity: cosineSimilarity(queryEmbedding, c.embedding!),
+      similarity: c.similarity,
     }))
-    .filter((c) => c.similarity >= MIN_SCORE)
-    .sort((a, b) => b.similarity - a.similarity)
     .slice(0, TOP_K);
 
   const context = buildContext(scored);

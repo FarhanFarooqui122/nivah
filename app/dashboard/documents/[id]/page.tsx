@@ -25,7 +25,7 @@ export default async function DocumentDetailPage(props: { params: Promise<{ id: 
     embedding: number[] | null;
     createdAt: Date;
   }[]>`
-    SELECT * FROM "DocumentChunk"
+    SELECT "id", "content", "chunkIndex", "charCount", "embedding", "createdAt" FROM "DocumentChunk"
     WHERE "documentId" = ${id}
     ORDER BY "chunkIndex" ASC
   `;

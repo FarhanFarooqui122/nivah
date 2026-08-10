@@ -4,6 +4,12 @@ export const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY!,
 });
 
+export const EMBEDDING_DIMENSIONS = 3072;
+
+export function toVectorLiteral(embedding: number[]): string {
+  return `[${embedding.join(",")}]`;
+}
+
 export async function generateEmbedding(text: string): Promise<number[] | null> {
   if (!text || text.trim().length === 0) return null;
 

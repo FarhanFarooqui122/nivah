@@ -35,7 +35,7 @@ export async function GET(
     embedding: number[] | null;
     createdAt: Date;
   }[]>`
-    SELECT * FROM "DocumentChunk"
+    SELECT "id", "documentId", "content", "chunkIndex", "charCount", "embedding", "createdAt" FROM "DocumentChunk"
     WHERE "documentId" = ${id}
     ORDER BY "chunkIndex" ASC
   `;

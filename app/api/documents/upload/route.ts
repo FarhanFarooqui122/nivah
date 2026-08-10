@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { extractText } from "@/lib/extract-text";
 import { chunkText } from "@/lib/chunker";
-import { generateEmbedding } from "@/lib/embeddings";
+import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
         const id = `chunk_${document.id}_${chunk.chunkIndex}`;
         if (embedding) {
           await prisma.$executeRaw`
-            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "createdAt")
-            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, NOW())
+            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
+            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
           `;
         } else {
           await prisma.$executeRaw`

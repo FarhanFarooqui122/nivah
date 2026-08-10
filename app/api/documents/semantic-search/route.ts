@@ -2,8 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { generateEmbedding } from "@/lib/embeddings";
-import { cosineSimilarity } from "@/lib/cosine-similarity";
+import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const MIN_SCORE = 0.3;
@@ -42,37 +41,38 @@ export async function POST(request: NextRequest) {
     }
 
     const topKValue = typeof topK === "number" && topK > 0 ? Math.min(topK, 50) : DEFAULT_TOP_K;
+    const queryVector = toVectorLiteral(queryEmbedding);
 
     const chunks = await prisma.$queryRaw<{
       id: string;
       documentId: string;
       content: string;
       chunkIndex: number;
-      embedding: number[] | null;
       title: string;
+      similarity: number;
     }[]>`
-      SELECT c."id", c."documentId", c."content", c."chunkIndex", c."embedding", d."title"
+      SELECT c."id", c."documentId", c."content", c."chunkIndex", d."title",
+             1 - (c."embeddingVector" <=> ${queryVector}::vector) AS "similarity"
       FROM "DocumentChunk" c
       JOIN "Document" d ON d."id" = c."documentId"
       WHERE d."userId" = ${user.id}
-        AND c."embedding" IS NOT NULL
+        AND c."embeddingVector" IS NOT NULL
         ${documentId ? Prisma.sql`AND c."documentId" = ${documentId}` : Prisma.empty}
         ${workspaceId ? Prisma.sql`AND d."workspaceId" = ${workspaceId}` : Prisma.empty}
+      ORDER BY c."embeddingVector" <=> ${queryVector}::vector
+      LIMIT ${topKValue}
     `;
 
     const scored = chunks
-      .filter((c) => c.embedding && c.embedding.length > 0)
+      .filter((c) => c.similarity >= MIN_SCORE)
       .map((c) => ({
         id: c.id,
         documentId: c.documentId,
         title: c.title,
         content: c.content,
         chunkIndex: c.chunkIndex,
-        score: cosineSimilarity(queryEmbedding, c.embedding!),
-      }))
-      .filter((c) => c.score >= MIN_SCORE)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topKValue);
+        score: c.similarity,
+      }));
 
     return NextResponse.json({ results: scored });
   } catch (error) {

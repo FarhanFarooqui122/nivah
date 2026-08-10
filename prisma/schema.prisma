@@ -70,6 +70,8 @@ model DocumentChunk {
 
   embedding   Json?
 
+  embeddingVector Unsupported("vector(3072)")?
+
   createdAt   DateTime @default(now())
 
   @@index([documentId])
