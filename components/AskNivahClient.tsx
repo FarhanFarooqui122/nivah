@@ -38,6 +38,8 @@ interface ChatSessionSummary {
   _count: { messages: number };
 }
 
+const FALLBACK_ANSWER = "I couldn't find that information in your documents.";
+
 export function AskNivahClient() {
   const searchParams = useSearchParams();
   const [question, setQuestion] = useState("");
@@ -47,6 +49,7 @@ export function AskNivahClient() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [streamingStarted, setStreamingStarted] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
@@ -192,9 +195,17 @@ export function AskNivahClient() {
       content: trimmed,
     };
 
-    setMessages((prev) => [...prev, questionMsg]);
+    const answerMsg: Message = {
+      id: crypto.randomUUID(),
+      type: "answer",
+      content: "",
+      sources: [],
+    };
+
+    setMessages((prev) => [...prev, questionMsg, answerMsg]);
     setQuestion("");
     setLoading(true);
+    setStreamingStarted(false);
 
     try {
       const res = await fetch("/api/ask", {
@@ -207,30 +218,73 @@ export function AskNivahClient() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || `Request failed: ${res.status}`);
+        let message = `Request failed: ${res.status}`;
+        try {
+          const err = await res.json();
+          message = err.error || message;
+        } catch {
+          // keep fallback message
+        }
+        throw new Error(message);
       }
 
-      const data = await res.json();
+      if (!res.body) throw new Error("Streaming not supported");
 
-      setCurrentSessionId(data.sessionId);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let gotDelta = false;
 
-      const answerMsg: Message = {
-        id: crypto.randomUUID(),
-        type: "answer",
-        content: data.answer,
-        sources: data.sources || [],
-      };
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+        for (const raw of events) {
+          const line = raw.trim();
+          if (!line.startsWith("data:")) continue;
+          let event: { type: string; text?: string; sessionId?: string; sources?: Source[]; error?: string };
+          try {
+            event = JSON.parse(line.slice(5).trim());
+          } catch {
+            continue;
+          }
+          if (event.type === "meta") {
+            if (event.sessionId) setCurrentSessionId(event.sessionId);
+            if (event.sources) {
+              setMessages((prev) =>
+                prev.map((m) => (m.id === answerMsg.id ? { ...m, sources: event.sources! } : m)),
+              );
+            }
+          } else if (event.type === "delta" && event.text) {
+            gotDelta = true;
+            setStreamingStarted(true);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === answerMsg.id ? { ...m, content: m.content + event.text! } : m,
+              ),
+            );
+          } else if (event.type === "error") {
+            throw new Error(event.error || "Failed to get answer");
+          }
+        }
+      }
 
-      setMessages((prev) => [...prev, answerMsg]);
+      if (!gotDelta) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === answerMsg.id ? { ...m, content: FALLBACK_ANSWER } : m)),
+        );
+      }
       loadSessions(true);
     } catch (e) {
-      const errorMsg: Message = {
-        id: crypto.randomUUID(),
-        type: "error",
-        content: e instanceof Error ? e.message : "Failed to get answer",
-      };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === answerMsg.id
+            ? { ...m, type: "error", content: e instanceof Error ? e.message : "Failed to get answer" }
+            : m,
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -412,7 +466,7 @@ export function AskNivahClient() {
             </div>
           ))}
 
-          {loading && (
+          {loading && !streamingStarted && (
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-1">
                 <NivahMascot size="sm" emotion="thinking" />
