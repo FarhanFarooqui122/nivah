@@ -46,3 +46,5 @@ next-env.d.ts
 
 # agent instructions (local only, not for GitHub)
 /AGENTS.md
+
+.env*
