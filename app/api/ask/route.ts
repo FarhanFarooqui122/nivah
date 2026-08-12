@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         const send = (event: object) => {
+          if (controller.signal.aborted) return;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
         };
 
@@ -137,16 +138,20 @@ export async function POST(request: NextRequest) {
             config: {
               systemInstruction: SYSTEM_PROMPT,
               temperature: 0.5,
+              abortSignal: controller.signal,
             },
           });
 
           let answer = "";
           for await (const chunk of result) {
+            if (controller.signal.aborted) return;
             const text = chunk.text ?? "";
             if (!text) continue;
             answer += text;
             send({ type: "delta", text });
           }
+
+          if (controller.signal.aborted) return;
 
           if (!answer.trim()) answer = FALLBACK_ANSWER;
 
@@ -169,10 +174,17 @@ export async function POST(request: NextRequest) {
 
           send({ type: "done" });
         } catch (error) {
+          if (controller.signal.aborted) return;
           console.error("[Ask Nivah] Generation failed:", error instanceof Error ? error.message : error);
           send({ type: "error", error: "Failed to generate answer. Please try again." });
         } finally {
-          controller.close();
+          if (!controller.signal.aborted) {
+            try {
+              controller.close();
+            } catch {
+              // stream already terminated by the consumer
+            }
+          }
         }
       },
     });
