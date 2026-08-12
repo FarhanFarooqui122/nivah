@@ -17,32 +17,45 @@ export function SettingsToggles({
   const [autoSyncAiMemory, setAutoSyncAiMemory] = useState(initialAutoSyncAiMemory);
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingSync, setSavingSync] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const updatePreference = async (field: string, value: boolean) => {
+  const updatePreference = async (field: string, value: boolean): Promise<boolean> => {
     try {
-      await fetch("/api/user/preferences", {
+      const res = await fetch("/api/user/preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: value }),
       });
+      if (!res.ok) return false;
+      return true;
     } catch {
-      // silently fail
+      return false;
     }
   };
 
   const handleEmailToggle = async () => {
     setSavingEmail(true);
+    setSaveError(null);
     const newVal = !emailNotifications;
     setEmailNotifications(newVal);
-    await updatePreference("emailNotifications", newVal);
+    const ok = await updatePreference("emailNotifications", newVal);
+    if (!ok) {
+      setEmailNotifications(!newVal);
+      setSaveError("Failed to save email notification preference");
+    }
     setSavingEmail(false);
   };
 
   const handleSyncToggle = async () => {
     setSavingSync(true);
+    setSaveError(null);
     const newVal = !autoSyncAiMemory;
     setAutoSyncAiMemory(newVal);
-    await updatePreference("autoSyncAiMemory", newVal);
+    const ok = await updatePreference("autoSyncAiMemory", newVal);
+    if (!ok) {
+      setAutoSyncAiMemory(!newVal);
+      setSaveError("Failed to save auto-sync preference");
+    }
     setSavingSync(false);
   };
 
@@ -66,6 +79,12 @@ export function SettingsToggles({
           />
         </button>
       </div>
+
+      {saveError && (
+        <div className="border border-red-500/30 rounded-xl p-3 bg-red-500/5">
+          <p className="text-red-400 text-sm">{saveError}</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-between py-3 border-t border-zinc-800">
         <div>
