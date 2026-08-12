@@ -8,7 +8,7 @@ export async function createNotification(
   link?: string
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user?.emailNotifications) return;
+  if (!user) return;
 
   await prisma.notification.create({
     data: {
