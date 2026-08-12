@@ -50,6 +50,7 @@ export default function UploadPage() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
+    setUploadError(null);
     const droppedFiles = Array.from(e.dataTransfer.files);
     const { accepted, rejected } = splitBySize(droppedFiles);
     if (rejected.length > 0) {
@@ -60,6 +61,7 @@ export default function UploadPage() {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      setUploadError(null);
       const selected = Array.from(e.target.files!);
       const { accepted, rejected } = splitBySize(selected);
       if (rejected.length > 0) {
@@ -81,7 +83,7 @@ export default function UploadPage() {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
+        setUploadProgress((prev) => ({ ...prev, [i]: 0 }));
 
         const formData = new FormData();
         formData.append("file", file);
@@ -93,7 +95,7 @@ export default function UploadPage() {
         xhr.upload.addEventListener("progress", (event) => {
           if (event.lengthComputable) {
             const percent = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress((prev) => ({ ...prev, [file.name]: percent }));
+            setUploadProgress((prev) => ({ ...prev, [i]: percent }));
           }
         });
 
@@ -115,7 +117,7 @@ export default function UploadPage() {
           xhr.send(formData);
         });
 
-        setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
+        setUploadProgress((prev) => ({ ...prev, [i]: 100 }));
       }
 
       setFiles([]);
@@ -202,9 +204,9 @@ export default function UploadPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white truncate">{file.name}</p>
                   <p className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                  {uploadProgress[file.name] !== undefined && (
+                  {uploadProgress[index] !== undefined && (
                     <div className="mt-2 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[file.name]}%` }} />
+                      <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[index]}%` }} />
                     </div>
                   )}
                 </div>
