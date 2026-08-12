@@ -60,6 +60,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
   const [aiRunning, setAiRunning] = useState(false);
   const [aiResult, setAiResult] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...documents];
@@ -108,21 +109,47 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this document?")) return;
     setDeleting(id);
+    setListError(null);
     try {
       const res = await fetch(`/api/documents?id=${id}`, { method: "DELETE" });
-      if (res.ok) router.refresh();
-    } catch (error) {
-      console.error("Delete failed:", error);
+      if (res.ok) {
+        setSelectedDocs((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        router.refresh();
+      } else {
+        setListError("Failed to delete document");
+      }
+    } catch {
+      setListError("Failed to delete document");
     }
     setDeleting(null);
   };
 
   const handleBulkDelete = async () => {
     if (!confirm(`Delete ${selectedDocs.size} document(s)?`)) return;
+    setListError(null);
+    const failed: string[] = [];
     for (const id of selectedDocs) {
-      await fetch(`/api/documents?id=${id}`, { method: "DELETE" });
+      try {
+        const res = await fetch(`/api/documents?id=${id}`, { method: "DELETE" });
+        if (!res.ok) failed.push(id);
+      } catch {
+        failed.push(id);
+      }
     }
-    setSelectedDocs(new Set());
+    if (failed.length > 0) {
+      setListError(`${failed.length} document(s) failed to delete`);
+    }
+    setSelectedDocs((prev) => {
+      const next = new Set(prev);
+      for (const id of prev) {
+        if (!failed.includes(id)) next.delete(id);
+      }
+      return next;
+    });
     router.refresh();
   };
 
@@ -243,10 +270,17 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         </div>
       )}
 
+      {listError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
+          <p className="text-red-400 text-sm">{listError}</p>
+          <button onClick={() => setListError(null)} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
+        </div>
+      )}
+
       {aiError && (
         <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
           <p className="text-red-400 text-sm">{aiError}</p>
-          <button onClick={() => { setAiError(null); setAiResult(null); }} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
+          <button onClick={() => { setAiError(null); setAiResult(null); setAiAction(""); }} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
         </div>
       )}
 
