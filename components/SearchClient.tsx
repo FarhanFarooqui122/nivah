@@ -24,16 +24,19 @@ export function SearchClient() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const requestSeq = useRef(0);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
   const doSearch = useCallback(async (q: string) => {
+    const seq = ++requestSeq.current;
     const trimmed = q.trim();
     if (!trimmed) {
       setResults([]);
       setHasSearched(false);
+      setLoading(false);
       return;
     }
 
@@ -47,6 +50,8 @@ export function SearchClient() {
         body: JSON.stringify({ q: trimmed }),
       });
 
+      if (seq !== requestSeq.current) return;
+
       if (!res.ok) {
         throw new Error(`Search failed: ${res.status}`);
       }
@@ -55,10 +60,11 @@ export function SearchClient() {
       setResults(data.results || []);
       setHasSearched(true);
     } catch (e) {
+      if (seq !== requestSeq.current) return;
       setError(e instanceof Error ? e.message : "Search failed");
       setResults([]);
     } finally {
-      setLoading(false);
+      if (seq === requestSeq.current) setLoading(false);
     }
   }, []);
 
