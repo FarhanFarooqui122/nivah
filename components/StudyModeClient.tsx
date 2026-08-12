@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useState, useEffect, useCallback } from "react";
 import { Sparkles, RefreshCw, Copy, Check, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -51,8 +52,10 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
   const [mcqSubmitted, setMcqSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const loadSeqRef = useRef(0);
 
   useEffect(() => {
+    const seq = ++loadSeqRef.current;
     fetch(`/api/study?documentId=${documentId}`)
       .then((res) => {
         if (!res.ok) {
@@ -61,18 +64,23 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         return res.json();
       })
       .then((data) => {
+        if (seq !== loadSeqRef.current) return;
         const map: Record<string, StudyContentItem> = {};
         for (const item of data.content || []) {
           if (!map[item.type]) map[item.type] = item;
         }
         setStudyContent(map);
+        setCardIndex(0);
+        setFlipped(false);
       })
       .catch((e) => {
+        if (seq !== loadSeqRef.current) return;
         setError(e instanceof Error ? e.message : "Failed to load study content");
       });
   }, [documentId]);
 
   const generate = useCallback(async (type: StudyTab) => {
+    loadSeqRef.current++;
     setLoading((prev) => ({ ...prev, [type]: true }));
     setError(null);
     try {
@@ -105,12 +113,13 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     const cards = data.content as Flashcard[];
     if (!Array.isArray(cards) || cards.length === 0) return null;
 
-    const card = cards[cardIndex];
+    const safeIndex = Math.min(cardIndex, cards.length - 1);
+    const card = cards[safeIndex];
 
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between text-sm text-zinc-500">
-          <span>{cardIndex + 1} of {cards.length}</span>
+          <span>{safeIndex + 1} of {cards.length}</span>
           <button
             onClick={() => generate("flashcards")}
             disabled={loading.flashcards}
@@ -139,14 +148,14 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => { setCardIndex((i) => Math.max(0, i - 1)); setFlipped(false); }}
-            disabled={cardIndex === 0}
+            disabled={safeIndex === 0}
             className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => { setCardIndex((i) => Math.min(cards.length - 1, i + 1)); setFlipped(false); }}
-            disabled={cardIndex >= cards.length - 1}
+            disabled={safeIndex >= cards.length - 1}
             className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50"
           >
             <ChevronRight className="w-5 h-5" />
