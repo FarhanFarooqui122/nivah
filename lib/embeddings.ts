@@ -21,6 +21,13 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
 
     const values = result.embeddings?.[0]?.values ?? [];
 
+    if (!values || values.length !== EMBEDDING_DIMENSIONS) {
+      console.error(
+        `[Embedding] Unexpected vector length: got ${values.length}, expected ${EMBEDDING_DIMENSIONS}`
+      );
+      return null;
+    }
+
     return values;
   } catch (error) {
     console.error("[Embedding] Failed:", error instanceof Error ? error.message : error);
