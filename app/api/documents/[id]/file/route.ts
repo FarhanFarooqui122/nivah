@@ -29,11 +29,21 @@ export async function GET(
     return NextResponse.json({ error: "File data not available" }, { status: 404 });
   }
 
+  const safeFileName = (document.fileName || "download")
+    .replace(/[\r\n"]/g, "_")
+    .replace(/[^\x20-\x7E]/g, "_");
+
+  const safeContentType =
+    /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/i.test(document.fileType || "")
+      ? document.fileType
+      : "application/octet-stream";
+
   return new NextResponse(document.fileBlob, {
     headers: {
-      "Content-Type": document.fileType,
-      "Content-Disposition": `attachment; filename="${document.fileName}"`,
+      "Content-Type": safeContentType,
+      "Content-Disposition": `attachment; filename="${safeFileName}"`,
       "Content-Length": document.fileSize.toString(),
+      "Cache-Control": "private, no-store",
     },
   });
 }
