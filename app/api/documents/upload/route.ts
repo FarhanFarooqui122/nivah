@@ -67,37 +67,47 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await prisma.document.update({
-      where: { id: document.id },
-      data: { fileUrl: `/api/documents/${document.id}/file` },
-    });
-    document.fileUrl = `/api/documents/${document.id}/file`;
+    try {
+      await prisma.document.update({
+        where: { id: document.id },
+        data: { fileUrl: `/api/documents/${document.id}/file` },
+      });
+      document.fileUrl = `/api/documents/${document.id}/file`;
 
-    let chunkCount = 0;
-    if (textContent && textContent.length > 0) {
-      const chunks = chunkText(textContent);
-      chunkCount = chunks.length;
+      let chunkCount = 0;
+      if (textContent && textContent.length > 0) {
+        const chunks = chunkText(textContent);
+        chunkCount = chunks.length;
 
-      const embeddings = await generateEmbeddings(
-        chunks.map((chunk) => chunk.content)
-      );
+        const embeddings = await generateEmbeddings(
+          chunks.map((chunk) => chunk.content)
+        );
 
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        const embedding = embeddings[i];
-        const id = `chunk_${document.id}_${chunk.chunkIndex}`;
-        if (embedding) {
-          await prisma.$executeRaw`
-            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
-            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
-          `;
-        } else {
-          await prisma.$executeRaw`
-            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
-            VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
-          `;
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i];
+          const embedding = embeddings[i];
+          const id = `chunk_${document.id}_${chunk.chunkIndex}`;
+          if (embedding) {
+            await prisma.$executeRaw`
+              INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
+              VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
+            `;
+          } else {
+            await prisma.$executeRaw`
+              INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
+              VALUES (${id}, ${document.id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
+            `;
+          }
         }
       }
+    } catch (chunkError) {
+      console.error("[Upload] Chunking failed:", chunkError);
+      await prisma.document
+        .delete({
+          where: { id: document.id },
+        })
+        .catch(() => {});
+      throw chunkError;
     }
 
     await createNotification(
