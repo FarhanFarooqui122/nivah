@@ -14,7 +14,9 @@ interface ProfileStats {
 }
 
 export function ProfileClient({ stats }: { stats: ProfileStats }) {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+
+  if (!isLoaded) return null;
 
   const joinDate = new Date(stats.joinedAt).toLocaleDateString("en-US", {
     month: "long",

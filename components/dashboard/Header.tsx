@@ -16,7 +16,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
@@ -143,10 +143,10 @@ export function Header() {
                 animate={{ boxShadow: userMenuOpen ? "0 0 20px rgba(124,58,237,0.3)" : "0 0 0px rgba(124,58,237,0)" }}
                 className="w-8 h-8 gradient-brand rounded-full flex items-center justify-center text-white text-sm font-semibold"
               >
-                {user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U"}
+                {isLoaded ? (user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U") : ""}
               </motion.div>
               <span className="hidden md:block text-sm font-medium text-white max-w-[150px] truncate">
-                {user?.fullName || user?.emailAddresses[0]?.emailAddress || "User"}
+                {isLoaded ? (user?.fullName || user?.emailAddresses[0]?.emailAddress || "User") : ""}
               </span>
             </motion.button>
 
@@ -161,7 +161,7 @@ export function Header() {
                 >
                   <div className="px-4 py-3 border-b border-zinc-800">
                     <p className="font-medium text-white truncate">{user?.fullName || "User"}</p>
-                    <p className="text-xs text-zinc-400 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
+                    <p className="text-xs text-zinc-400 truncate">{user?.emailAddresses[0]?.emailAddress || ""}</p>
                   </div>
                   <Link
                     href="/dashboard/profile"
