@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    let chunkCount = 0;
+
     try {
       await prisma.document.update({
         where: { id: document.id },
@@ -74,7 +76,6 @@ export async function POST(request: NextRequest) {
       });
       document.fileUrl = `/api/documents/${document.id}/file`;
 
-      let chunkCount = 0;
       if (textContent && textContent.length > 0) {
         const chunks = chunkText(textContent);
         chunkCount = chunks.length;
