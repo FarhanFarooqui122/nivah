@@ -23,10 +23,12 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
   const [editing, setEditing] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const handleCreate = async () => {
     if (!name.trim()) return;
     setCreating(true);
+    setActionError(null);
     try {
       const res = await fetch("/api/workspaces", {
         method: "POST",
@@ -39,23 +41,30 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
         setName("");
         setDescription("");
         setShowCreate(false);
+      } else {
+        const data = await res.json().catch(() => null);
+        setActionError(data?.error || "Failed to create workspace");
       }
-    } catch (error) {
-      console.error("Failed to create workspace:", error);
+    } catch {
+      setActionError("Failed to create workspace");
     }
     setCreating(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this workspace? Documents in it will not be deleted.")) return;
+    setActionError(null);
     try {
       const res = await fetch(`/api/workspaces/${id}`, { method: "DELETE" });
       if (res.ok) {
         setWorkspaces((prev) => prev.filter((w) => w.id !== id));
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => null);
+        setActionError(data?.error || "Failed to delete workspace");
       }
-    } catch (error) {
-      console.error("Failed to delete workspace:", error);
+    } catch {
+      setActionError("Failed to delete workspace");
     }
   };
 
@@ -67,6 +76,7 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
 
   const saveEdit = async (id: string) => {
     if (!editName.trim()) return;
+    setActionError(null);
     try {
       const res = await fetch(`/api/workspaces/${id}`, {
         method: "PATCH",
@@ -77,9 +87,12 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
         const { workspace } = await res.json();
         setWorkspaces((prev) => prev.map((w) => w.id === id ? { ...w, ...workspace } : w));
         setEditing(null);
+      } else {
+        const data = await res.json().catch(() => null);
+        setActionError(data?.error || "Failed to update workspace");
       }
-    } catch (error) {
-      console.error("Failed to update workspace:", error);
+    } catch {
+      setActionError("Failed to update workspace");
     }
   };
 
@@ -100,6 +113,13 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
           Create Workspace
         </button>
       </div>
+
+      {actionError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5 flex items-center justify-between gap-3">
+          <p className="text-red-400 text-sm">{actionError}</p>
+          <button onClick={() => setActionError(null)} className="text-sm text-zinc-400 hover:text-white transition-colors flex-shrink-0">Dismiss</button>
+        </div>
+      )}
 
       {showCreate && (
         <div className="p-6 rounded-2xl border border-purple-500/30 bg-purple-900/10 space-y-4">

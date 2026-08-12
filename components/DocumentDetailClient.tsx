@@ -44,6 +44,7 @@ export function DocumentDetailClient({
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>(document.workspaceId || "");
   const [savingWorkspace, setSavingWorkspace] = useState(false);
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(document.summary);
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export function DocumentDetailClient({
 
   const saveWorkspace = async (workspaceId: string) => {
     setSavingWorkspace(true);
+    setWorkspaceError(null);
     try {
       const res = await fetch(`/api/documents/${document.id}`, {
         method: "PATCH",
@@ -68,9 +70,12 @@ export function DocumentDetailClient({
       if (res.ok) {
         setSelectedWorkspace(workspaceId);
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => null);
+        setWorkspaceError(data?.error || "Failed to save workspace");
       }
-    } catch (error) {
-      console.error("Failed to update workspace:", error);
+    } catch {
+      setWorkspaceError("Failed to save workspace");
     }
     setSavingWorkspace(false);
   };
@@ -277,6 +282,12 @@ export function DocumentDetailClient({
           {deleting ? "Deleting..." : "Delete"}
         </button>
       </div>
+
+      {workspaceError && (
+        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
+          <p className="text-red-400 text-sm">{workspaceError}</p>
+        </div>
+      )}
 
       {summaryError && (
         <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
