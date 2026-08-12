@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, Moon, Sun, LogOut, User, Settings, Search, Command } from "lucide-react";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import { usePathname } from "next/navigation";
@@ -15,10 +15,24 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { user } = useUser();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   const pages = [
     { name: "Dashboard", href: "/dashboard", keywords: "home overview stats" },
@@ -60,6 +74,7 @@ export function Header() {
           <div className="relative w-full max-w-md hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
+              ref={searchInputRef}
               type="search"
               placeholder="Search Nivah... (⌘K)"
               className="w-full h-10 pl-10 pr-4 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
