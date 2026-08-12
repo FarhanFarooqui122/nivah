@@ -37,6 +37,7 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const requestSeq = useRef(0);
+  const lastWrittenUrlRef = useRef("");
 
   const doSearch = useCallback(async (q: string, docId?: string, wsId?: string) => {
     const seq = ++requestSeq.current;
@@ -87,20 +88,31 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
     if (docId) params.set("documentId", docId);
     if (wsId) params.set("workspaceId", wsId);
     const str = params.toString();
+    lastWrittenUrlRef.current = str;
     router.replace(`/dashboard/semantic-search${str ? `?${str}` : ""}`, { scroll: false });
   }, [router]);
 
   useEffect(() => {
-    const q = searchParams.get("q");
-    const docId = searchParams.get("documentId");
-    const wsId = searchParams.get("workspaceId");
+    const q = searchParams.get("q") || "";
+    const docId = searchParams.get("documentId") || "";
+    const wsId = searchParams.get("workspaceId") || "";
+    const urlKey = `${q}|${docId}|${wsId}`;
+    if (urlKey === lastWrittenUrlRef.current) return;
+    lastWrittenUrlRef.current = urlKey;
+    setQuery(q);
+    setDocumentFilter(docId);
+    setWorkspaceFilter(wsId);
     if (q) {
       startTransition(() => {
         doSearch(q, docId || undefined, wsId || undefined);
       });
+    } else {
+      setResults([]);
+      setHasSearched(false);
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     return () => {
