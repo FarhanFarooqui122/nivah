@@ -54,10 +54,19 @@ export function AskNivahClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
   const requestedSessionRef = useRef<string | null>(null);
+  const processedSessionRef = useRef<string | null>(null);
+  const epochRef = useRef(0);
+  const streamAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => streamAbortRef.current?.abort();
+  }, []);
 
   const loadSession = useCallback(
     async (sessionId: string) => {
       setShowHistory(false);
+      epochRef.current++;
+      streamAbortRef.current?.abort();
       setCurrentSessionId(sessionId);
       setMessages([]);
       setLoading(true);
@@ -106,45 +115,61 @@ export function AskNivahClient() {
   }, [sessionsLoaded]);
 
   useEffect(() => {
-    const sessionId = searchParams.get("session");
-    if (sessionId) {
-      requestedSessionRef.current = sessionId;
-      startTransition(() => {
-        setShowHistory(false);
-        setCurrentSessionId(sessionId);
-        setMessages([]);
-        setLoading(true);
+    if (sessionsLoaded) return;
+    fetch("/api/chat/sessions")
+      .then((res) => res.json())
+      .then((data) => setSessions(data.sessions))
+      .catch(() => {})
+      .finally(() => {
+        setSessionsLoading(false);
+        setSessionsLoaded(true);
       });
-      fetch(`/api/chat/sessions/${sessionId}/messages`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (requestedSessionRef.current !== sessionId) return;
-          const loaded: Message[] = (data.messages || []).map(
-            (m: { id: string; role: string; content: string; sources: Source[] | null }) => ({
-              id: m.id,
-              type: m.role === "USER" ? "question" : "answer",
-              content: m.content,
-              sources: m.sources ?? undefined,
-            }),
-          );
-          setMessages(loaded);
-        })
-        .catch(() => {})
-        .finally(() => {
-          if (requestedSessionRef.current === sessionId) setLoading(false);
-        });
-    }
-    if (!sessionsLoaded) {
-      fetch("/api/chat/sessions")
-        .then((res) => res.json())
-        .then((data) => setSessions(data.sessions))
-        .catch(() => {})
-        .finally(() => {
-          setSessionsLoading(false);
-          setSessionsLoaded(true);
-        });
-    }
-  }, [searchParams, sessionsLoaded]);
+  }, [sessionsLoaded]);
+
+  useEffect(() => {
+    const sessionId = searchParams.get("session");
+    if (!sessionId || processedSessionRef.current === sessionId) return;
+    processedSessionRef.current = sessionId;
+    epochRef.current++;
+    streamAbortRef.current?.abort();
+    requestedSessionRef.current = sessionId;
+    startTransition(() => {
+      setShowHistory(false);
+      setCurrentSessionId(sessionId);
+      setMessages([]);
+      setLoading(true);
+    });
+    fetch(`/api/chat/sessions/${sessionId}/messages`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load session: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (requestedSessionRef.current !== sessionId) return;
+        const loaded: Message[] = (data.messages || []).map(
+          (m: { id: string; role: string; content: string; sources: Source[] | null }) => ({
+            id: m.id,
+            type: m.role === "USER" ? "question" : "answer",
+            content: m.content,
+            sources: m.sources ?? undefined,
+          }),
+        );
+        setMessages(loaded);
+      })
+      .catch(() => {
+        if (requestedSessionRef.current !== sessionId) return;
+        setMessages([
+          {
+            id: crypto.randomUUID(),
+            type: "error",
+            content: "Failed to load this conversation.",
+          },
+        ]);
+      })
+      .finally(() => {
+        if (requestedSessionRef.current === sessionId) setLoading(false);
+      });
+  }, [searchParams]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -156,6 +181,7 @@ export function AskNivahClient() {
   }, [messages]);
 
   const newChat = useCallback(() => {
+    epochRef.current++;
     setCurrentSessionId(null);
     setMessages([]);
     setQuestion("");
@@ -202,6 +228,12 @@ export function AskNivahClient() {
       sources: [],
     };
 
+    const epochAtSubmit = epochRef.current;
+
+    streamAbortRef.current?.abort();
+    const abortController = new AbortController();
+    streamAbortRef.current = abortController;
+
     setMessages((prev) => [...prev, questionMsg, answerMsg]);
     setQuestion("");
     setLoading(true);
@@ -215,6 +247,7 @@ export function AskNivahClient() {
           question: trimmed,
           sessionId: currentSessionId,
         }),
+        signal: abortController.signal,
       });
 
       if (!res.ok) {
@@ -251,7 +284,9 @@ export function AskNivahClient() {
             continue;
           }
           if (event.type === "meta") {
-            if (event.sessionId) setCurrentSessionId(event.sessionId);
+            if (event.sessionId && epochRef.current === epochAtSubmit) {
+              setCurrentSessionId(event.sessionId);
+            }
             if (event.sources) {
               setMessages((prev) =>
                 prev.map((m) => (m.id === answerMsg.id ? { ...m, sources: event.sources! } : m)),
@@ -278,6 +313,7 @@ export function AskNivahClient() {
       }
       loadSessions(true);
     } catch (e) {
+      if (abortController.signal.aborted) return;
       setMessages((prev) =>
         prev.map((m) =>
           m.id === answerMsg.id
@@ -286,7 +322,9 @@ export function AskNivahClient() {
         ),
       );
     } finally {
-      setLoading(false);
+      if (streamAbortRef.current === abortController) {
+        setLoading(false);
+      }
     }
   };
 
