@@ -15,10 +15,10 @@ export async function POST() {
   }
 
   try {
+    await prisma.user.delete({ where: { id: user.id } });
+
     const client = await clerkClient();
     await client.users.deleteUser(userId);
-
-    await prisma.user.delete({ where: { id: user.id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
