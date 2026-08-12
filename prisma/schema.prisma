@@ -54,6 +54,9 @@ model Document {
   workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
 
   chunks DocumentChunk[]
+
+  @@index([userId])
+  @@index([workspaceId])
 }
 
 model DocumentChunk {
@@ -90,6 +93,7 @@ model ChatSession {
   messages  ChatMessage[]
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 model ChatMessage {
