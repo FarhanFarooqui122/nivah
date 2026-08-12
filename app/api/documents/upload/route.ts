@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { extractText } from "@/lib/extract-text";
 import { chunkText } from "@/lib/chunker";
-import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
+import { generateEmbeddings, toVectorLiteral } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
       const chunks = chunkText(textContent);
       chunkCount = chunks.length;
 
-      const embeddings = await Promise.all(
-        chunks.map((chunk) => generateEmbedding(chunk.content))
+      const embeddings = await generateEmbeddings(
+        chunks.map((chunk) => chunk.content)
       );
 
       for (let i = 0; i < chunks.length; i++) {

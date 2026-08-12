@@ -6,8 +6,29 @@ export const ai = new GoogleGenAI({
 
 export const EMBEDDING_DIMENSIONS = 3072;
 
+const EMBEDDING_CONCURRENCY = 8;
+
 export function toVectorLiteral(embedding: number[]): string {
   return `[${embedding.join(",")}]`;
+}
+
+export async function generateEmbeddings(texts: string[]): Promise<(number[] | null)[]> {
+  const results: (number[] | null)[] = new Array(texts.length).fill(null);
+  let cursor = 0;
+
+  const worker = async () => {
+    while (cursor < texts.length) {
+      const index = cursor;
+      cursor++;
+      results[index] = await generateEmbedding(texts[index]);
+    }
+  };
+
+  await Promise.all(
+    Array.from({ length: Math.min(EMBEDDING_CONCURRENCY, texts.length) }, () => worker())
+  );
+
+  return results;
 }
 
 export async function generateEmbedding(text: string): Promise<number[] | null> {

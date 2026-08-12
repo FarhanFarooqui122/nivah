@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { chunkText } from "@/lib/chunker";
-import { generateEmbedding, toVectorLiteral } from "@/lib/embeddings";
+import { generateEmbeddings, toVectorLiteral } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -37,8 +37,8 @@ export async function POST(
   }
 
   const chunks = chunkText(document.textContent);
-  const embeddings = await Promise.all(
-    chunks.map((chunk) => generateEmbedding(chunk.content))
+  const embeddings = await generateEmbeddings(
+    chunks.map((chunk) => chunk.content)
   );
 
   if (embeddings.every((embedding) => embedding === null)) {
