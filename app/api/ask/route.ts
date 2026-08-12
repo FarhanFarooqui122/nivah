@@ -53,15 +53,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Question is required" }, { status: 400 });
     }
 
-    let session;
+    let session: Awaited<ReturnType<typeof prisma.chatSession.findUnique>> | null = null;
     if (sessionId) {
       session = await prisma.chatSession.findUnique({ where: { id: sessionId } });
       if (!session || session.userId !== user.id) {
         return NextResponse.json({ error: "Session not found" }, { status: 404 });
       }
-    }
-
-    if (!session) {
+    } else {
       session = await prisma.chatSession.create({
         data: { title: question.trim().slice(0, 80), userId: user.id },
       });
