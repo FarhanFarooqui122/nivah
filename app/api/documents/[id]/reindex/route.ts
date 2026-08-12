@@ -36,28 +36,45 @@ export async function POST(
     return NextResponse.json({ error: "Document has no text content" }, { status: 400 });
   }
 
-  await prisma.$executeRaw`DELETE FROM "DocumentChunk" WHERE "documentId" = ${id}`;
-
   const chunks = chunkText(document.textContent);
   const embeddings = await Promise.all(
     chunks.map((chunk) => generateEmbedding(chunk.content))
   );
 
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const embedding = embeddings[i];
-    const chunkId = `chunk_${id}_${chunk.chunkIndex}`;
-    if (embedding) {
-      await prisma.$executeRaw`
-        INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
-        VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
-      `;
-    } else {
-      await prisma.$executeRaw`
-        INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
-        VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
-      `;
-    }
+  if (embeddings.every((embedding) => embedding === null)) {
+    return NextResponse.json(
+      { error: "Embedding generation failed; existing chunks kept intact" },
+      { status: 502 }
+    );
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`DELETE FROM "DocumentChunk" WHERE "documentId" = ${id}`;
+
+      for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const embedding = embeddings[i];
+        const chunkId = `chunk_${id}_${chunk.chunkIndex}`;
+        if (embedding) {
+          await tx.$executeRaw`
+            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "embedding", "embeddingVector", "createdAt")
+            VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, ${JSON.stringify(embedding)}::jsonb, ${toVectorLiteral(embedding)}::vector, NOW())
+          `;
+        } else {
+          await tx.$executeRaw`
+            INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "charCount", "createdAt")
+            VALUES (${chunkId}, ${id}, ${chunk.content}, ${chunk.chunkIndex}, ${chunk.charCount}, NOW())
+          `;
+        }
+      }
+    });
+  } catch (error) {
+    console.error("[Reindex] Failed:", error instanceof Error ? error.message : error);
+    return NextResponse.json(
+      { error: "Re-index failed; existing chunks kept intact" },
+      { status: 500 }
+    );
   }
 
   await createNotification(
