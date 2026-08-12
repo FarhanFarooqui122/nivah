@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   FolderOpen,
@@ -48,6 +48,7 @@ const navItemVariants = {
 export function Sidebar() {
   const { mobileOpen, collapsed, closeMobile, toggleCollapsed } = useSidebar();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [workspaceList, setWorkspaceList] = useState<{ id: string; name: string }[]>([]);
   const [recentChats, setRecentChats] = useState<{ id: string; title: string }[]>([]);
 
@@ -210,7 +211,8 @@ export function Sidebar() {
             </div>
             <ul className="space-y-0.5" role="list">
               {recentChats.map((chat) => {
-                const isActive = pathname === `/dashboard/ask?session=${chat.id}`;
+                const isActive =
+                  pathname === "/dashboard/ask" && searchParams.get("session") === chat.id;
                 return (
                   <motion.li
                     key={chat.id}
