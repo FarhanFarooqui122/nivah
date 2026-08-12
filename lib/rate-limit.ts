@@ -7,6 +7,9 @@ interface Bucket {
 
 const buckets = new Map<string, Bucket>();
 
+const SWEEP_INTERVAL_MS = 60_000;
+let nextSweepAt = 0;
+
 export const RATE_LIMITS = {
   ask: { limit: 30, windowMs: 60_000 },
   semanticSearch: { limit: 60, windowMs: 60_000 },
@@ -21,10 +24,11 @@ export const RATE_LIMITS = {
 } as const;
 
 function sweepExpired(now: number) {
-  if (buckets.size < 10_000) return;
+  if (now < nextSweepAt) return;
   for (const [key, bucket] of buckets) {
     if (bucket.resetAt <= now) buckets.delete(key);
   }
+  nextSweepAt = now + SWEEP_INTERVAL_MS;
 }
 
 export function rateLimit(key: string, limit: number, windowMs: number) {
