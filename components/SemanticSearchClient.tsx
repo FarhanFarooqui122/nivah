@@ -107,9 +107,11 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
         doSearch(q, docId || undefined, wsId || undefined);
       });
     } else {
-      setResults([]);
-      setHasSearched(false);
-      setLoading(false);
+      startTransition(() => {
+        setResults([]);
+        setHasSearched(false);
+        setLoading(false);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
