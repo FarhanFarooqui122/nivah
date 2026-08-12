@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
+const MAX_EXPORT_DOCUMENTS = 50;
+
 export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) {
@@ -29,9 +31,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No documents selected" }, { status: 400 });
   }
 
+  const uniqueIds = [...new Set(documentIds)];
+
+  if (uniqueIds.length > MAX_EXPORT_DOCUMENTS) {
+    return NextResponse.json(
+      { error: `Too many documents (max ${MAX_EXPORT_DOCUMENTS})` },
+      { status: 400 },
+    );
+  }
+
   const documents = await prisma.document.findMany({
     where: {
-      id: { in: documentIds },
+      id: { in: uniqueIds },
       userId: user.id,
     },
     select: {
@@ -43,12 +54,12 @@ export async function POST(request: Request) {
     },
   });
 
-  if (documents.length !== documentIds.length) {
+  if (documents.length !== uniqueIds.length) {
     return NextResponse.json({ error: "One or more documents not found" }, { status: 404 });
   }
 
   const docMap = new Map(documents.map((d) => [d.id, d]));
-  const ordered = documentIds.map((id) => docMap.get(id)).filter((d): d is NonNullable<typeof d> => d !== undefined);
+  const ordered = uniqueIds.map((id) => docMap.get(id)).filter((d): d is NonNullable<typeof d> => d !== undefined);
 
   const parts = ordered.map((doc) => {
     const date = new Date(doc.createdAt).toISOString().split("T")[0];
