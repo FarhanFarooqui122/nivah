@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, startTransition } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   SendHorizonal,
   FileText,
@@ -42,6 +42,7 @@ const FALLBACK_ANSWER = "I couldn't find that information in your documents.";
 
 export function AskNivahClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -182,11 +183,16 @@ export function AskNivahClient() {
 
   const newChat = useCallback(() => {
     epochRef.current++;
+    streamAbortRef.current?.abort();
     setCurrentSessionId(null);
     setMessages([]);
     setQuestion("");
+    setLoading(false);
+    requestedSessionRef.current = null;
+    processedSessionRef.current = null;
+    router.replace("/dashboard/ask", { scroll: false });
     inputRef.current?.focus();
-  }, []);
+  }, [router]);
 
   const deleteSession = useCallback(
     async (e: React.MouseEvent | React.KeyboardEvent, sessionId: string) => {
