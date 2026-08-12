@@ -47,6 +47,18 @@ export async function POST(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
+      select: {
+        id: true,
+        title: true,
+        fileName: true,
+        fileType: true,
+        fileSize: true,
+        fileUrl: true,
+        textContent: true,
+        summary: true,
+        createdAt: true,
+        workspaceId: true,
+      },
     });
 
     return NextResponse.json({ results });
