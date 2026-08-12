@@ -50,10 +50,14 @@ export function NivahMascot({ emotion: forcedEmotion, size = "md", className, in
     }
   }, [isTyping, forcedEmotion, emotion]);
 
+  const needsTick =
+    emotion === "happy" || emotion === "laughing" || emotion === "celebrating" || emotion === "listening";
+
   useEffect(() => {
+    if (!needsTick) return;
     const interval = setInterval(() => setTick((prev) => prev + 1), 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [needsTick]);
 
   const trackMouse = useCallback((e: MouseEvent) => {
     if (!containerRef.current || focused) return;
