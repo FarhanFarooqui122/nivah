@@ -342,17 +342,18 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       ) : (
         <>
         <div className="border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="hidden md:grid grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-3 bg-zinc-900/50 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+          <div className="hidden md:grid grid-cols-[40px_1fr_180px_100px_110px_90px] gap-4 px-6 py-3 bg-zinc-900/50 text-xs font-medium text-zinc-500 uppercase tracking-wider">
             <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="rounded border-zinc-600 accent-purple-600" /></div>
             <span>Name</span>
             <span>Type</span>
             <span>Size</span>
             <span>Date</span>
+            <span>Actions</span>
           </div>
 
           <div className="divide-y divide-zinc-800">
             {paginated.map((doc) => (
-              <div key={doc.id} className={cn("grid grid-cols-[40px_1fr] md:grid-cols-[40px_1fr_200px_120px_100px] gap-4 px-6 py-4 items-center hover:bg-zinc-900/50 transition-colors group", deleting === doc.id && "opacity-50")}>
+              <div key={doc.id} className={cn("grid grid-cols-[40px_1fr] md:grid-cols-[40px_1fr_180px_100px_110px_90px] gap-4 px-6 py-4 items-center hover:bg-zinc-900/50 transition-colors group", deleting === doc.id && "opacity-50")}>
                 <div>
                   <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="rounded border-zinc-600 accent-purple-600" />
                 </div>
@@ -368,7 +369,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                     <p className="text-xs text-zinc-500 truncate md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
                     {doc.charCount != null && doc.charCount > 0 && (
                       <p className="text-xs text-zinc-600 mt-0.5 flex items-center gap-2">
-                        <span>{doc.charCount.toLocaleString()} chars · {doc.wordCount?.toLocaleString()} words · {doc.chunkCount} chunks</span>
+                        <span>{doc.charCount.toLocaleString()} chars · {doc.wordCount != null ? `${doc.wordCount.toLocaleString()} words` : ""} · {doc.chunkCount ?? 0} chunks</span>
                         {doc.embeddedCount != null && doc.chunkCount != null && doc.embeddedCount < doc.chunkCount && (
                           <span className="text-yellow-500 text-[10px] font-medium">Needs re-index</span>
                         )}
