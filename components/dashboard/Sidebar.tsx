@@ -252,9 +252,9 @@ export function Sidebar() {
             </p>
             <ul className="space-y-1" role="list">
               {[
-                { name: "Cross-AI Memory", icon: Database, href: "/dashboard/cross-ai", comingSoon: true },
-                { name: "Team Workspaces", icon: FolderGit2, href: "/dashboard/teams", comingSoon: true },
-                { name: "Enterprise Security", icon: Shield, href: "/dashboard/security", comingSoon: true },
+                { name: "Cross-AI Memory", icon: Database },
+                { name: "Team Workspaces", icon: FolderGit2 },
+                { name: "Enterprise Security", icon: Shield },
               ].map((item) => (
                 <motion.li
                   key={item.name}
@@ -262,16 +262,13 @@ export function Sidebar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <a
-                    href={item.href}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors group relative"
-                  >
+                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors group relative cursor-not-allowed" title="Coming soon">
                     <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                     <span className="font-medium text-sm truncate">{item.name}</span>
                     <span className="ml-auto text-xs px-1.5 py-0.5 bg-zinc-800 text-zinc-500 rounded-full">
                       Soon
                     </span>
-                  </a>
+                  </div>
                 </motion.li>
               ))}
             </ul>
