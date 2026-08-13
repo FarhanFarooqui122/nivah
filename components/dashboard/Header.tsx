@@ -40,9 +40,9 @@ export function Header() {
     { name: "Upload Document", href: "/dashboard/upload", keywords: "new file add pdf" },
     { name: "AI Connections", href: "/dashboard/ai-connections", keywords: "chatgpt claude ai" },
     { name: "Search", href: "/dashboard/search", keywords: "find query semantic" },
-    { name: "Storage", href: "/dashboard/storage", keywords: "usage quota disk" },
+    { name: "Semantic Search", href: "/dashboard/semantic-search", keywords: "embedding vector meaning" },
     { name: "Settings", href: "/dashboard/settings", keywords: "preferences account" },
-    { name: "Help & Docs", href: "/dashboard/help", keywords: "support guide" },
+    { name: "Profile", href: "/dashboard/profile", keywords: "account info" },
   ];
 
   const query = searchQuery.trim().toLowerCase();
