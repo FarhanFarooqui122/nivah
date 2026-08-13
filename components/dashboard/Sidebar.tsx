@@ -296,13 +296,13 @@ export function Sidebar() {
                   <p className="text-xs text-zinc-400">Unlock unlimited storage & AI</p>
                 </div>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-3 w-full btn-primary text-sm py-2 cursor-pointer select-none"
+              <button
+                disabled
+                title="Coming soon"
+                className="mt-3 w-full btn-primary text-sm py-2 cursor-not-allowed opacity-60"
               >
                 Upgrade to Pro
-              </motion.button>
+              </button>
             </motion.div>
           </motion.div>
         )}
