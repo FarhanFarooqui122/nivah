@@ -14,6 +14,22 @@
 
 ---
 
+## Table of Contents
+
+- [About Nivah](#about-nivah)
+- [Features](#features)
+- [How It Works](#how-it-works)
+- [Tech Stack](#tech-stack)
+- [API Routes](#api-routes)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Database Schema](#database-schema)
+- [Known Issues](#known-issues)
+- [Roadmap](#roadmap)
+- [License](#license)
+
+---
+
 ## About Nivah
 
 Nivah is a smart document assistant that helps you manage, search, and understand your files using AI.
@@ -33,6 +49,14 @@ Think of Nivah as your personal AI research assistant that actually knows what's
 - **Free to start** — No credit card required. Upload documents, search semantically, and chat with your documents right away.
 
 ---
+
+## How It Works
+
+```
+Upload ──▶ Extract text ──▶ Chunk (1000 chars, 200 overlap) ──▶ Embed (Gemini, 3072-dim) ──▶ Store in pgvector
+                                                                                              │
+Ask a question ──▶ Embed question ──▶ Cosine search (Postgres <=>) ──▶ Top 5 chunks ──▶ LLM (streaming SSE) ──▶ Answer + sources
+```
 
 ## Features
 
@@ -271,6 +295,22 @@ nivah/
 - **Semantic Search** — Uses pgvector `embeddingVector` column with Postgres-side cosine scan; no ANN index (pgvector caps HNSW/IVFFlat at 2000 dims, `gemini-embedding-001` outputs 3072) — fine to ~10K chunks, brute-force beyond that
 - **AI Connections** — Page is purely cosmetic (no real OAuth integration)
 - **Large Uploads** — Files >10MB may hit Neon BYTEA limits or Vercel serverless function timeouts
+
+---
+
+## Screenshots
+
+> Screenshots coming soon. Until then, try the [live demo](https://nivah-one.vercel.app)!
+
+---
+
+## Roadmap
+
+- **ANN vector indexing** — pgvector caps HNSW/IVFFlat at 2000 dims; exploring dimensionality reduction (e.g. 3072 → 1536) or external vector stores for sub-10K-chunk scaling
+- **Real AI Connections** — OAuth integration for Drive, Notion, and OneDrive (page is currently cosmetic)
+- **Multi-user workspaces** — Shared workspaces with roles and invite links
+- **Bulk actions** — Multi-document export, batch re-index, and folder import
+- **Mobile app** — Native companion app for document capture and quick search
 
 ---
 
