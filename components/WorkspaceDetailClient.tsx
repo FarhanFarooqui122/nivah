@@ -132,7 +132,7 @@ export function WorkspaceDetailClient({
                 <span className="hidden md:block text-sm text-zinc-400">{formatBytes(doc.fileSize)}</span>
                 <div className="hidden md:flex items-center gap-2">
                   <a
-                    href={doc.fileUrl}
+                    href={`/api/documents/${doc.id}/file`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-purple-400 hover:text-purple-300 transition-colors"

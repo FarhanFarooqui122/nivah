@@ -386,7 +386,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                 <span className="hidden md:block text-sm text-zinc-400">{formatDate(doc.createdAt)}</span>
 
                 <div className="hidden md:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors" title="Download">
+                  <a href={`/api/documents/${doc.id}/file`} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors" title="Download">
                     <DownloadIcon className="w-4 h-4" />
                   </a>
                   <button onClick={() => handleDelete(doc.id)} disabled={deleting === doc.id} className="p-1.5 hover:bg-red-900/30 rounded-lg text-zinc-400 hover:text-red-400 transition-colors" title="Delete">

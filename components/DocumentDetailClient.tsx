@@ -250,7 +250,7 @@ export function DocumentDetailClient({
 
       <div className="flex items-center gap-3 flex-wrap">
         <a
-          href={document.fileUrl}
+          href={`/api/documents/${document.id}/file`}
           target="_blank"
           rel="noopener noreferrer"
           className="btn-primary rounded-xl px-4 py-2 text-sm"
