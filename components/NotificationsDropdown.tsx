@@ -41,6 +41,22 @@ export function NotificationsDropdown() {
     if (next) fetchNotifications();
   };
 
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (!cancelled && res.ok) {
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.unreadCount || 0);
+      }
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
+
   const markAsRead = async (id: string) => {
     try {
       await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
