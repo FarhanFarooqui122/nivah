@@ -1,18 +1,16 @@
-# Nivah
+<div align="center">
+
+# 🟣 Nivah
 
 **AI-powered document intelligence platform.** Upload documents, search by meaning, ask questions with grounded AI answers, generate study materials, and keep everything organized in workspaces.
 
-<p align="center">
-  <a href="https://nivah-one.vercel.app">🌐 Live Demo</a>
-  &nbsp;|&nbsp;
-  <a href="#features">Features</a>
-  &nbsp;|&nbsp;
-  <a href="#tech-stack">Tech Stack</a>
-  &nbsp;|&nbsp;
-  <a href="#getting-started">Getting Started</a>
-  &nbsp;|&nbsp;
-  <a href="#api-routes">API Routes</a>
-</p>
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-nivah--one.vercel.app-7c3aed?style=for-the-badge&logo=vercel&logoColor=white)](https://nivah-one.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js%2016-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL%20%2B%20pgvector-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech)
+[![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
+
+</div>
 
 ---
 
@@ -104,7 +102,7 @@ Think of Nivah as your personal AI research assistant that actually knows what's
 | Technology | Purpose |
 |------------|---------|
 | [Google Gemini](https://ai.google.dev/) (`gemini-embedding-001`, `gemini-3.1-flash-lite`) | Embeddings & text generation |
-| Cosine similarity (in-memory) | Semantic search scoring, clamped to [0, 1] |
+| [pgvector](https://github.com/pgvector/pgvector) | Postgres-side cosine similarity (`<=>` operator, `ORDER BY ... LIMIT`) |
 | Custom chunker (1000 char, 200 overlap) | Document chunking for embedding |
 
 ### Document Processing
@@ -137,7 +135,7 @@ Think of Nivah as your personal AI research assistant that actually knows what's
 
 | Method | Route | Description |
 |--------|-------|-------------|
-| POST | `/api/ask` | Grounded RAG — accepts `{ question, sessionId? }`, returns `{ answer, sources, sessionId }` |
+| POST | `/api/ask` | Grounded RAG — accepts `{ question, sessionId? }`, streams SSE events (`meta` / `delta` / `done` / `error`) |
 | GET | `/api/chat/sessions` | List user's chat sessions (sorted by most recent) |
 | POST | `/api/chat/sessions` | Create a new chat session |
 | DELETE | `/api/chat/sessions/[id]` | Delete a chat session |
@@ -279,3 +277,9 @@ nivah/
 ## License
 
 MIT
+
+---
+
+<div align="center">
+  Made with 💜 · [Nivah](https://nivah-one.vercel.app)
+</div>
