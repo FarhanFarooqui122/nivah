@@ -88,7 +88,7 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
     if (docId) params.set("documentId", docId);
     if (wsId) params.set("workspaceId", wsId);
     const str = params.toString();
-    lastWrittenUrlRef.current = str;
+    lastWrittenUrlRef.current = `${q.trim()}|${docId}|${wsId}`;
     router.replace(`/dashboard/semantic-search${str ? `?${str}` : ""}`, { scroll: false });
   }, [router]);
 
