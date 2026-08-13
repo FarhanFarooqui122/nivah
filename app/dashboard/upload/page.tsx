@@ -145,13 +145,13 @@ export default function UploadPage() {
         onDrop={handleDrop}
         className={cn(
           "relative border-2 border-dashed rounded-2xl p-12 transition-all text-center",
-          dragging ? "border-green-500 bg-green-500/10" : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/50"
+          dragging ? "border-purple-500 bg-purple-500/10" : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/50"
         )}
       >
         <input type="file" multiple accept={ACCEPTED_STRINGS} onChange={handleFileSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
         <div className="pointer-events-none">
           <div className="flex items-center justify-center mb-4">
-            <UploadIcon className={cn("w-12 h-12 transition-colors", dragging ? "text-green-400" : "text-zinc-500")} />
+            <UploadIcon className={cn("w-12 h-12 transition-colors", dragging ? "text-purple-400" : "text-zinc-500")} />
           </div>
           <p className="text-lg font-medium text-white">{dragging ? "Drop files here" : "Drag & drop files here"}</p>
           <p className="text-zinc-500 mt-2">or click to browse</p>
@@ -165,7 +165,7 @@ export default function UploadPage() {
           <select
             value={selectedWorkspace}
             onChange={(e) => setSelectedWorkspace(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-green-500 focus:outline-none"
+            className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none"
           >
             <option value="">No workspace</option>
             {workspaces.map((w) => (
@@ -206,7 +206,7 @@ export default function UploadPage() {
                   <p className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   {uploadProgress[index] !== undefined && (
                     <div className="mt-2 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[index]}%` }} />
+                      <div className="h-full bg-purple-500 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[index]}%` }} />
                     </div>
                   )}
                 </div>
@@ -222,7 +222,7 @@ export default function UploadPage() {
           <button
             onClick={handleUpload}
             disabled={uploading}
-            className={cn("mt-4 w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2", uploading ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-green-600 hover:bg-green-700 text-white")}
+            className={cn("mt-4 w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2", uploading ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700 text-white")}
           >
             {uploading ? (
               <>

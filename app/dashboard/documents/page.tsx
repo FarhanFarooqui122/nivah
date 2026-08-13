@@ -107,7 +107,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
           <p className="text-zinc-400 mt-1">
             {docs.length} document{docs.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
             {filterLabel && (
-              <Link href="/dashboard/documents" className="ml-2 text-xs text-green-400 hover:text-green-300 transition-colors">
+              <Link href="/dashboard/documents" className="ml-2 text-xs text-purple-400 hover:text-purple-300 transition-colors">
                 Clear filter
               </Link>
             )}
@@ -115,7 +115,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
         </div>
         <Link
           href="/dashboard/upload"
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
         >
           + Upload
         </Link>
