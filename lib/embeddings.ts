@@ -13,13 +13,14 @@ export function toVectorLiteral(embedding: number[]): string {
 }
 
 export async function generateEmbeddings(texts: string[]): Promise<(number[] | null)[]> {
+  if (texts.length === 0) return [];
   const results: (number[] | null)[] = new Array(texts.length).fill(null);
   let cursor = 0;
 
   const worker = async () => {
-    while (cursor < texts.length) {
-      const index = cursor;
-      cursor++;
+    while (true) {
+      const index = cursor++;
+      if (index >= texts.length) break;
       results[index] = await generateEmbedding(texts[index]);
     }
   };
