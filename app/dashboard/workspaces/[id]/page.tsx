@@ -53,7 +53,7 @@ export default async function WorkspaceDetailPage(props: { params: Promise<{ id:
       SELECT "documentId" AS document_id, COUNT(*)::int AS count
       FROM "DocumentChunk"
       WHERE "documentId" IN (${Prisma.join(documents.map((d) => d.id))})
-        AND "embedding" IS NOT NULL
+        AND "embeddingVector" IS NOT NULL
       GROUP BY "documentId"
     `;
     for (const row of embeddedRows) {

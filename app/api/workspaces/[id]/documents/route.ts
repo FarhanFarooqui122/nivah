@@ -57,7 +57,7 @@ export async function GET(
     SELECT "documentId" AS document_id, COUNT(*)::int AS count
     FROM "DocumentChunk"
     WHERE "documentId" IN (${Prisma.join(documents.map((d) => d.id))})
-      AND "embedding" IS NOT NULL
+      AND "embeddingVector" IS NOT NULL
     GROUP BY "documentId"
   `;
 
