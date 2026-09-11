@@ -20,19 +20,21 @@ export function NotificationsDropdown() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/notifications");
-      const data = await res.json();
-      if (res.ok) {
+      const res = await fetch("/api/notifications", { signal });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && !signal?.aborted) {
         setNotifications(data.notifications || []);
         setUnreadCount(data.unreadCount || 0);
       }
-    } catch {
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
       // silently fail
+    } finally {
+      if (!signal?.aborted) setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const handleToggle = () => {
@@ -42,24 +44,19 @@ export function NotificationsDropdown() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    const timer = setTimeout(async () => {
-      const res = await fetch("/api/notifications");
-      const data = await res.json();
-      if (!cancelled && res.ok) {
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
-      }
-    }, 0);
+    const controller = new AbortController();
+    // Defer fetch to avoid set-state-in-effect cascade; fetchNotifications is external sync
+    const id = setTimeout(() => fetchNotifications(controller.signal), 0);
     return () => {
-      cancelled = true;
-      clearTimeout(timer);
+      clearTimeout(id);
+      controller.abort();
     };
-  }, []);
+  }, [fetchNotifications]);
 
   const markAsRead = async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+      const res = await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+      if (!res.ok) return;
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))
       );
