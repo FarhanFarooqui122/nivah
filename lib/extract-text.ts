@@ -20,8 +20,12 @@ export async function extractText(
         data: new Uint8Array(buffer),
         verbosity: 0,
       });
-      const result = await parser.getText();
-      await parser.destroy();
+      let result: { text?: string };
+      try {
+        result = await parser.getText();
+      } finally {
+        try { await parser.destroy(); } catch {}
+      }
       const extracted = result.text?.trim() || null;
 
       const MIN_TEXT_LENGTH = 20;
@@ -62,12 +66,13 @@ export async function extractText(
       const { createWorker } = await import("tesseract.js");
       const worker = await createWorker("eng", 1, { workerPath: workerScript });
 
-      const { data } = await worker.recognize(buffer);
-      await worker.terminate();
-
-      const text = data.text?.trim() || null;
-
-      return text;
+      try {
+        const { data } = await worker.recognize(buffer);
+        const text = data.text?.trim() || null;
+        return text;
+      } finally {
+        try { await worker.terminate(); } catch {}
+      }
     }
 
     return null;
@@ -108,7 +113,6 @@ async function ocrPdf(buffer: Buffer): Promise<string | null> {
       const page = await doc.getPage(i);
       const viewport = page.getViewport({ scale: 2.0 });
       const canvas = createCanvas(viewport.width, viewport.height);
-      canvas.getContext("2d");
       await page.render({ canvas: canvas as unknown as HTMLCanvasElement, viewport }).promise;
       const pngBuf = canvas.toBuffer("image/png");
       const { data: ocrData } = await worker.recognize(pngBuf);
@@ -120,6 +124,8 @@ async function ocrPdf(buffer: Buffer): Promise<string | null> {
     if (pages.length === 0) return null;
     return pages.join("\n\n");
   } finally {
-    await worker.terminate();
+    try { await worker.terminate(); } catch {}
+    try { await (doc as { destroy?: () => Promise<void> }).destroy?.(); } catch {}
+    try { (doc as { cleanup?: () => void }).cleanup?.(); } catch {}
   }
 }
