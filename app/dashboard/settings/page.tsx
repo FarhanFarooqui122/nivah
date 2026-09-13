@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { PLANS } from "@/lib/plans";
+import { formatBytes } from "@/lib/utils";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { LogoutButton } from "@/components/LogoutButton";
 import { SettingsToggles } from "@/components/SettingsToggles";
@@ -13,6 +14,14 @@ export default async function SettingsPage() {
   const clerkUser = await currentUser();
   const user = await prisma.user.findUnique({ where: { clerkId: userId } });
   const email = clerkUser?.emailAddresses[0]?.emailAddress || user?.email || "";
+
+  const plan = user?.plan === "pro" ? PLANS.PRO : PLANS.FREE;
+  const storage = await prisma.document.aggregate({
+    _sum: { fileSize: true },
+    where: { userId: user?.id ?? "" },
+  });
+  const usedBytes = storage._sum.fileSize ?? 0;
+  const usedPercent = Math.min(100, Math.round((usedBytes / plan.storageLimit) * 100));
 
   return (
     <div className="space-y-8 max-w-3xl">
@@ -71,19 +80,33 @@ export default async function SettingsPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Current Plan</span>
-            <span className="text-white font-medium">{PLANS.FREE.name}</span>
+            <span className="text-white font-medium">{plan.name}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-zinc-400">Storage Used</span>
+            <span className="text-white font-medium">
+              {formatBytes(usedBytes)} of {plan.storageLabel}
+            </span>
+          </div>
+          <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all"
+              style={{ width: `${usedPercent}%` }}
+            />
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Storage Limit</span>
-            <span className="text-white font-medium">{PLANS.FREE.storageLabel}</span>
+            <span className="text-white font-medium">{plan.storageLabel}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">AI Connections</span>
-            <span className="text-white font-medium">{PLANS.FREE.maxAiConnections} max</span>
+            <span className="text-white font-medium">{plan.maxAiConnections} max</span>
           </div>
-          <button className="mt-4 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-2.5 rounded-xl transition-all">
-            Upgrade to {PLANS.PRO.name} — ${PLANS.PRO.price}/mo
-          </button>
+          {plan === PLANS.FREE && (
+            <button className="mt-4 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-2.5 rounded-xl transition-all">
+              Upgrade to {PLANS.PRO.name} — ${PLANS.PRO.price}/mo
+            </button>
+          )}
         </div>
       </section>
 
