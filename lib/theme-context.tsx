@@ -13,14 +13,17 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof document === "undefined") return "dark";
-    return (document.documentElement.getAttribute("data-theme") as Theme) || "dark";
-  });
+  // Deterministic on both server and client ("dark") so the first render
+  // always matches; the DOM value is synced after mount.
+  const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     startTransition(() => {
+      const initial = document.documentElement.getAttribute("data-theme");
+      if (initial === "light" || initial === "dark") {
+        setTheme(initial);
+      }
       setMounted(true);
     });
   }, []);
