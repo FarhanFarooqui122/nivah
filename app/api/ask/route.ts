@@ -59,10 +59,6 @@ export async function POST(request: NextRequest) {
       if (!session || session.userId !== user.id) {
         return NextResponse.json({ error: "Session not found" }, { status: 404 });
       }
-    } else {
-      session = await prisma.chatSession.create({
-        data: { title: question.trim().slice(0, 80), userId: user.id },
-      });
     }
 
     const queryEmbedding = await generateEmbedding(question.trim());
@@ -71,6 +67,14 @@ export async function POST(request: NextRequest) {
         { error: "Failed to generate query embedding. Check your GOOGLE_API_KEY." },
         { status: 500 },
       );
+    }
+
+    // Create the session only after the embedding succeeded so a failure
+    // doesn't leave an empty orphan session in the sidebar.
+    if (!session) {
+      session = await prisma.chatSession.create({
+        data: { title: question.trim().slice(0, 80), userId: user.id },
+      });
     }
 
     const queryVector = toVectorLiteral(queryEmbedding);
@@ -137,6 +141,25 @@ export async function POST(request: NextRequest) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
         };
 
+        // Persist whatever the user saw, including on abort mid-stream.
+        const persistMessages = async (answerText: string) => {
+          await prisma.chatMessage.createMany({
+            data: [
+              { role: "USER", content: question.trim(), sessionId: session.id },
+              {
+                role: "ASSISTANT",
+                content: answerText,
+                sources: sources,
+                sessionId: session.id,
+              },
+            ],
+          });
+          await prisma.chatSession.update({
+            where: { id: session.id },
+            data: { updatedAt: new Date() },
+          });
+        };
+
         try {
           send({ type: "meta", sessionId: session.id, sources });
 
@@ -152,33 +175,28 @@ export async function POST(request: NextRequest) {
 
           let answer = "";
           for await (const chunk of result) {
-            if (streamAbort.signal.aborted) return;
+            if (streamAbort.signal.aborted) {
+              if (answer.trim()) {
+                try { await persistMessages(answer); } catch {}
+              }
+              return;
+            }
             const text = chunk.text ?? "";
             if (!text) continue;
             answer += text;
             send({ type: "delta", text });
           }
 
-          if (streamAbort.signal.aborted) return;
+          if (streamAbort.signal.aborted) {
+            if (answer.trim()) {
+              try { await persistMessages(answer); } catch {}
+            }
+            return;
+          }
 
           if (!answer.trim()) answer = FALLBACK_ANSWER;
 
-          await prisma.chatMessage.createMany({
-            data: [
-              { role: "USER", content: question.trim(), sessionId: session.id },
-              {
-                role: "ASSISTANT",
-                content: answer,
-                sources: sources,
-                sessionId: session.id,
-              },
-            ],
-          });
-
-          await prisma.chatSession.update({
-            where: { id: session.id },
-            data: { updatedAt: new Date() },
-          });
+          await persistMessages(answer);
 
           send({ type: "done" });
         } catch (error) {
