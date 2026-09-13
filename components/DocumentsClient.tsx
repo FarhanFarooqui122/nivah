@@ -93,7 +93,10 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
   }, [documents, search, sortBy, filterType, filterWorkspace]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  // Clamp for rendering so deletions that shrink the list never strand the
+  // user on an empty page (page state is only reset on filter changes).
+  const safePage = Math.min(page, totalPages - 1);
+  const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedDocs);
@@ -401,12 +404,12 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50">
             <span className="text-sm text-zinc-500">
-              Page {page + 1} of {totalPages} ({filtered.length} documents)
+              Page {safePage + 1} of {totalPages} ({filtered.length} documents)
             </span>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
+                onClick={() => setPage(Math.max(0, safePage - 1))}
+                disabled={safePage === 0}
                 className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
@@ -417,15 +420,16 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                   onClick={() => setPage(i)}
                   className={cn(
                     "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
-                    i === page ? "bg-purple-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
-                  )}
+                    i === safePage ? "bg-purple-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
+                  )
+                }
                 >
                   {i + 1}
                 </button>
               ))}
               <button
-                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                disabled={page >= totalPages - 1}
+                onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
+                disabled={safePage >= totalPages - 1}
                 className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
