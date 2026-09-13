@@ -28,6 +28,9 @@ export function SearchClient() {
 
   useEffect(() => {
     inputRef.current?.focus();
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []);
 
   const doSearch = useCallback(async (q: string) => {

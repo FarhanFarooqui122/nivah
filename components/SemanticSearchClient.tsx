@@ -156,6 +156,7 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   );
 
   const handleDocFilterChange = (docId: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     setDocumentFilter(docId);
     if (query.trim()) {
       doSearch(query, docId || undefined, workspaceFilter || undefined);
@@ -164,6 +165,7 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   };
 
   const handleWorkspaceFilterChange = (wsId: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     setDocumentFilter("");
     setWorkspaceFilter(wsId);
     if (query.trim()) {
