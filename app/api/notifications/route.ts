@@ -29,15 +29,25 @@ export async function POST(request: NextRequest) {
   const user = await prisma.user.findUnique({ where: { clerkId: userId } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const { type, title, message, link } = await request.json();
+  let body: { type?: unknown; title?: unknown; message?: unknown; link?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { type, title, message, link } = body;
+  if (typeof type !== "string" || !type.trim() || typeof title !== "string" || !title.trim()) {
+    return NextResponse.json({ error: "type and title are required" }, { status: 400 });
+  }
 
   const notification = await prisma.notification.create({
     data: {
       userId: user.id,
       type,
       title,
-      message,
-      link,
+      message: typeof message === "string" ? message : null,
+      link: typeof link === "string" ? link : null,
     },
   });
 

@@ -119,7 +119,23 @@ export async function POST(request: NextRequest) {
       `/dashboard/documents/${document.id}`
     );
 
-    return NextResponse.json({ document }, { status: 201 });
+    // Select fields explicitly — returning the raw row would serialize
+    // fileBlob (the whole binary) and textContent into the JSON response.
+    const saved = await prisma.document.findUnique({
+      where: { id: document.id },
+      select: {
+        id: true,
+        title: true,
+        fileName: true,
+        fileType: true,
+        fileSize: true,
+        fileUrl: true,
+        workspaceId: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ document: saved }, { status: 201 });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });

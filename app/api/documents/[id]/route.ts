@@ -21,7 +21,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
-  const body = await request.json();
+  let body: { title?: unknown; workspaceId?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
   const { title, workspaceId } = body;
 
   const data: Record<string, unknown> = {};
@@ -50,6 +55,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const updated = await prisma.document.update({
     where: { id },
     data,
+    // Skip fileBlob/textContent — the binary can be many MB and clients
+    // here only check the status code.
+    select: {
+      id: true,
+      title: true,
+      fileName: true,
+      fileType: true,
+      fileSize: true,
+      fileUrl: true,
+      workspaceId: true,
+      createdAt: true,
+    },
   });
 
   return NextResponse.json({ document: updated });
