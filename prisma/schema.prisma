@@ -10,6 +10,7 @@ model User {
   id        String   @id @default(cuid())
   email     String
   clerkId   String   @unique
+  plan      String   @default("free")
   emailNotifications Boolean @default(true)
   autoSyncAiMemory   Boolean @default(true)
   createdAt DateTime @default(now())
