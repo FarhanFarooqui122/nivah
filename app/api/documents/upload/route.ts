@@ -7,6 +7,7 @@ import { generateEmbeddings, toVectorLiteral } from "@/lib/embeddings";
 import { createNotification } from "@/lib/notifications";
 import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { PLANS } from "@/lib/plans";
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -36,6 +37,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: `File too large (max ${MAX_FILE_SIZE_MB}MB)` },
         { status: 400 },
+      );
+    }
+
+    // Enforce the plan's total storage quota (Free 500 MB / Pro 50 GB).
+    const plan = user.plan === "pro" ? PLANS.PRO : PLANS.FREE;
+    const storage = await prisma.document.aggregate({
+      _sum: { fileSize: true },
+      where: { userId: user.id },
+    });
+    const usedBytes = storage._sum.fileSize ?? 0;
+    if (usedBytes + file.size > plan.storageLimit) {
+      return NextResponse.json(
+        { error: `Storage limit reached (${plan.storageLabel} on the ${plan.name} plan). Delete documents or upgrade to Pro for more storage.` },
+        { status: 413 },
       );
     }
 
