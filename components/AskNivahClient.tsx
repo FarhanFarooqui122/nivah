@@ -328,7 +328,7 @@ export function AskNivahClient() {
         ),
       );
     } finally {
-      if (streamAbortRef.current === abortController) {
+      if (streamAbortRef.current === abortController && epochRef.current === epochAtSubmit) {
         setLoading(false);
       }
     }
