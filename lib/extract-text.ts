@@ -20,13 +20,15 @@ export async function extractText(
         data: new Uint8Array(buffer),
         verbosity: 0,
       });
-      let result: { text?: string };
+      let result: { text?: string } | null = null;
       try {
         result = await parser.getText();
+      } catch {
+        // parse errors (encrypted/corrupt PDFs) should fall through to OCR
       } finally {
         try { await parser.destroy(); } catch {}
       }
-      const extracted = result.text?.trim() || null;
+      const extracted = result?.text?.trim() || null;
 
       const MIN_TEXT_LENGTH = 20;
       if (extracted && extracted.length >= MIN_TEXT_LENGTH) {
