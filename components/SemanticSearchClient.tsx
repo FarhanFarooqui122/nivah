@@ -187,21 +187,21 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
   };
 
   const scoreColor = (score: number): string => {
-    if (score >= 0.8) return "text-green-400";
-    if (score >= 0.6) return "text-yellow-400";
+    if (score >= 0.8) return "text-green-600 dark:text-green-400";
+    if (score >= 0.6) return "text-amber-600 dark:text-amber-400";
     return "text-zinc-400";
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Semantic Search</h1>
           <p className="text-zinc-400 mt-1">
             Find documents by meaning, not just keywords
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {workspaces.length > 0 && (
             <select
               value={workspaceFilter}

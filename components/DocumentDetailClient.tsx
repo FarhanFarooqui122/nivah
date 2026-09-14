@@ -221,7 +221,7 @@ export function DocumentDetailClient({
           <p className="flex items-center gap-2 mt-1">
             <span className="text-white font-medium">{embeddedCount}/{chunkCount}</span>
             {embeddedCount < chunkCount && (
-              <span className="text-xs text-yellow-400">Needs re-index</span>
+              <span className="text-xs text-amber-600 dark:text-amber-400">Needs re-index</span>
             )}
           </p>
         </div>
@@ -323,7 +323,7 @@ export function DocumentDetailClient({
           onClick={() => setShowStudy(false)}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            !showStudy ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            !showStudy ? "bg-purple-600 text-on-brand" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
           )}
         >
           Content
@@ -332,7 +332,7 @@ export function DocumentDetailClient({
           onClick={() => setShowStudy(true)}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            showStudy ? "bg-purple-600 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            showStudy ? "bg-purple-600 text-on-brand" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
           )}
         >
           Study Mode

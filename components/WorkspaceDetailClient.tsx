@@ -123,9 +123,18 @@ export function WorkspaceDetailClient({
                     <p className="text-xs text-zinc-500 mt-0.5">
                       {doc.chunkCount} chunks · {doc.embeddedCount}/{doc.chunkCount} embedded
                       {doc.embeddedCount < doc.chunkCount && (
-                        <span className="text-yellow-500 ml-2">Needs re-index</span>
+                        <span className="text-amber-600 dark:text-amber-400 ml-2">Needs re-index</span>
                       )}
                     </p>
+                    {/* Actions column is desktop-only — mobile needs its own download link */}
+                    <a
+                      href={`/api/documents/${doc.id}/file`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="md:hidden text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors mt-1 inline-block"
+                    >
+                      Download
+                    </a>
                   </div>
                 </div>
                 <span className="hidden md:block text-sm text-zinc-400">{doc.fileType.split("/").pop()?.toUpperCase() || "FILE"}</span>
@@ -135,7 +144,7 @@ export function WorkspaceDetailClient({
                     href={`/api/documents/${doc.id}/file`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                    className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                   >
                     Download
                   </a>

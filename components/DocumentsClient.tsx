@@ -53,6 +53,8 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
   const [filterWorkspace, setFilterWorkspace] = useState<string>("all");
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -133,6 +135,8 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
 
   const handleBulkDelete = async () => {
     if (!confirm(`Delete ${selectedDocs.size} document(s)?`)) return;
+    if (bulkDeleting) return;
+    setBulkDeleting(true);
     setListError(null);
     const failed: string[] = [];
     for (const id of selectedDocs) {
@@ -153,6 +157,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       }
       return next;
     });
+    setBulkDeleting(false);
     router.refresh();
   };
 
@@ -258,7 +263,9 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               <option value="faq">Generate FAQ</option>
             </select>
           </div>
-          <button onClick={handleBulkDelete} className="text-sm text-red-400 hover:text-red-300 transition-colors">Delete selected</button>
+          <button onClick={handleBulkDelete} disabled={bulkDeleting} className="text-sm text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            {bulkDeleting ? "Deleting..." : "Delete selected"}
+          </button>
           <button onClick={() => setSelectedDocs(new Set())} className="text-sm text-zinc-400 hover:text-white transition-colors">Clear</button>
         </div>
       )}
@@ -299,10 +306,18 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
             </h3>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => { navigator.clipboard.writeText(aiResult); }}
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(aiResult);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  } catch {
+                    setCopied(false);
+                  }
+                }}
                 className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
               >
-                Copy
+                {copied ? "Copied!" : "Copy"}
               </button>
               <button
                 onClick={() => { setAiResult(null); setAiError(null); setAiAction(""); }}
@@ -374,7 +389,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                       <p className="text-xs text-zinc-600 mt-0.5 flex items-center gap-2">
                         <span>{doc.charCount.toLocaleString()} chars · {doc.wordCount != null ? `${doc.wordCount.toLocaleString()} words` : ""} · {doc.chunkCount ?? 0} chunks</span>
                         {doc.embeddedCount != null && doc.chunkCount != null && doc.embeddedCount < doc.chunkCount && (
-                          <span className="text-yellow-500 text-[10px] font-medium">Needs re-index</span>
+                          <span className="text-amber-600 dark:text-amber-400 text-[10px] font-medium">Needs re-index</span>
                         )}
                       </p>
                     )}
@@ -388,7 +403,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                 <span className="hidden md:block text-sm text-zinc-400">{formatBytes(doc.fileSize)}</span>
                 <span className="hidden md:block text-sm text-zinc-400">{formatDate(doc.createdAt)}</span>
 
-                <div className="hidden md:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="hidden md:flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
                   <a href={`/api/documents/${doc.id}/file`} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors" title="Download">
                     <DownloadIcon className="w-4 h-4" />
                   </a>
@@ -420,7 +435,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                   onClick={() => setPage(i)}
                   className={cn(
                     "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
-                    i === safePage ? "bg-purple-600 text-white" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
+                    i === safePage ? "bg-purple-600 text-on-brand" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
                   )
                 }
                 >

@@ -32,7 +32,7 @@ export function ProfileClient({ stats }: { stats: ProfileStats }) {
 
       <div className="border border-zinc-800 rounded-2xl p-6 bg-zinc-900/50">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 gradient-brand rounded-2xl flex items-center justify-center text-2xl font-bold text-white">
+          <div className="w-16 h-16 gradient-brand rounded-2xl flex items-center justify-center text-2xl font-bold text-on-brand">
             {user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex-1 min-w-0">

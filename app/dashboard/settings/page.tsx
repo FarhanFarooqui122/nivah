@@ -34,7 +34,7 @@ export default async function SettingsPage() {
         <h2 className="text-lg font-semibold text-white mb-4">Profile</h2>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-2xl font-bold text-white">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-2xl font-bold text-on-brand">
               {email[0]?.toUpperCase() || "U"}
             </div>
             <div>
@@ -103,7 +103,7 @@ export default async function SettingsPage() {
             <span className="text-white font-medium">{plan.maxAiConnections} max</span>
           </div>
           {plan === PLANS.FREE && (
-            <button className="mt-4 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-2.5 rounded-xl transition-all">
+            <button className="mt-4 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-on-brand font-medium py-2.5 rounded-xl transition-all">
               Upgrade to {PLANS.PRO.name} — ${PLANS.PRO.price}/mo
             </button>
           )}

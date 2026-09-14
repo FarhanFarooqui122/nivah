@@ -222,7 +222,7 @@ export default function UploadPage() {
           <button
             onClick={handleUpload}
             disabled={uploading}
-            className={cn("mt-4 w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2", uploading ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700 text-white")}
+            className={cn("mt-4 w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2", uploading ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700 text-on-brand")}
           >
             {uploading ? (
               <>

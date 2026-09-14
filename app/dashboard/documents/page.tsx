@@ -115,7 +115,7 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
         </div>
         <Link
           href="/dashboard/upload"
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-on-brand rounded-xl font-medium transition-colors flex items-center gap-2"
         >
           + Upload
         </Link>

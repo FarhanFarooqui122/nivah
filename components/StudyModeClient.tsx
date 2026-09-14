@@ -131,8 +131,17 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         </div>
 
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={flipped ? "Show question" : "Show answer"}
           onClick={() => setFlipped(!flipped)}
-          className="cursor-pointer p-8 rounded-2xl border border-zinc-700 bg-zinc-900 min-h-[250px] flex items-center justify-center transition-all hover:border-purple-500/50"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setFlipped(!flipped);
+            }
+          }}
+          className="cursor-pointer p-8 rounded-2xl border border-zinc-700 bg-zinc-900 min-h-[250px] flex items-center justify-center transition-all hover:border-purple-500/50 focus-visible:border-purple-500 focus-visible:outline-none"
         >
           <div className="text-center">
             <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider">
@@ -141,7 +150,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             <p className="text-lg text-white font-medium leading-relaxed">
               {flipped ? card.answer : card.question}
             </p>
-            <p className="text-xs text-zinc-600 mt-4">Click to flip</p>
+            <p className="text-xs text-zinc-600 mt-4">Click or press Enter to flip</p>
           </div>
         </div>
 
@@ -200,7 +209,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
               </button>
               {expanded === i && (
                 <div className="px-5 pb-4 pt-2 border-t border-zinc-800">
-                  <p className="text-sm text-green-400 leading-relaxed">{item.answer}</p>
+                  <p className="text-sm text-green-600 dark:text-green-400 leading-relaxed">{item.answer}</p>
                 </div>
               )}
             </div>
@@ -231,7 +240,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
           <span className="text-sm text-zinc-500">{items.length} questions</span>
           <div className="flex items-center gap-2">
             {mcqSubmitted && (
-              <span className="text-sm text-green-400">
+              <span className="text-sm text-green-600 dark:text-green-400">
                 Score: {score}/{items.length}
               </span>
             )}
@@ -288,7 +297,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
                         "w-7 h-7 rounded-lg flex items-center justify-center text-sm font-medium",
                         mcqSubmitted && isCorrect ? "bg-green-500 text-white" :
                         mcqSubmitted && selected && !isCorrect ? "bg-red-500 text-white" :
-                        selected ? "bg-green-500/20 text-green-400" : "bg-zinc-800 text-zinc-400"
+                        selected ? "bg-green-500/20 text-green-600 dark:text-green-400" : "bg-zinc-800 text-zinc-400"
                       )}>
                         {String.fromCharCode(65 + oIndex)}
                       </span>
@@ -421,7 +430,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
-                ? "bg-purple-600 text-white"
+                ? "bg-purple-600 text-on-brand"
                 : "text-zinc-400 hover:text-white hover:bg-zinc-800",
             )}
           >
