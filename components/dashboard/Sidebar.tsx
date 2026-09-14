@@ -63,6 +63,10 @@ export function Sidebar() {
       .catch(() => {});
   }, []);
 
+  // The mobile drawer always renders expanded — a collapsed desktop sidebar
+  // must not leak icon-only content into the drawer.
+  const expanded = !collapsed || mobileOpen;
+
   const inner = (
     <>
       <motion.div
@@ -71,13 +75,13 @@ export function Sidebar() {
         transition={{ duration: 0.3 }}
         className="flex h-16 items-center justify-between px-4 border-b border-zinc-800"
       >
-        {!collapsed && (
+        {expanded && (
           <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-2">
             <motion.div
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
               className="w-8 h-8 gradient-brand rounded-xl flex items-center justify-center"
             >
-              <Zap className="w-5 h-5 text-white" />
+              <Zap className="w-5 h-5 text-on-brand" />
             </motion.div>
             <span className="text-xl font-bold text-white">Nivah</span>
           </Link>
@@ -105,7 +109,12 @@ export function Sidebar() {
       <nav className="flex-1 py-4 px-2 overflow-y-auto" aria-label="Main navigation">
         <ul className="space-y-1" role="list">
           {navigation.map((item, i) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            // Exact match for the dashboard root — every other route starts
+            // with "/dashboard/", which would highlight both items.
+            const isActive =
+              item.href === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <motion.li
                 key={item.name}
@@ -123,7 +132,7 @@ export function Sidebar() {
                     isActive
                       ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30 shadow-glow-brand"
                       : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
-                    collapsed && "justify-center"
+                    !expanded && "justify-center"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -132,9 +141,9 @@ export function Sidebar() {
                     className="flex items-center gap-3"
                   >
                     <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-                    {!collapsed && <span className="font-medium">{item.name}</span>}
+                    {!expanded && <span className="font-medium">{item.name}</span>}
                   </motion.div>
-                  {isActive && !collapsed && (
+                  {isActive && expanded && (
                     <motion.span
                       layoutId="activeNavIndicator"
                       initial={{ opacity: 0, scaleY: 0 }}
@@ -149,7 +158,7 @@ export function Sidebar() {
           })}
         </ul>
 
-        {!collapsed && workspaceList.length > 0 && (
+        {expanded && workspaceList.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -160,7 +169,7 @@ export function Sidebar() {
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
                 Workspaces
               </p>
-              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
                 Manage
               </Link>
             </div>
@@ -194,7 +203,7 @@ export function Sidebar() {
           </motion.div>
         )}
 
-        {!collapsed && recentChats.length > 0 && (
+        {expanded && recentChats.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -205,7 +214,7 @@ export function Sidebar() {
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
                 Recent Chats
               </p>
-              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
                 View all
               </Link>
             </div>
@@ -240,7 +249,7 @@ export function Sidebar() {
           </motion.div>
         )}
 
-        {!collapsed && (
+        {expanded && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -275,21 +284,17 @@ export function Sidebar() {
           </motion.div>
         )}
 
-        {!collapsed && (
+        {expanded && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
             className="mt-8 pt-6 border-t border-zinc-800 px-3"
           >
-            <motion.div
-              animate={{ boxShadow: ["0 0 20px rgba(124,58,237,0.1)", "0 0 40px rgba(124,58,237,0.2)", "0 0 20px rgba(124,58,237,0.1)"] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-xl p-4"
-            >
+            <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-xl p-4 shadow-glow-brand">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
+                  <Shield className="w-5 h-5 text-on-brand" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white">Nivah Pro</p>
@@ -303,12 +308,12 @@ export function Sidebar() {
               >
                 Upgrade to Pro
               </button>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </nav>
 
-      {!collapsed && (
+      {expanded && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
