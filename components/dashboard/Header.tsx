@@ -16,6 +16,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { user, isLoaded } = useUser();
   const { toggleMobile } = useSidebar();
   const { theme, toggleTheme, mounted } = useTheme();
@@ -24,6 +25,15 @@ export function Header() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        // Don't hijack browser/editor shortcuts while typing multiline or
+        // rich text (e.g. the Ask Nivah composer), and ignore key repeats.
+        const target = e.target as HTMLElement | null;
+        if (
+          e.repeat ||
+          target?.closest('textarea, [contenteditable="true"], [data-clerk-modal]')
+        ) {
+          return;
+        }
         e.preventDefault();
         searchInputRef.current?.focus();
         searchInputRef.current?.select();
@@ -33,6 +43,25 @@ export function Header() {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, []);
+
+  // Close the user menu on outside click or Escape.
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setUserMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [userMenuOpen]);
 
   const pages = [
     { name: "Dashboard", href: "/dashboard", keywords: "home overview stats" },
@@ -82,6 +111,12 @@ export function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchOpen(true)}
               onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setSearchOpen(false);
+                  searchInputRef.current?.blur();
+                }
+              }}
             />
             <AnimatePresence>
               {searchOpen && (
@@ -96,12 +131,12 @@ export function Header() {
                     <p className="px-4 py-3 text-sm text-zinc-500">No pages match &ldquo;{searchQuery}&rdquo;</p>
                   ) : (
                     filteredPages.map((page) => (
-                      <Link
+                        <Link
                         key={page.name}
                         href={page.href}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors",
-                          pathname === page.href && "bg-purple-500/10 text-purple-400"
+                          pathname === page.href && "bg-purple-500/10 text-purple-600 dark:text-purple-400"
                         )}
                       >
                         <Command className="w-4 h-4 text-zinc-500" />
@@ -130,7 +165,7 @@ export function Header() {
             </motion.button>
           )}
 
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -138,10 +173,11 @@ export function Header() {
               className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer select-none"
               aria-label="User menu"
               aria-expanded={userMenuOpen}
+              aria-haspopup="menu"
             >
               <motion.div
                 animate={{ boxShadow: userMenuOpen ? "0 0 20px rgba(124,58,237,0.3)" : "0 0 0px rgba(124,58,237,0)" }}
-                className="w-8 h-8 gradient-brand rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                className="w-8 h-8 gradient-brand rounded-full flex items-center justify-center text-on-brand text-sm font-semibold"
               >
                 {isLoaded ? (user?.firstName?.[0] || user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase() || "U") : ""}
               </motion.div>
@@ -165,6 +201,7 @@ export function Header() {
                   </div>
                   <Link
                     href="/dashboard/profile"
+                    onClick={() => setUserMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
                     <User className="w-4 h-4" />
@@ -172,6 +209,7 @@ export function Header() {
                   </Link>
                   <Link
                     href="/dashboard/settings"
+                    onClick={() => setUserMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
                     <Settings className="w-4 h-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Bell, Check, X, Loader2 } from "lucide-react";
 
@@ -19,6 +19,7 @@ export function NotificationsDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -42,6 +43,27 @@ export function NotificationsDropdown() {
     setOpen(next);
     if (next) fetchNotifications();
   };
+
+  // Close on outside click or Escape. The header has backdrop-blur, which
+  // makes it the containing block for fixed descendants — so the old
+  // fixed-position scrim only covered the header strip, not the viewport.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -101,30 +123,30 @@ export function NotificationsDropdown() {
   }, [notifications, now]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
-        className="relative p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
+        className="relative p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors focus-ring-brand"
         onClick={handleToggle}
         aria-label="Notifications"
+        aria-expanded={open}
+        aria-haspopup="menu"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-1 min-w-4 h-4 px-1 bg-red-500 rounded-full text-[10px] font-bold text-on-brand flex items-center justify-center">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-80 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50" role="menu">
             <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
               <p className="text-sm font-semibold text-white">Notifications</p>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+                  className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors flex items-center gap-1"
                 >
                   <Check className="w-3 h-3" />
                   Mark all read
@@ -182,7 +204,6 @@ export function NotificationsDropdown() {
               )}
             </div>
           </div>
-        </>
       )}
     </div>
   );
