@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* data-theme driven dark variant — default Tailwind dark: uses the OS
+   preference, which desyncs from the in-app theme toggle. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: "SF Mono", ui-monospace, monospace;
@@ -360,4 +364,22 @@ html {
 .focus-ring-brand:focus-visible {
   outline: 2px solid #4b41e1;
   outline-offset: 2px;
+}
+
+/* Text on saturated brand/accent surfaces (purple, green, red, gradient-brand).
+   --color-white remaps to near-black in light mode, which makes text-white
+   unreadable on those colors; text-on-brand stays white in both themes. */
+.text-on-brand {
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
