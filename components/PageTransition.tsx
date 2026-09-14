@@ -8,16 +8,18 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
+// Enter-only animation. An App Router exit animation re-renders the old
+// motion.div with the NEW children during its exit, so the next page would
+// flash in twice — and mode="wait" adds latency to every navigation.
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence initial={false}>
       <motion.div
         key={pathname}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         {children}

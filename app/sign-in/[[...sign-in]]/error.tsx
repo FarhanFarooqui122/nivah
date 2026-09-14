@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function SignInError({
@@ -25,14 +26,22 @@ export default function SignInError({
         </div>
         <h2 className="text-xl font-semibold text-white mb-2">Sign-in error</h2>
         <p className="text-zinc-400 mb-6">
-          {error.message || "Something went wrong. Please try again."}
+          We couldn&apos;t complete sign-in. Please try again.
         </p>
-        <button
-          onClick={reset}
-          className="px-6 py-2.5 btn-primary rounded-xl transition-colors"
-        >
-          Try again
-        </button>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={reset}
+            className="px-6 py-2.5 btn-primary rounded-xl transition-colors"
+          >
+            Try again
+          </button>
+          <Link
+            href="/"
+            className="px-6 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors"
+          >
+            Back to home
+          </Link>
+        </div>
       </div>
     </div>
   );

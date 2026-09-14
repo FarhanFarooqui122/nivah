@@ -21,6 +21,7 @@ export function BrandPattern() {
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       <svg
         className="absolute -top-40 -right-40 w-96 h-96 text-purple-500/5"
+        aria-hidden="true"
         viewBox="0 0 400 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -35,6 +36,7 @@ export function BrandPattern() {
       </svg>
       <svg
         className="absolute -bottom-40 -left-40 w-80 h-80 text-indigo-500/5"
+        aria-hidden="true"
         viewBox="0 0 400 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

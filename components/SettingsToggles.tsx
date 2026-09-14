@@ -68,6 +68,9 @@ export function SettingsToggles({
         </div>
         <button
           onClick={toggleTheme}
+          role="switch"
+          aria-checked={theme === "dark"}
+          aria-label="Dark mode"
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
             theme === "dark" ? "bg-purple-600" : "bg-zinc-700"
           }`}
@@ -94,6 +97,9 @@ export function SettingsToggles({
         <button
           onClick={handleEmailToggle}
           disabled={savingEmail}
+          role="switch"
+          aria-checked={emailNotifications}
+          aria-label="Email notifications"
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
             emailNotifications ? "bg-purple-600" : "bg-zinc-700"
           } ${savingEmail ? "opacity-50" : ""}`}
@@ -114,6 +120,9 @@ export function SettingsToggles({
         <button
           onClick={handleSyncToggle}
           disabled={savingSync}
+          role="switch"
+          aria-checked={autoSyncAiMemory}
+          aria-label="Auto-sync AI memory"
           className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${
             autoSyncAiMemory ? "bg-purple-600" : "bg-zinc-700"
           } ${savingSync ? "opacity-50" : ""}`}
