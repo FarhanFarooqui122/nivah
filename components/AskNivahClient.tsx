@@ -343,7 +343,7 @@ export function AskNivahClient() {
   return (
     <div className="flex gap-4 h-full min-h-0">
       {showHistory && (
-        <div className="w-72 flex-shrink-0 bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col overflow-hidden">
+        <div className="fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] bg-zinc-900 border-r border-zinc-800 shadow-2xl flex flex-col overflow-hidden md:relative md:inset-auto md:z-auto md:w-72 md:max-w-none md:flex-shrink-0 md:bg-zinc-900/50 md:border-r-0 md:shadow-none">
           <div className="flex items-center justify-between p-4 border-b border-zinc-800">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <History className="w-4 h-4" />
@@ -352,6 +352,7 @@ export function AskNivahClient() {
             <button
               onClick={() => setShowHistory(false)}
               className="p-1 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+              aria-label="Close history"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -370,11 +371,14 @@ export function AskNivahClient() {
               <p className="text-zinc-500 text-sm text-center py-8">No conversations yet</p>
             )}
             {sessions.map((session) => (
-              <button
+              <div
                 key={session.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => loadSession(session.id)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadSession(session.id); } }}
                 className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all group",
+                  "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all group cursor-pointer",
                   currentSessionId === session.id
                     ? "bg-purple-500/10 border border-purple-500/20 text-white"
                     : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
@@ -384,7 +388,7 @@ export function AskNivahClient() {
                 <span className="text-sm truncate flex-1">{session.title}</span>
                 <span
                   onClick={(e) => deleteSession(e, session.id)}
-                  className="p-1 rounded-lg cursor-pointer opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-all"
+                  className="p-1 rounded-lg cursor-pointer opacity-0 group-hover:opacity-100 md:group-focus-within:opacity-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-all"
                   role="button"
                   tabIndex={0}
                   aria-label="Delete session"
@@ -392,7 +396,7 @@ export function AskNivahClient() {
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </span>
-              </button>
+              </div>
             ))}
           </div>
 
