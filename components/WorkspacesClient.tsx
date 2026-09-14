@@ -208,7 +208,7 @@ export function WorkspacesClient({ workspaces: initial }: { workspaces: Workspac
                     <span className="text-sm text-zinc-500">
                       {workspace._count.documents} document{workspace._count.documents !== 1 ? "s" : ""}
                     </span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => { e.stopPropagation(); startEdit(workspace); }}
                         className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
