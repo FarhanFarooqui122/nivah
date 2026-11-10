@@ -213,20 +213,23 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | `prisma generate` + production build (fails on TypeScript errors) |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run the Vitest suite once |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run seed` | Seed the database (`prisma db seed`) |
+
 ### Database Setup
 
 ```bash
 npx prisma migrate dev
 npx prisma generate
-```
-
-### Testing
-
-```bash
-npm test            # Run tests once
-npm run test:watch  # Watch mode
-npm run lint        # ESLint
-npm run build       # prisma generate + production build (also type-checks)
 ```
 
 ---
