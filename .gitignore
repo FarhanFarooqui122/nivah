@@ -48,3 +48,8 @@ next-env.d.ts
 /AGENTS.md
 
 .env*
+
+# local dev logs and OCR test artifacts
+*.log
+test-ocr.png
+*.traineddata
