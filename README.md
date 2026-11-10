@@ -223,8 +223,10 @@ npx prisma generate
 ### Testing
 
 ```bash
-npm test          # Run tests
+npm test            # Run tests once
 npm run test:watch  # Watch mode
+npm run lint        # ESLint
+npm run build       # prisma generate + production build (also type-checks)
 ```
 
 ---
