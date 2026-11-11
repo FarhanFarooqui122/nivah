@@ -164,12 +164,28 @@ Ask a question ──▶ Embed question ──▶ Cosine search (Postgres <=>) �
 | POST | `/api/chat/sessions` | Create a new chat session |
 | DELETE | `/api/chat/sessions/[id]` | Delete a chat session |
 | GET | `/api/chat/sessions/[id]/messages` | Load messages for a session |
+| GET | `/api/documents` | List the user's documents |
+| DELETE | `/api/documents?id=…` | Delete a single document by id |
 | POST | `/api/documents/upload` | Upload document (saves to BYTEA, extracts text, chunks, embeds) |
+| POST | `/api/documents/search` | Keyword search — accepts `{ q }` |
 | POST | `/api/documents/semantic-search` | Search — accepts `{ q, topK?, documentId? }`, returns `{ results }` |
-| POST | `/api/documents/[id]/reindex` | Delete and regenerate embeddings for a document |
-| PATCH | `/api/documents/[id]` | Update document title/workspace |
-| GET | `/api/documents/[id]/file` | Serve raw file from BYTEA storage |
+| POST | `/api/documents/ai-actions` | Run `summarize` / `compare` / `faq` over `{ action, documentIds }` |
 | POST | `/api/documents/export` | Export documents as markdown |
+| PATCH | `/api/documents/[id]` | Update document title/workspace |
+| DELETE | `/api/documents/[id]` | Delete a document |
+| GET | `/api/documents/[id]/chunks` | List a document's chunks |
+| GET | `/api/documents/[id]/file` | Serve raw file from BYTEA storage |
+| POST | `/api/documents/[id]/reindex` | Delete and regenerate embeddings for a document |
+| POST | `/api/documents/[id]/study` | Generate study content (flashcards / quiz) for a document |
+| POST | `/api/documents/[id]/summarize` | Generate a summary for a document |
+| GET | `/api/study` | List generated study content |
+| GET | `/api/workspaces` | List workspaces |
+| POST | `/api/workspaces` | Create a workspace |
+| GET | `/api/workspaces/[id]` | Fetch one workspace |
+| PATCH | `/api/workspaces/[id]` | Update a workspace |
+| DELETE | `/api/workspaces/[id]` | Delete a workspace |
+| GET | `/api/workspaces/[id]/documents` | Documents in a workspace, with chunk counts |
+| GET | `/api/dashboard/stats` | Dashboard counters (documents, storage usage) |
 | GET | `/api/notifications` | List notifications + unread count |
 | POST | `/api/notifications` | Create a notification |
 | PATCH | `/api/notifications/[id]/read` | Mark notification as read |
