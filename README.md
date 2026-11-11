@@ -192,6 +192,23 @@ Ask a question ──▶ Embed question ──▶ Cosine search (Postgres <=>) �
 | PATCH | `/api/user/preferences` | Update email notifications / auto-sync settings |
 | POST | `/api/user/delete` | Delete Clerk user + Prisma user (cascades to docs/chunks) |
 
+### Rate limits
+
+Per-user, fixed window of 60 s, defined in `lib/rate-limit.ts`:
+
+| Endpoint | Requests / minute |
+|--------|-------|
+| `POST /api/documents/upload` | 10 |
+| `POST /api/documents/[id]/reindex` | 10 |
+| `POST /api/documents/ai-actions` | 10 |
+| `POST /api/documents/[id]/summarize` | 10 |
+| `POST /api/documents/[id]/study` | 20 |
+| `POST /api/ask` | 30 |
+| `POST /api/documents/export` | 30 |
+| `POST /api/documents/search` | 60 |
+| `POST /api/documents/semantic-search` | 60 |
+| `GET /api/study` | 120 |
+
 ---
 
 ## Getting Started
