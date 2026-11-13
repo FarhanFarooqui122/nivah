@@ -18,6 +18,7 @@
 
 - [About Nivah](#about-nivah)
 - [Features](#features)
+- [Plans & Quotas](#plans--quotas)
 - [How It Works](#how-it-works)
 - [Tech Stack](#tech-stack)
 - [API Routes](#api-routes)
@@ -98,6 +99,21 @@ Ask a question ──▶ Embed question ──▶ Cosine search (Postgres <=>) �
 - **Responsive Sidebar** — Hamburger menu on mobile, collapsible chevron on desktop
 - **Auth Pages** — Branded custom sign-in/sign-up pages with email/password, Google SSO, GitHub SSO
 - **Profile & Settings** — User profile page, settings with email notification and auto-sync toggles
+
+---
+
+## Plans & Quotas
+
+Plan limits live in a single source of truth, `lib/plans.ts`:
+
+| Plan | Storage | AI connections | Price |
+| --- | --- | --- | --- |
+| Free | 500 MB | 3 | $0 |
+| Pro | 50 GB | 10 | $9 / month |
+
+The user's plan is stored on `User.plan` (default `"free"`). Uploads aggregate the user's existing
+`Document.fileSize` and are rejected with **413** when the new file would exceed the plan limit;
+the settings page shows the current plan and a storage-used bar.
 
 ---
 
