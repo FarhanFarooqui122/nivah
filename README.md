@@ -281,6 +281,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run seed` | Seed the database (`prisma db seed`) |
 
+Vitest currently covers two modules: the text chunker (`lib/chunker.test.ts`) and the in-memory rate
+limiter (`lib/rate-limit.test.ts`).
+
 ### Database Setup
 
 ```bash
