@@ -288,6 +288,16 @@ npx prisma migrate dev
 npx prisma generate
 ```
 
+Semantic search also relies on a partial index that ships as plain SQL (`prisma/add-index-embedding.sql`):
+
+```sql
+CREATE INDEX IF NOT EXISTS "DocumentChunk_user_embedding_idx"
+ON "DocumentChunk" ("documentId") WHERE "embedding" IS NOT NULL;
+```
+
+Apply it once with `npx prisma db execute --file prisma/add-index-embedding.sql --schema prisma/schema.prisma`,
+or paste it into the Neon SQL editor.
+
 ---
 
 ## Project Structure
