@@ -298,6 +298,18 @@ ON "DocumentChunk" ("documentId") WHERE "embedding" IS NOT NULL;
 Apply it once with `npx prisma db execute --file prisma/add-index-embedding.sql --schema prisma/schema.prisma`,
 or paste it into the Neon SQL editor.
 
+### Seed data
+
+`npm run seed` fills an account with demo material for the presentation:
+
+- workspace **Study Pack** ("Demo documents for the Nivah presentation")
+- 4 documents — *Photosynthesis: The Light Reactions*, *Database Normalization: 1NF to 3NF*,
+  *The French Revolution: 1789–1799* and *Machine Learning Fundamentals* — chunked and embedded
+- a seeded chat session plus an in-app notification
+
+It targets the most recently created user unless you pass `--clerkId=user_xxx`. You must sign in at
+least once first; accounts that already have documents are skipped unless you add `--reset`.
+
 ---
 
 ## Project Structure
