@@ -254,6 +254,13 @@ CLERK_SECRET_KEY=sk_...
 GOOGLE_API_KEY=AIza...
 ```
 
+| Variable | Used for |
+| --- | --- |
+| `DATABASE_URL` | Postgres/Neon connection — Prisma client and its pg adapter (`lib/prisma.ts`) |
+| `GOOGLE_API_KEY` | Gemini: embeddings (`lib/embeddings.ts`, `gemini-embedding-001`, 3072-dim) and the answer model in `/api/ask` |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk client-side auth |
+| `CLERK_SECRET_KEY` | Clerk server-side auth, read by Clerk's middleware in `proxy.ts` |
+
 ### Run Development Server
 
 ```bash
