@@ -225,6 +225,21 @@ Per-user, fixed window of 60 s, defined in `lib/rate-limit.ts`:
 | `POST /api/documents/semantic-search` | 60 |
 | `GET /api/study` | 120 |
 
+### Dashboard stats
+
+`GET /api/dashboard/stats` powers the dashboard cards. Worth knowing what the names really mean:
+
+| Field | Actually is |
+| --- | --- |
+| `totalDocuments` | All of the user's documents |
+| `totalImages` | Documents whose MIME type is an image |
+| `totalWords` | Word count across every non-null `textContent` |
+| `storageBreakdown` | **Document counts** per category (PDF / DOCX / TXT-MD / Images / Other) — not bytes |
+| `mostRecentUpload` | `{ title, fileName, createdAt }` of the newest document |
+| `largestDocument` | Biggest by **extracted text length** (`charCount`), not file size |
+| `mostCommonFileType` | `{ fileType, count }` with the highest document count |
+| `topDocuments` | Top 5 documents by extracted text length |
+
 ---
 
 ## Getting Started
