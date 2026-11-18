@@ -253,6 +253,28 @@ Per-user, fixed window of 60 s, defined in `lib/rate-limit.ts`:
 In-app notifications are independent of the email-notification preference — that toggle only affects
 email, not the bell.
 
+### Semantic search response
+
+`POST /api/documents/semantic-search` drops anything below `MIN_SCORE = 0.3` and caps `topK` at 50
+(default 10):
+
+```json
+{
+  "results": [
+    {
+      "id": "chunk-id",
+      "documentId": "document-id",
+      "title": "Quarterly report",
+      "content": "…matched chunk text…",
+      "chunkIndex": 3,
+      "score": 0.82
+    }
+  ]
+}
+```
+
+`score` is cosine similarity computed in Postgres (`1 - (embeddingVector <=> query)`), so it ranges 0–1.
+
 ---
 
 ## Getting Started
