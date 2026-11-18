@@ -240,6 +240,19 @@ Per-user, fixed window of 60 s, defined in `lib/rate-limit.ts`:
 | `mostCommonFileType` | `{ fileType, count }` with the highest document count |
 | `topDocuments` | Top 5 documents by extracted text length |
 
+### Notification types
+
+`createNotification(userId, type, title, message?, link?)` is called with three type strings today:
+
+| Type | Raised when |
+| --- | --- |
+| `upload_complete` | A document finished uploading and chunking |
+| `reindex_complete` | Re-indexing regenerated a document's embeddings |
+| `summary_ready` | A document summary finished generating |
+
+In-app notifications are independent of the email-notification preference — that toggle only affects
+email, not the bell.
+
 ---
 
 ## Getting Started
