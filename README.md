@@ -74,6 +74,24 @@ a sentence from being lost across a boundary. Each chunk carries `chunkIndex` (s
 `charCount`; empty text yields an empty array. Eight unit tests in `lib/chunker.test.ts` cover the size,
 overlap and numbering.
 
+### Upload pipeline
+
+`POST /api/documents/upload` does the whole job in one request:
+
+| Step | What happens |
+| --- | --- |
+| 1. Auth + quota | Clerk id → `prisma.User`; the plan's storage limit (`lib/plans.ts`) is checked against the sum of `fileSize` and the upload is rejected with **413** before anything is written |
+| 2. Workspace | An optional `workspaceId` must belong to the user (else 404); without one the document is stored workspace-less |
+| 3. Store | The binary goes into `fileBlob` (BYTEA) — there is no object storage |
+| 4. Extract | `lib/extract-text.ts`: PDF through `pdf-parse`, OCR fallback when the text is under 20 characters or parsing fails; DOCX through mammoth; TXT/MD as UTF-8; PNG/JPEG/WebP through Tesseract |
+| 5. Chunk + embed | `chunkText()`, then `generateEmbeddings()` — Gemini `gemini-embedding-001`, 3072 dimensions, at most 8 concurrent requests |
+| 6. Write | One raw `INSERT` per chunk, filling both `embedding` (jsonb) and `embeddingVector` (`vector(3072)`) |
+| 7. Notify | `upload_complete` notification with the chunk count and a link to the document |
+| 8. Respond | An explicit field list — `fileBlob` and `textContent` never reach the response JSON |
+
+If chunking or embedding throws, the document row is deleted again instead of leaving a half-indexed file
+behind.
+
 ## Features
 
 ### 📄 Document Management
