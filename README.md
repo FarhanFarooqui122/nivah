@@ -59,6 +59,21 @@ Upload ──▶ Extract text ──▶ Chunk (1000 chars, 200 overlap) ──�
 Ask a question ──▶ Embed question ──▶ Cosine search (Postgres <=>) ──▶ Top 5 chunks ──▶ LLM (streaming SSE) ──▶ Answer + sources
 ```
 
+### Chunking
+
+`lib/chunker.ts` splits text by **characters, not words or tokens**:
+
+| Constant | Value |
+| --- | --- |
+| `CHUNK_SIZE` | 1000 characters |
+| `OVERLAP` | 200 characters |
+| `STEP` | 800 characters (size − overlap) |
+
+Cuts happen at fixed offsets, so a chunk can begin or end mid-word — the 200-character overlap is what keeps
+a sentence from being lost across a boundary. Each chunk carries `chunkIndex` (sequential from 0) and
+`charCount`; empty text yields an empty array. Eight unit tests in `lib/chunker.test.ts` cover the size,
+overlap and numbering.
+
 ## Features
 
 ### 📄 Document Management
