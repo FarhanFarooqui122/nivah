@@ -92,6 +92,22 @@ overlap and numbering.
 If chunking or embedding throws, the document row is deleted again instead of leaving a half-indexed file
 behind.
 
+### Re-indexing
+
+`POST /api/documents/[id]/reindex` rebuilds one document's chunks and embeddings. The order is deliberate:
+
+| Step | Detail |
+| --- | --- |
+| 1. Checks | Rate limited (`reindex` bucket); the document must belong to the user (404); no `textContent` → **400** |
+| 2. Embed first | New embeddings are generated **before** anything is deleted |
+| 3. All-null guard | If every embedding came back `null`, it returns **502** and the old chunks stay |
+| 4. Atomic swap | The `DELETE` and the new `INSERT`s run in one `prisma.$transaction`, so a failure rolls back |
+| 5. Partial embeddings | Chunks whose embedding failed are still inserted with content only, so the document is flagged "Needs re-index" rather than losing text |
+| 6. Report | `reindex_complete` notification plus `{ success, chunkCount, embeddedCount }` — equal counts mean fully indexed |
+
+You need this for documents uploaded before the pgvector column existed, or while Gemini was failing: their
+chunks have no `embeddingVector`, so search cannot see them.
+
 ## Features
 
 ### 📄 Document Management
