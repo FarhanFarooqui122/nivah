@@ -108,6 +108,20 @@ behind.
 You need this for documents uploaded before the pgvector column existed, or while Gemini was failing: their
 chunks have no `embeddingVector`, so search cannot see them.
 
+### Workspaces
+
+Workspaces are a grouping on top of documents — there is no sharing and no per-workspace permissions:
+
+| Rule | Where it lives |
+| --- | --- |
+| `Document.workspaceId` is optional; a document can sit outside every workspace | `prisma/schema.prisma` (`workspaceId String?`) |
+| Upload accepts a `workspaceId` only if it belongs to the caller, otherwise 404 | `app/api/documents/upload/route.ts` |
+| Moving a document validates the target workspace; `null` unassigns it | `PATCH /api/documents/[id]` |
+| `GET /api/documents` returns **all** of the user's documents with their `workspaceId`, so filtering is client-side | `app/api/documents/route.ts` |
+| Ask and semantic search narrow retrieval with an optional `workspaceId` | `/api/ask`, `/api/documents/semantic-search` |
+| `GET /api/workspaces` includes a `_count` of documents per workspace | `app/api/workspaces/route.ts` |
+| Deleting a workspace un-assigns its documents (`onDelete: SetNull`) — it never deletes them | `prisma/schema.prisma` |
+
 ## Features
 
 ### 📄 Document Management
