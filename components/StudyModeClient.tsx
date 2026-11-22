@@ -118,12 +118,12 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between text-sm text-zinc-500">
-          <span>{safeIndex + 1} of {cards.length}</span>
+        <div className="flex items-center justify-between">
+          <span className="kicker">{safeIndex + 1} of {cards.length}</span>
           <button
             onClick={() => generate("flashcards")}
             disabled={loading.flashcards}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 text-xs"
+            className="flex items-center gap-1.5 border-2 border-[var(--color-border)] px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${loading.flashcards ? "animate-spin" : ""}`} />
             Regenerate
@@ -141,16 +141,16 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
               setFlipped(!flipped);
             }
           }}
-          className="cursor-pointer p-8 rounded-2xl border border-zinc-700 bg-zinc-900 min-h-[250px] flex items-center justify-center transition-all hover:border-purple-500/50 focus-visible:border-purple-500 focus-visible:outline-none"
+          className="group flex min-h-[250px] cursor-pointer items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900 p-8 shadow-[5px_5px_0_0_var(--color-primary-vivid)] transition-all hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--color-primary-vivid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
         >
           <div className="text-center">
-            <p className="text-xs text-zinc-500 mb-3 uppercase tracking-wider">
+            <p className="kicker mb-3">
               {flipped ? "Answer" : "Question"}
             </p>
-            <p className="text-lg text-white font-medium leading-relaxed">
+            <p className="text-lg font-semibold leading-relaxed text-white">
               {flipped ? card.answer : card.question}
             </p>
-            <p className="text-xs text-zinc-600 mt-4">Click or press Enter to flip</p>
+            <p className="mt-4 text-[0.6rem] font-bold uppercase tracking-widest text-zinc-500">Click or press Enter to flip</p>
           </div>
         </div>
 
@@ -158,14 +158,14 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
           <button
             onClick={() => { setCardIndex((i) => Math.max(0, i - 1)); setFlipped(false); }}
             disabled={safeIndex === 0}
-            className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50"
+            className="border-2 border-[var(--color-border)] bg-zinc-900 p-2 text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => { setCardIndex((i) => Math.min(cards.length - 1, i + 1)); setFlipped(false); }}
             disabled={safeIndex >= cards.length - 1}
-            className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50"
+            className="border-2 border-[var(--color-border)] bg-zinc-900 p-2 text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -183,11 +183,11 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-zinc-500">{items.length} questions</span>
+          <span className="kicker">{items.length} questions</span>
           <button
             onClick={() => generate("quiz")}
             disabled={loading.quiz}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 text-xs"
+            className="flex items-center gap-1.5 border-2 border-[var(--color-border)] px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${loading.quiz ? "animate-spin" : ""}`} />
             Regenerate
@@ -196,20 +196,20 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
         <div className="space-y-3">
           {items.map((item, i) => (
-            <div key={i} className="border border-zinc-800 rounded-2xl overflow-hidden">
+            <div key={i} className="overflow-hidden border-2 border-[var(--color-border)] bg-zinc-900">
               <button
                 onClick={() => setExpanded(expanded === i ? null : i)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-zinc-900/50 transition-colors"
+                className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-zinc-800/50"
               >
-                <span className="text-white font-medium">
-                  <span className="text-zinc-500 mr-2">Q{i + 1}.</span>
+                <span className="font-semibold text-white">
+                  <span className="mr-2 font-mono text-xs text-zinc-500">Q{i + 1}.</span>
                   {item.question}
                 </span>
                 <ChevronRight className={cn("w-4 h-4 text-zinc-500 transition-transform", expanded === i && "rotate-90")} />
               </button>
               {expanded === i && (
-                <div className="px-5 pb-4 pt-2 border-t border-zinc-800">
-                  <p className="text-sm text-green-600 dark:text-green-400 leading-relaxed">{item.answer}</p>
+                <div className="border-t-2 border-[var(--color-border)] bg-zinc-950 px-5 pb-4 pt-3">
+                  <p className="text-sm leading-relaxed text-emerald-600 dark:text-emerald-400">{item.answer}</p>
                 </div>
               )}
             </div>
@@ -237,17 +237,17 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-zinc-500">{items.length} questions</span>
+          <span className="kicker">{items.length} questions</span>
           <div className="flex items-center gap-2">
             {mcqSubmitted && (
-              <span className="text-sm text-green-600 dark:text-green-400">
+              <span className="border-2 border-emerald-500 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
                 Score: {score}/{items.length}
               </span>
             )}
             {!mcqSubmitted && Object.keys(mcqAnswers).length > 0 && (
               <button
                 onClick={() => setMcqSubmitted(true)}
-                className="btn-primary rounded-lg px-3 py-1.5 text-xs"
+                className="btn-primary px-3 py-1.5 text-[0.65rem]"
               >
                 Submit
               </button>
@@ -255,7 +255,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             <button
               onClick={() => { generate("mcq"); setMcqAnswers({}); setMcqSubmitted(false); }}
               disabled={loading.mcq}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 text-xs"
+              className="flex items-center gap-1.5 border-2 border-[var(--color-border)] px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${loading.mcq ? "animate-spin" : ""}`} />
               Regenerate
@@ -265,22 +265,22 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
         <div className="space-y-4">
           {items.map((item, qIndex) => (
-            <div key={qIndex} className="border border-zinc-800 rounded-2xl p-5">
-              <p className="text-white font-medium mb-3">
-                <span className="text-zinc-500 mr-2">Q{qIndex + 1}.</span>
+            <div key={qIndex} className="border-2 border-[var(--color-border)] bg-zinc-900 p-5">
+              <p className="mb-3 font-semibold text-white">
+                <span className="mr-2 font-mono text-xs text-zinc-500">Q{qIndex + 1}.</span>
                 {item.question}
               </p>
               <div className="space-y-2">
                 {item.options.map((opt, oIndex) => {
                   const selected = mcqAnswers[qIndex] === oIndex;
                   const isCorrect = oIndex === item.correctIndex;
-                  let optionClass = "border-zinc-700 hover:border-zinc-500";
+                  let optionClass = "border-[var(--color-border)] hover:bg-zinc-800";
                   if (mcqSubmitted) {
-                    if (isCorrect) optionClass = "border-green-500 bg-green-500/10";
+                    if (isCorrect) optionClass = "border-emerald-500 bg-emerald-500/10";
                     else if (selected && !isCorrect) optionClass = "border-red-500 bg-red-500/10";
-                    else optionClass = "border-zinc-700 opacity-50";
+                    else optionClass = "border-[var(--color-border)] opacity-50";
                   } else if (selected) {
-                    optionClass = "border-green-500/50 bg-green-500/5";
+                    optionClass = "border-emerald-500 bg-emerald-500/5";
                   }
 
                   return (
@@ -289,15 +289,15 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
                       onClick={() => handleAnswer(qIndex, oIndex)}
                       disabled={mcqSubmitted}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all",
+                        "flex w-full items-center gap-3 border-2 px-4 py-3 text-left transition-all",
                         optionClass,
                       )}
                     >
                       <span className={cn(
-                        "w-7 h-7 rounded-lg flex items-center justify-center text-sm font-medium",
-                        mcqSubmitted && isCorrect ? "bg-green-500 text-white" :
-                        mcqSubmitted && selected && !isCorrect ? "bg-red-500 text-white" :
-                        selected ? "bg-green-500/20 text-green-600 dark:text-green-400" : "bg-zinc-800 text-zinc-400"
+                        "flex h-7 w-7 items-center justify-center border-2 text-sm font-bold",
+                        mcqSubmitted && isCorrect ? "border-emerald-500 bg-emerald-500 text-white" :
+                        mcqSubmitted && selected && !isCorrect ? "border-red-500 bg-red-500 text-white" :
+                        selected ? "border-emerald-500 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "border-[var(--color-border)] bg-zinc-800 text-zinc-400"
                       )}>
                         {String.fromCharCode(65 + oIndex)}
                       </span>
@@ -311,13 +311,13 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
         </div>
 
         {mcqSubmitted && (
-          <div className="border border-green-500/30 rounded-2xl p-5 bg-green-900/10 text-center">
-            <p className="text-lg font-semibold text-white">
-              Your Score: {score}/{items.length} ({Math.round((score / items.length) * 100)}%)
+          <div className="border-2 border-emerald-500 bg-emerald-500/10 p-5 text-center">
+            <p className="font-display text-2xl uppercase text-white">
+              Score {score}/{items.length} <span className="text-emerald-400">({Math.round((score / items.length) * 100)}%)</span>
             </p>
             <button
               onClick={() => { setMcqAnswers({}); setMcqSubmitted(false); }}
-              className="mt-3 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm font-medium transition-colors"
+              className="btn-ghost mt-3 px-4 py-2 text-xs"
             >
               Try Again
             </button>
@@ -342,11 +342,11 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-zinc-500">Study notes</span>
+          <span className="kicker">Study notes</span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors text-xs"
+              className="flex items-center gap-1.5 border-2 border-[var(--color-border)] px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white transition-colors hover:bg-zinc-800"
             >
               {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
               {copied ? "Copied" : "Copy"}
@@ -354,7 +354,7 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
             <button
               onClick={() => generate("short-notes")}
               disabled={loading["short-notes"]}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 text-xs"
+              className="flex items-center gap-1.5 border-2 border-[var(--color-border)] px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${loading["short-notes"] ? "animate-spin" : ""}`} />
               Regenerate
@@ -362,9 +362,9 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
           </div>
         </div>
 
-        <div className="border border-zinc-800 rounded-2xl p-6 bg-zinc-900/50">
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-6">
           <div className="prose prose-invert prose-sm max-w-none">
-            <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">{notes}</pre>
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-300">{notes}</pre>
           </div>
         </div>
       </div>
@@ -374,18 +374,18 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
   const renderContent = () => {
     if (loading[activeTab]) {
       return (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <Sparkles className="w-10 h-10 text-purple-400 mx-auto mb-4 animate-pulse" />
-          <p className="text-zinc-400">Generating {TABS.find((t) => t.key === activeTab)?.label?.toLowerCase()}...</p>
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <Sparkles className="mx-auto mb-4 h-10 w-10 animate-pulse text-purple-400" />
+          <p className="kicker">Generating {TABS.find((t) => t.key === activeTab)?.label?.toLowerCase()}...</p>
         </div>
       );
     }
 
     if (error) {
       return (
-        <div className="border border-red-500/30 rounded-2xl p-6 text-center bg-red-500/5">
-          <p className="text-red-400">{error}</p>
-          <button onClick={() => generate(activeTab)} className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-medium transition-colors">
+        <div className="border-2 border-red-500 bg-red-500/5 p-6 text-center">
+          <p className="font-semibold text-red-400">{error}</p>
+          <button onClick={() => generate(activeTab)} className="btn-primary mt-3 px-4 py-2 text-xs">
             Retry
           </button>
         </div>
@@ -394,13 +394,15 @@ export function StudyModeClient({ documentId }: StudyViewProps) {
 
     if (!hasContent) {
       return (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <Lightbulb className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">No {TABS.find((t) => t.key === activeTab)?.label?.toLowerCase()} yet</p>
-          <p className="text-zinc-500 text-sm mt-1">Generate study material from this document</p>
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900">
+            <Lightbulb className="h-6 w-6 text-zinc-500" />
+          </div>
+          <p className="font-display text-xl uppercase text-white">No {TABS.find((t) => t.key === activeTab)?.label?.toLowerCase()} yet</p>
+          <p className="mt-1 text-sm text-zinc-500">Generate study material from this document</p>
           <button
             onClick={() => generate(activeTab)}
-            className="mt-4 inline-flex items-center gap-2 btn-primary rounded-xl px-5 py-2.5"
+            className="btn-primary mt-4 inline-flex items-center gap-2 px-5 py-2.5 text-xs"
           >
             <Sparkles className="w-4 h-4" />
             Generate {TABS.find((t) => t.key === activeTab)?.label}
