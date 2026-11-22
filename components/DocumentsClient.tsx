@@ -219,25 +219,25 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               placeholder="Search documents..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
+              className="brutal-input w-full py-2.5 pl-10 pr-4 text-white placeholder-zinc-500"
             />
           </div>
         </div>
         <div className="flex items-center gap-2">
           {workspaces.length > 0 && (
-            <select value={filterWorkspace} onChange={(e) => { setFilterWorkspace(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
+            <select value={filterWorkspace} onChange={(e) => { setFilterWorkspace(e.target.value); setPage(0); }} className="brutal-input px-3 py-2.5 text-sm text-white">
               <option value="all">All Workspaces</option>
               {workspaces.map((w) => (
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
           )}
-          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
+          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(0); }} className="brutal-input px-3 py-2.5 text-sm text-white">
             {FILTER_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as "date" | "name" | "size"); setPage(0); }} className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none">
+          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as "date" | "name" | "size"); setPage(0); }} className="brutal-input px-3 py-2.5 text-sm text-white">
             <option value="date">Newest</option>
             <option value="name">Name</option>
             <option value="size">Size</option>
@@ -246,14 +246,14 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       </div>
 
       {selectedDocs.size > 0 && !aiResult && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-purple-900/20 border border-purple-500/30 rounded-xl flex-wrap">
-          <span className="text-sm text-purple-400">{selectedDocs.size} selected</span>
-          <div className="flex items-center gap-2 ml-auto">
+        <div className="flex flex-wrap items-center gap-3 border-2 border-[var(--color-border)] bg-purple-500/10 px-4 py-3 shadow-[3px_3px_0_0_var(--color-primary-vivid)]">
+          <span className="text-[0.7rem] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">{selectedDocs.size} selected</span>
+          <div className="ml-auto flex items-center gap-2">
             <select
               value={aiAction}
               onChange={(e) => handleAiAction(e.target.value)}
               disabled={aiRunning}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-1.5 text-white text-sm focus:border-purple-500 focus:outline-none disabled:opacity-50"
+              className="brutal-input px-3 py-1.5 text-sm text-white disabled:opacity-50"
             >
               <option value="">AI Actions</option>
               <option value="summarize">Summarize</option>
@@ -263,16 +263,16 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               <option value="faq">Generate FAQ</option>
             </select>
           </div>
-          <button onClick={handleBulkDelete} disabled={bulkDeleting} className="text-sm text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <button onClick={handleBulkDelete} disabled={bulkDeleting} className="text-[0.7rem] font-bold uppercase tracking-widest text-red-400 transition-colors hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50">
             {bulkDeleting ? "Deleting..." : "Delete selected"}
           </button>
-          <button onClick={() => setSelectedDocs(new Set())} className="text-sm text-zinc-400 hover:text-white transition-colors">Clear</button>
+          <button onClick={() => setSelectedDocs(new Set())} className="text-[0.7rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:text-white">Clear</button>
         </div>
       )}
 
       {aiRunning && (
-        <div className="border border-purple-500/30 rounded-2xl p-8 text-center bg-purple-900/10">
-          <svg className="w-8 h-8 animate-spin text-purple-500 mx-auto" viewBox="0 0 24 24" fill="none">
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-8 text-center shadow-[4px_4px_0_0_var(--color-primary-vivid)]">
+          <svg className="mx-auto h-8 w-8 animate-spin text-purple-500" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
             <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
           </svg>
@@ -281,23 +281,23 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       )}
 
       {listError && (
-        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
-          <p className="text-red-400 text-sm">{listError}</p>
-          <button onClick={() => setListError(null)} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
+        <div className="border-2 border-red-500 bg-red-500/10 p-4">
+          <p className="text-sm font-semibold text-red-400">{listError}</p>
+          <button onClick={() => setListError(null)} className="mt-2 text-[0.7rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:text-white">Dismiss</button>
         </div>
       )}
 
       {aiError && (
-        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
-          <p className="text-red-400 text-sm">{aiError}</p>
-          <button onClick={() => { setAiError(null); setAiResult(null); setAiAction(""); }} className="mt-2 text-sm text-zinc-400 hover:text-white transition-colors">Dismiss</button>
+        <div className="border-2 border-red-500 bg-red-500/10 p-4">
+          <p className="text-sm font-semibold text-red-400">{aiError}</p>
+          <button onClick={() => { setAiError(null); setAiResult(null); setAiAction(""); }} className="mt-2 text-[0.7rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:text-white">Dismiss</button>
         </div>
       )}
 
       {aiResult && (
-        <div className="border border-purple-500/30 rounded-2xl bg-purple-900/10 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-purple-500/20">
-            <h3 className="font-semibold text-white flex items-center gap-2">
+        <div className="overflow-hidden border-2 border-[var(--color-border)] bg-zinc-900 shadow-[5px_5px_0_0_var(--color-primary-vivid)]">
+          <div className="flex items-center justify-between border-b-2 border-[var(--color-border)] px-5 py-3">
+            <h3 className="font-display flex items-center gap-2 text-sm uppercase text-white">
               <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2a10 10 0 1010 10 10 10 0 00-10-10z" />
                 <path d="M12 6v6l4 2" />
@@ -315,43 +315,45 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                     setCopied(false);
                   }
                 }}
-                className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
+                className="border-2 border-transparent px-2 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white"
               >
                 {copied ? "Copied!" : "Copy"}
               </button>
               <button
                 onClick={() => { setAiResult(null); setAiError(null); setAiAction(""); }}
-                className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
+                className="border-2 border-transparent px-2 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white"
               >
                 Dismiss
               </button>
             </div>
           </div>
-          <div className="p-5 max-h-96 overflow-y-auto">
-            <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">{aiResult}</pre>
+          <div className="max-h-96 overflow-y-auto p-5">
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-300">{aiResult}</pre>
           </div>
         </div>
       )}
 
       {paginated.length === 0 && filtered.length > 0 ? (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <p className="text-zinc-400 font-medium">No documents on this page</p>
-          <button onClick={() => setPage(0)} className="mt-4 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors">
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <p className="font-semibold text-zinc-400">No documents on this page</p>
+          <button onClick={() => setPage(0)} className="btn-ghost mt-4 px-5 py-2.5 text-xs">
             Go to first page
           </button>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          {search ? (
-            <SearchIcon className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          ) : (
-            <FolderIcon className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          )}
-          <p className="text-zinc-400 font-medium">
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900">
+            {search ? (
+              <SearchIcon className="w-6 h-6 text-zinc-500" />
+            ) : (
+              <FolderIcon className="w-6 h-6 text-zinc-500" />
+            )}
+          </div>
+          <p className="font-semibold text-zinc-400">
             {search ? "No documents match your search" : "No documents uploaded yet"}
           </p>
           {!search && (
-            <Link href="/dashboard/upload" className="mt-4 inline-flex items-center gap-2 btn-primary rounded-xl px-5 py-2.5">
+            <Link href="/dashboard/upload" className="btn-primary mt-4 inline-flex items-center gap-2 px-5 py-2.5 text-xs">
               <UploadIcon className="w-4 h-4" />
               Upload your first document
             </Link>
@@ -359,55 +361,55 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         </div>
       ) : (
         <>
-        <div className="border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="hidden md:grid grid-cols-[40px_1fr_180px_100px_110px_90px] gap-4 px-6 py-3 bg-zinc-900/50 text-xs font-medium text-zinc-500 uppercase tracking-wider">
-            <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="rounded border-zinc-600 accent-purple-600" /></div>
-            <span>Name</span>
-            <span>Type</span>
-            <span>Size</span>
-            <span>Date</span>
-            <span>Actions</span>
+        <div className="overflow-hidden border-2 border-[var(--color-border)] bg-zinc-900 shadow-[5px_5px_0_0_var(--color-primary-vivid)]">
+          <div className="hidden grid-cols-[40px_1fr_180px_100px_110px_90px] gap-4 border-b-2 border-[var(--color-border)] bg-zinc-950 px-6 py-3 md:grid">
+            <div><input type="checkbox" checked={selectedDocs.size === filtered.length && filtered.length > 0} onChange={selectAll} className="accent-purple-600" /></div>
+            <span className="kicker">Name</span>
+            <span className="kicker">Type</span>
+            <span className="kicker">Size</span>
+            <span className="kicker">Date</span>
+            <span className="kicker">Actions</span>
           </div>
 
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y-2 divide-zinc-800">
             {paginated.map((doc) => (
-              <div key={doc.id} className={cn("grid grid-cols-[40px_1fr] md:grid-cols-[40px_1fr_180px_100px_110px_90px] gap-4 px-6 py-4 items-center hover:bg-zinc-900/50 transition-colors group", deleting === doc.id && "opacity-50")}>
+              <div key={doc.id} className={cn("group grid grid-cols-[40px_1fr] items-center gap-4 px-6 py-4 transition-colors hover:bg-zinc-800/40 md:grid-cols-[40px_1fr_180px_100px_110px_90px]", deleting === doc.id && "opacity-50")}>
                 <div>
-                  <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="rounded border-zinc-600 accent-purple-600" />
+                  <input type="checkbox" checked={selectedDocs.has(doc.id)} onChange={() => toggleSelect(doc.id)} className="accent-purple-600" />
                 </div>
 
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center flex-shrink-0 text-zinc-400">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-950 text-zinc-400">
                     <FileTypeIcon fileType={doc.fileType} className="w-4.5 h-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <a href={`/dashboard/documents/${doc.id}`} className="font-medium text-white truncate hover:text-purple-400 transition-colors">
+                    <a href={`/dashboard/documents/${doc.id}`} className="block truncate font-semibold text-white transition-colors hover:text-purple-400">
                       {doc.title}
                     </a>
-                    <p className="text-xs text-zinc-500 truncate md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
+                    <p className="truncate text-xs text-zinc-500 md:hidden">{formatBytes(doc.fileSize)} · {formatDate(doc.createdAt)}</p>
                     {doc.charCount != null && doc.charCount > 0 && (
-                      <p className="text-xs text-zinc-600 mt-0.5 flex items-center gap-2">
+                      <p className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
                         <span>{doc.charCount.toLocaleString()} chars · {doc.wordCount != null ? `${doc.wordCount.toLocaleString()} words` : ""} · {doc.chunkCount ?? 0} chunks</span>
                         {doc.embeddedCount != null && doc.chunkCount != null && doc.embeddedCount < doc.chunkCount && (
-                          <span className="text-amber-600 dark:text-amber-400 text-[10px] font-medium">Needs re-index</span>
+                          <span className="border-2 border-amber-400 px-1 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Needs re-index</span>
                         )}
                       </p>
                     )}
                     {doc.workspaceName && (
-                      <p className="text-xs text-zinc-600 mt-0.5">Workspace: {doc.workspaceName}</p>
+                      <p className="mt-0.5 text-xs text-zinc-500">Workspace: {doc.workspaceName}</p>
                     )}
                   </div>
                 </div>
 
-                <span className="hidden md:block text-sm text-zinc-400">{doc.fileType.split("/").pop()?.toUpperCase() || "FILE"}</span>
-                <span className="hidden md:block text-sm text-zinc-400">{formatBytes(doc.fileSize)}</span>
-                <span className="hidden md:block text-sm text-zinc-400">{formatDate(doc.createdAt)}</span>
+                <span className="hidden text-[0.7rem] font-bold uppercase tracking-widest text-zinc-400 md:block">{doc.fileType.split("/").pop()?.toUpperCase() || "FILE"}</span>
+                <span className="hidden text-sm text-zinc-400 md:block">{formatBytes(doc.fileSize)}</span>
+                <span className="hidden text-sm text-zinc-400 md:block">{formatDate(doc.createdAt)}</span>
 
-                <div className="hidden md:flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
-                  <a href={`/api/documents/${doc.id}/file`} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors" title="Download">
+                <div className="hidden items-center gap-1 transition-opacity md:flex md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
+                  <a href={`/api/documents/${doc.id}/file`} target="_blank" rel="noopener noreferrer" className="border-2 border-transparent p-1.5 text-zinc-400 transition-colors hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white" title="Download">
                     <DownloadIcon className="w-4 h-4" />
                   </a>
-                  <button onClick={() => handleDelete(doc.id)} disabled={deleting === doc.id} className="p-1.5 hover:bg-red-900/30 rounded-lg text-zinc-400 hover:text-red-400 transition-colors" title="Delete">
+                  <button onClick={() => handleDelete(doc.id)} disabled={deleting === doc.id} className="border-2 border-transparent p-1.5 text-zinc-400 transition-colors hover:border-red-500 hover:bg-red-500/10 hover:text-red-400" title="Delete">
                     <TrashIcon className="w-4 h-4" />
                   </button>
                 </div>
@@ -417,15 +419,15 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50">
-            <span className="text-sm text-zinc-500">
+          <div className="flex items-center justify-between border-2 border-[var(--color-border)] bg-zinc-900 px-4 py-3">
+            <span className="text-[0.7rem] font-bold uppercase tracking-widest text-zinc-500">
               Page {safePage + 1} of {totalPages} ({filtered.length} documents)
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(Math.max(0, safePage - 1))}
                 disabled={safePage === 0}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-ghost px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
@@ -434,8 +436,8 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
                   key={i}
                   onClick={() => setPage(i)}
                   className={cn(
-                    "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
-                    i === safePage ? "bg-purple-600 text-on-brand" : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400"
+                    "h-8 w-8 border-2 text-xs font-bold transition-colors",
+                    i === safePage ? "border-[var(--color-border)] bg-primary-vivid text-white" : "border-transparent bg-zinc-800 text-zinc-400 hover:border-[var(--color-border)] hover:text-white"
                   )
                 }
                 >
@@ -445,7 +447,7 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
               <button
                 onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
                 disabled={safePage >= totalPages - 1}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-ghost px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>
@@ -456,11 +458,11 @@ export function DocumentsClient({ documents, initialFilter, workspaces = [] }: {
       )}
 
       {selectedDocs.size > 0 && !aiResult && (
-        <div className="flex items-center justify-between px-4 py-3 bg-purple-900/20 border border-purple-500/30 rounded-xl">
-          <span className="text-sm text-purple-400">{selectedDocs.size} documents selected</span>
+        <div className="flex items-center justify-between border-2 border-[var(--color-border)] bg-purple-500/10 px-4 py-3 shadow-[3px_3px_0_0_var(--color-primary-vivid)]">
+          <span className="text-[0.7rem] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">{selectedDocs.size} documents selected</span>
           <div className="flex items-center gap-3">
             {exportMsg && <span className="text-sm text-purple-400">{exportMsg}</span>}
-            <button onClick={handleExport} disabled={exporting} className="btn-primary rounded-xl px-4 py-2 text-sm gap-1.5 disabled:opacity-50">
+            <button onClick={handleExport} disabled={exporting} className="btn-primary gap-1.5 px-4 py-2 text-xs disabled:opacity-50">
               <CopyIcon className="w-4 h-4" />
               {exporting ? "Exporting..." : "Export Context"}
             </button>

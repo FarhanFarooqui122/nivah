@@ -5,6 +5,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DocumentsClient } from "@/components/DocumentsClient";
 import { formatBytes } from "@/lib/utils";
+import { PageHeader } from "@/components/dashboard/PageHeader";
+import { UploadIcon } from "@/components/Icons";
 
 const FILTER_LABELS: Record<string, string> = {
   pdf: "PDF",
@@ -94,32 +96,27 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ typ
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-white">Documents</h1>
+      <PageHeader
+        kicker="Library"
+        title="Documents"
+        description={`${docs.length} document${docs.length !== 1 ? "s" : ""} · ${formatBytes(totalSize)} total indexed storage`}
+        actions={
+          <>
             {filterLabel && (
-              <span className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium text-zinc-300">
+              <span className="inline-flex items-center gap-2 border-2 border-[var(--color-border)] bg-purple-500/10 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-purple-400">
                 {filterLabel}
+                <Link href="/dashboard/documents" className="text-zinc-400 transition-colors hover:text-white">
+                  Clear
+                </Link>
               </span>
             )}
-          </div>
-          <p className="text-zinc-400 mt-1">
-            {docs.length} document{docs.length !== 1 ? "s" : ""} · {formatBytes(totalSize)} total
-            {filterLabel && (
-              <Link href="/dashboard/documents" className="ml-2 text-xs text-purple-400 hover:text-purple-300 transition-colors">
-                Clear filter
-              </Link>
-            )}
-          </p>
-        </div>
-        <Link
-          href="/dashboard/upload"
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-on-brand rounded-xl font-medium transition-colors flex items-center gap-2"
-        >
-          + Upload
-        </Link>
-      </div>
+            <Link href="/dashboard/upload" className="btn-primary px-4 py-2.5 text-xs">
+              <UploadIcon className="h-4 w-4" />
+              Upload
+            </Link>
+          </>
+        }
+      />
 
       <DocumentsClient documents={docs} initialFilter={typeFilter} workspaces={workspaces} />
     </div>
