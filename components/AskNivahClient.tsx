@@ -343,22 +343,22 @@ export function AskNivahClient() {
   return (
     <div className="flex gap-4 h-full min-h-0">
       {showHistory && (
-        <div className="fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] bg-zinc-900 border-r border-zinc-800 shadow-2xl flex flex-col overflow-hidden md:relative md:inset-auto md:z-auto md:w-72 md:max-w-none md:flex-shrink-0 md:bg-zinc-900/50 md:border-r-0 md:shadow-none">
-          <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-            <h2 className="font-semibold text-white flex items-center gap-2">
+        <div className="fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col overflow-hidden border-r-2 border-[var(--color-border)] bg-zinc-900 shadow-2xl md:relative md:inset-auto md:z-auto md:w-72 md:max-w-none md:flex-shrink-0 md:border-2">
+          <div className="flex items-center justify-between border-b-2 border-[var(--color-border)] p-4">
+            <h2 className="font-display flex items-center gap-2 text-sm uppercase text-white">
               <History className="w-4 h-4" />
               History
             </h2>
             <button
               onClick={() => setShowHistory(false)}
-              className="p-1 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+              className="border-2 border-transparent p-1 text-zinc-400 transition-colors hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white"
               aria-label="Close history"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          <div className="flex-1 space-y-1 overflow-y-auto p-2">
             {sessionsLoading && (
               <div className="flex items-center justify-center py-8">
                 <svg className="w-5 h-5 animate-spin text-zinc-500" viewBox="0 0 24 24" fill="none">
@@ -368,7 +368,7 @@ export function AskNivahClient() {
               </div>
             )}
             {!sessionsLoading && sessions.length === 0 && (
-              <p className="text-zinc-500 text-sm text-center py-8">No conversations yet</p>
+              <p className="py-8 text-center text-sm text-zinc-500">No conversations yet</p>
             )}
             {sessions.map((session) => (
               <div
@@ -378,17 +378,17 @@ export function AskNivahClient() {
                 onClick={() => loadSession(session.id)}
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadSession(session.id); } }}
                 className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all group cursor-pointer",
+                  "group flex w-full cursor-pointer items-center gap-2 border-2 px-3 py-2.5 text-left transition-all",
                   currentSessionId === session.id
-                    ? "bg-purple-500/10 border border-purple-500/20 text-white"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                    ? "border-[var(--color-border)] bg-primary-vivid text-white shadow-[2px_2px_0_0_var(--color-border)]"
+                    : "border-transparent text-zinc-400 hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white",
                 )}
               >
                 <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                <span className="text-sm truncate flex-1">{session.title}</span>
+                <span className="flex-1 truncate text-sm">{session.title}</span>
                 <span
                   onClick={(e) => deleteSession(e, session.id)}
-                  className="p-1 rounded-lg cursor-pointer opacity-0 group-hover:opacity-100 md:group-focus-within:opacity-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-all"
+                  className="cursor-pointer border-2 border-transparent p-1 text-zinc-500 opacity-0 transition-all hover:border-red-500 hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100 md:group-focus-within:opacity-100"
                   role="button"
                   tabIndex={0}
                   aria-label="Delete session"
@@ -400,10 +400,10 @@ export function AskNivahClient() {
             ))}
           </div>
 
-          <div className="p-2 border-t border-zinc-800">
+          <div className="border-t-2 border-[var(--color-border)] p-2">
             <button
               onClick={newChat}
-              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all text-sm"
+              className="flex w-full items-center gap-2 border-2 border-[var(--color-border)] px-3 py-2.5 text-[0.65rem] font-bold uppercase tracking-widest text-zinc-400 transition-all hover:bg-zinc-800 hover:text-white"
             >
               <Plus className="w-4 h-4" />
               New Chat
@@ -412,19 +412,19 @@ export function AskNivahClient() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between mb-4 flex-shrink-0">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Ask Nivah</h1>
-            <p className="text-zinc-400 text-sm mt-0.5">Ask questions about your documents</p>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="mb-4 flex flex-shrink-0 items-center justify-between gap-3 border-b-2 border-[var(--color-border)] pb-3">
+          <div className="min-w-0">
+            <p className="kicker">Retrieval-augmented chat</p>
+            <h1 className="headline mt-1 text-2xl text-white sm:text-3xl">Ask Nivah</h1>
           </div>
           <button
             onClick={() => setShowHistory((v) => !v)}
             className={cn(
-              "p-2.5 rounded-xl border transition-all",
+              "border-2 p-2.5 transition-all",
               showHistory
-                ? "bg-purple-500/10 border-purple-500/30 text-purple-400"
-                : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                ? "border-[var(--color-border)] bg-primary-vivid text-white shadow-[2px_2px_0_0_var(--color-border)]"
+                : "border-[var(--color-border)] bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white",
             )}
             aria-label="Toggle history"
           >
@@ -432,17 +432,17 @@ export function AskNivahClient() {
           </button>
         </div>
 
-        <div ref={containerRef} className="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div ref={containerRef} className="flex-1 space-y-4 overflow-y-auto pr-1">
           {!hasMessages && !loading && (
-            <div className="border border-zinc-800 rounded-2xl p-12 text-center">
+            <div className="border-2 border-dashed border-[var(--color-border)] p-8 text-center sm:p-12">
               <div className="mx-auto mb-6">
                 <NivahMascot size="lg" emotion={question ? "listening" : "idle"} inputRef={inputRef} />
               </div>
-              <p className="text-zinc-500 text-lg font-medium">Ask anything about your documents</p>
-              <p className="text-zinc-600 mt-2 text-sm max-w-md mx-auto">
+              <p className="font-display text-xl uppercase text-white">Ask anything about your documents</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-500">
                 Nivah searches your documents for relevant context and generates a grounded answer using AI.
               </p>
-              <div className="flex items-center justify-center gap-2 mt-4 text-xs text-zinc-600">
+              <div className="mt-5 inline-flex items-center gap-2 border-2 border-[var(--color-border)] bg-zinc-900 px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-widest text-zinc-400">
                 <Bot className="w-3.5 h-3.5" />
                 <span>Answers are grounded in your documents only</span>
               </div>
@@ -452,11 +452,11 @@ export function AskNivahClient() {
           {messages.map((msg) => (
             <div key={msg.id} data-message>
               {msg.type === "question" && (
-                <div className="flex items-start gap-3 justify-end">
-                  <div className="bg-zinc-800 border border-zinc-700/60 rounded-2xl rounded-tr-sm px-5 py-3 max-w-[80%]">
+                <div className="flex items-start justify-end gap-3">
+                  <div className="max-w-[80%] border-2 border-[var(--color-border)] bg-purple-500/10 px-5 py-3 shadow-[3px_3px_0_0_var(--color-primary-vivid)]">
                     <p className="text-white">{msg.content}</p>
                   </div>
-                  <div className="w-9 h-9 gradient-brand rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center border-2 border-[var(--color-border)] bg-primary-vivid">
                     <User className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -465,16 +465,16 @@ export function AskNivahClient() {
               {msg.type === "answer" && (
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-1">
+                    <div className="mt-1 flex-shrink-0">
                       <NivahMascot size="sm" emotion="happy" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="ai-border p-5 rounded-2xl">
-                        <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="ai-border p-5">
+                        <p className="whitespace-pre-wrap leading-relaxed text-zinc-300">{msg.content}</p>
                       </div>
                       {msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-                          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <div className="mt-3 border-2 border-[var(--color-border)] bg-zinc-900 p-4">
+                          <p className="kicker mb-2 flex items-center gap-1.5">
                             <FileText className="w-3.5 h-3.5" />
                             Sources
                           </p>
@@ -483,12 +483,12 @@ export function AskNivahClient() {
                               <Link
                                 key={source.documentId}
                                 href={`/dashboard/documents/${source.documentId}`}
-                                className="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-800/30 border border-zinc-700/30 hover:bg-zinc-800 hover:border-zinc-600 transition-all group"
+                                className="group flex items-center justify-between border-2 border-transparent bg-zinc-950 px-3 py-2 transition-all hover:border-[var(--color-border)] hover:bg-zinc-800"
                               >
-                                <span className="text-sm text-zinc-400 group-hover:text-white truncate">
+                                <span className="truncate text-sm text-zinc-400 group-hover:text-white">
                                   {source.documentTitle}
                                 </span>
-                                <span className="text-xs text-purple-400/70 font-mono flex-shrink-0 ml-2">
+                                <span className="ml-2 flex-shrink-0 font-mono text-[0.65rem] text-purple-400">
                                   {formatScore(source.similarity)}
                                 </span>
                               </Link>
@@ -503,11 +503,11 @@ export function AskNivahClient() {
 
               {msg.type === "error" && (
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center border-2 border-red-500 bg-red-500/10">
                     <Bot className="w-5 h-5 text-red-400" />
                   </div>
-                  <div className="border border-red-500/30 rounded-2xl rounded-tl-sm p-4 bg-red-500/5">
-                    <p className="text-red-400 text-sm">{msg.content}</p>
+                  <div className="border-2 border-red-500 bg-red-500/5 p-4">
+                    <p className="text-sm font-semibold text-red-400">{msg.content}</p>
                   </div>
                 </div>
               )}
@@ -516,14 +516,14 @@ export function AskNivahClient() {
 
           {loading && !streamingStarted && (
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-1">
+              <div className="mt-1 flex-shrink-0">
                 <NivahMascot size="sm" emotion="thinking" />
               </div>
-              <div className="ai-border rounded-2xl p-5">
+              <div className="ai-border p-5">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <div className="h-2 w-2 animate-bounce bg-purple-500" style={{ animationDelay: "0ms" }} />
+                  <div className="h-2 w-2 animate-bounce bg-purple-500" style={{ animationDelay: "150ms" }} />
+                  <div className="h-2 w-2 animate-bounce bg-purple-500" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -533,17 +533,17 @@ export function AskNivahClient() {
 
         <form onSubmit={handleSubmit} className="relative mt-4 flex-shrink-0">
           <div className="flex items-end gap-3">
-            <div className="hidden sm:block flex-shrink-0 pb-1.5">
+            <div className="hidden flex-shrink-0 pb-1.5 sm:block">
               <NivahMascot size="sm" emotion={loading ? "thinking" : question ? "listening" : "idle"} inputRef={inputRef} />
             </div>
-            <div className="flex-1 relative">
+            <div className="relative flex-1">
               <textarea
                 ref={inputRef}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Ask a question..."
                 rows={2}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-3.5 pr-14 text-white text-base placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
+                className="brutal-input w-full resize-none px-5 py-3.5 pr-14 text-base text-white placeholder-zinc-500"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -554,7 +554,7 @@ export function AskNivahClient() {
               <button
                 type="submit"
                 disabled={loading || !question.trim()}
-                className="absolute right-2.5 bottom-2.5 p-2.5 btn-primary rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="btn-primary absolute bottom-2.5 right-2.5 p-2.5 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Ask"
               >
                 {loading ? (
@@ -570,7 +570,7 @@ export function AskNivahClient() {
           </div>
         </form>
 
-        <p className="text-xs text-zinc-600 text-center mt-1.5 flex-shrink-0">
+        <p className="kicker mt-2 flex-shrink-0 text-center">
           Enter to send &middot; Shift+Enter for new line
         </p>
       </div>
