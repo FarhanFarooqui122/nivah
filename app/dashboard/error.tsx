@@ -1,3 +1,5 @@
+"use client";
+
 import { NivahError } from "@/components/dashboard/Error";
 
 export default function DashboardError({ error }: { error: Error }) {
