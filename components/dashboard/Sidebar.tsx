@@ -73,32 +73,37 @@ export function Sidebar() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex h-16 items-center justify-between px-4 border-b border-zinc-800"
+        className="flex h-16 items-center justify-between border-b-2 border-[var(--color-border)] px-4"
       >
         {expanded && (
-          <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-2">
+          <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-2.5">
             <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
-              className="w-8 h-8 gradient-brand rounded-xl flex items-center justify-center"
+              whileHover={{ scale: 1.05 }}
+              className="flex h-9 w-9 items-center justify-center border-2 border-[var(--color-border)] bg-primary-vivid shadow-[3px_3px_0_0_var(--color-border)]"
             >
-              <Zap className="w-5 h-5 text-on-brand" />
+              <Zap className="h-5 w-5 text-on-brand" />
             </motion.div>
-            <span className="text-xl font-bold text-white">Nivah</span>
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-xl uppercase tracking-tight text-white">Nivah</span>
+              <span className="mt-1 text-[0.55rem] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                AI memory
+              </span>
+            </span>
           </Link>
         )}
         <div className="flex items-center gap-1">
           <button
             onClick={closeMobile}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white cursor-pointer select-none"
+            className="cursor-pointer border-2 border-transparent p-1.5 text-zinc-400 transition-colors select-none hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white lg:hidden"
             aria-label="Close sidebar"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={toggleCollapsed}
-            className="hidden lg:block p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white cursor-pointer select-none"
+            className="hidden cursor-pointer border-2 border-transparent p-1.5 text-zinc-400 transition-colors select-none hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white lg:block"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -127,21 +132,24 @@ export function Sidebar() {
                   href={item.href}
                   onClick={closeMobile}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
-                    "group relative overflow-hidden",
+                    "relative flex items-center gap-3 border-2 px-3 py-2.5 transition-all duration-150",
                     isActive
-                      ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30 shadow-glow-brand"
-                      : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                      ? "border-[var(--color-border)] bg-primary-vivid text-white shadow-[3px_3px_0_0_var(--color-border)]"
+                      : "border-transparent text-zinc-400 hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white hover:shadow-[3px_3px_0_0_var(--color-primary-vivid)]",
                     !expanded && "justify-center"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <motion.div
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.08 }}
                     className="flex items-center gap-3"
                   >
                     <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-                    {!expanded && <span className="font-medium">{item.name}</span>}
+                    {expanded && (
+                      <span className="text-[0.8rem] font-semibold uppercase tracking-wide">
+                        {item.name}
+                      </span>
+                    )}
                   </motion.div>
                   {isActive && expanded && (
                     <motion.span
@@ -149,7 +157,7 @@ export function Sidebar() {
                       initial={{ opacity: 0, scaleY: 0 }}
                       animate={{ opacity: 1, scaleY: 1 }}
                       transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 gradient-brand rounded-r-full shadow-glow-brand"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-zinc-950"
                     />
                   )}
                 </Link>
@@ -163,13 +171,13 @@ export function Sidebar() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
-            className="mt-6 pt-4 border-t border-zinc-800"
+            className="mt-6 border-t-2 border-[var(--color-border)] pt-4"
           >
             <div className="flex items-center justify-between px-3 mb-2">
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              <p className="kicker">
                 Workspaces
               </p>
-              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
+              <Link href="/dashboard/workspaces" onClick={closeMobile} className="text-[0.65rem] font-bold uppercase tracking-widest text-purple-400 transition-colors hover:text-white">
                 Manage
               </Link>
             </div>
@@ -187,10 +195,10 @@ export function Sidebar() {
                       href={`/dashboard/workspaces/${ws.id}`}
                       onClick={closeMobile}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
+                        "flex items-center gap-3 border-2 px-3 py-2 transition-all duration-150",
                         isActive
-                          ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30"
-                          : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                          ? "border-[var(--color-border)] bg-primary-vivid text-white shadow-[2px_2px_0_0_var(--color-border)]"
+                          : "border-transparent text-zinc-400 hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white"
                       )}
                     >
                       <Layers className="w-4 h-4 flex-shrink-0" />
@@ -208,13 +216,13 @@ export function Sidebar() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
-            className="mt-6 pt-4 border-t border-zinc-800"
+            className="mt-6 border-t-2 border-[var(--color-border)] pt-4"
           >
             <div className="flex items-center justify-between px-3 mb-2">
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              <p className="kicker">
                 Recent Chats
               </p>
-              <Link href="/dashboard/ask" onClick={closeMobile} className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
+              <Link href="/dashboard/ask" onClick={closeMobile} className="text-[0.65rem] font-bold uppercase tracking-widest text-purple-400 transition-colors hover:text-white">
                 View all
               </Link>
             </div>
@@ -233,10 +241,10 @@ export function Sidebar() {
                       href={`/dashboard/ask?session=${chat.id}`}
                       onClick={closeMobile}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
+                        "flex items-center gap-3 border-2 px-3 py-2 transition-all duration-150",
                         isActive
-                          ? "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-white border border-purple-500/30"
-                          : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                          ? "border-[var(--color-border)] bg-primary-vivid text-white shadow-[2px_2px_0_0_var(--color-border)]"
+                          : "border-transparent text-zinc-400 hover:border-[var(--color-border)] hover:bg-zinc-800 hover:text-white"
                       )}
                     >
                       <MessageCircle className="w-4 h-4 flex-shrink-0" />
@@ -254,9 +262,9 @@ export function Sidebar() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.4 }}
-            className="mt-6 pt-4 border-t border-zinc-800"
+            className="mt-6 border-t-2 border-[var(--color-border)] pt-4"
           >
-            <p className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+            <p className="kicker mb-3 px-3">
               Coming Soon
             </p>
             <ul className="space-y-1" role="list">
@@ -271,10 +279,10 @@ export function Sidebar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors group relative cursor-not-allowed" title="Coming soon">
+                  <div className="group relative flex cursor-not-allowed items-center gap-3 border-2 border-transparent px-3 py-2.5 text-zinc-500 transition-colors hover:border-[var(--color-border)] hover:bg-zinc-800/50 hover:text-zinc-300" title="Coming soon">
                     <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                     <span className="font-medium text-sm truncate">{item.name}</span>
-                    <span className="ml-auto text-xs px-1.5 py-0.5 bg-zinc-800 text-zinc-500 rounded-full">
+                    <span className="ml-auto border-2 border-[var(--color-border)] px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest text-zinc-400">
                       Soon
                     </span>
                   </div>
@@ -289,16 +297,16 @@ export function Sidebar() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
-            className="mt-8 pt-6 border-t border-zinc-800 px-3"
+            className="mt-8 border-t-2 border-[var(--color-border)] px-3 pt-6"
           >
-            <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-xl p-4 shadow-glow-brand">
+            <div className="border-2 border-[var(--color-border)] bg-zinc-950 p-4 shadow-[4px_4px_0_0_var(--color-primary-vivid)]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center border-2 border-[var(--color-border)] bg-primary-vivid">
                   <Shield className="w-5 h-5 text-on-brand" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">Nivah Pro</p>
-                  <p className="text-xs text-zinc-400">Unlock unlimited storage & AI</p>
+                  <p className="font-display text-sm uppercase text-white">Nivah Pro</p>
+                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-zinc-400">Unlimited storage & AI</p>
                 </div>
               </div>
               <button
@@ -318,15 +326,15 @@ export function Sidebar() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.5 }}
-          className="p-4 border-t border-zinc-800"
+          className="border-t-2 border-[var(--color-border)] p-4"
         >
           <div className="flex items-center gap-3 px-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-zinc-700 to-zinc-800 rounded-full flex items-center justify-center">
+            <div className="flex h-8 w-8 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-800">
               <Bot className="w-4 h-4 text-zinc-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-zinc-400">Nivah AI</p>
-              <p className="text-xs text-zinc-500">Your memory layer</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">Nivah AI</p>
+              <p className="text-[0.65rem] uppercase tracking-wider text-zinc-500">Your memory layer</p>
             </div>
           </div>
         </motion.div>
@@ -339,7 +347,7 @@ export function Sidebar() {
       <motion.aside
         animate={{ width: collapsed ? 80 : 280 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="hidden lg:flex bg-zinc-900 border-r border-zinc-800 flex-col overflow-hidden"
+        className="hidden lg:flex bg-zinc-900 border-r-2 border-[var(--color-border)] flex-col overflow-hidden"
       >
         {inner}
       </motion.aside>
@@ -358,7 +366,7 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative bg-zinc-900/80 backdrop-blur-xl border-r border-zinc-800 w-72 flex flex-col"
+            className="relative bg-zinc-900 border-r-2 border-[var(--color-border)] w-72 flex flex-col"
           >
             {inner}
           </motion.aside>
