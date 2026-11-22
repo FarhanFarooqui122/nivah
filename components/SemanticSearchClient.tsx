@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon, FileIcon, FilterIcon } from "@/components/Icons";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 interface SemanticResult {
   id: string;
@@ -194,57 +195,59 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Semantic Search</h1>
-          <p className="text-zinc-400 mt-1">
-            Find documents by meaning, not just keywords
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {workspaces.length > 0 && (
-            <select
-              value={workspaceFilter}
-              onChange={(e) => handleWorkspaceFilterChange(e.target.value)}
-              className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none cursor-pointer"
-            >
-              <option value="">All Workspaces</option>
-              {workspaces.map((ws) => (
-                <option key={ws.id} value={ws.id}>{ws.name}</option>
-              ))}
-            </select>
-          )}
-          <div className="relative">
-            <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
-            <select
-              value={documentFilter}
-              onChange={(e) => handleDocFilterChange(e.target.value)}
-              className="bg-zinc-900 border border-zinc-700 rounded-xl pl-9 pr-4 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
-            >
-              <option value="">All documents</option>
-              {documents.map((doc) => (
-                <option key={doc.id} value={doc.id}>{doc.title}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        kicker="Retrieval"
+        title="Semantic search"
+        description="Find documents by meaning, not just keywords. Every result is ranked by embedding similarity."
+        actions={
+          <>
+            {workspaces.length > 0 && (
+              <select
+                value={workspaceFilter}
+                onChange={(e) => handleWorkspaceFilterChange(e.target.value)}
+                className="brutal-input cursor-pointer px-3 py-2.5 text-sm text-white"
+              >
+                <option value="">All Workspaces</option>
+                {workspaces.map((ws) => (
+                  <option key={ws.id} value={ws.id}>{ws.name}</option>
+                ))}
+              </select>
+            )}
+            <div className="relative">
+              <FilterIcon className="pointer-events-none absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-zinc-500" />
+              <select
+                value={documentFilter}
+                onChange={(e) => handleDocFilterChange(e.target.value)}
+                className="brutal-input cursor-pointer appearance-none py-2.5 pl-9 pr-4 text-sm text-white"
+              >
+                <option value="">All documents</option>
+                {documents.map((doc) => (
+                  <option key={doc.id} value={doc.id}>{doc.title}</option>
+                ))}
+              </select>
+            </div>
+          </>
+        }
+      />
 
-      <form onSubmit={handleSubmit} className="relative">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+      <form
+        onSubmit={handleSubmit}
+        className="relative border-2 border-[var(--color-border)] bg-zinc-900 shadow-[6px_6px_0_0_var(--color-primary-vivid)] transition-colors focus-within:border-purple-500"
+      >
+        <SearchIcon className="pointer-events-none absolute left-4 top-1/2 w-5 h-5 -translate-y-1/2 text-zinc-500" />
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Search by meaning... (press / to focus)"
-          className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl pl-12 pr-14 py-4 text-white text-lg placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+          className="w-full bg-transparent py-4 pl-12 pr-32 text-base text-white placeholder-zinc-500 focus:outline-none sm:text-lg"
           aria-label="Semantic search query"
         />
         <button
           type="submit"
           disabled={loading || !query.trim()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary rounded-xl px-4 py-2 text-sm disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed"
+          className="btn-primary absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-xs"
         >
           {loading ? (
             <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -258,23 +261,23 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
       </form>
 
       {loading && (
-        <div className="flex items-center justify-center py-16">
+        <div className="flex items-center justify-center border-2 border-dashed border-[var(--color-border)] py-16">
           <div className="text-center">
-            <svg className="w-8 h-8 animate-spin text-purple-500 mx-auto" viewBox="0 0 24 24" fill="none">
+            <svg className="mx-auto h-8 w-8 animate-spin text-purple-500" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
               <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
             </svg>
-            <p className="text-zinc-500 mt-4 text-sm">Generating embedding and searching...</p>
+            <p className="kicker mt-4">Generating embedding and searching...</p>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="border border-red-500/30 rounded-2xl p-6 text-center bg-red-500/5">
-          <p className="text-red-400">{error}</p>
+        <div className="border-2 border-red-500 bg-red-500/10 p-6 text-center">
+          <p className="font-semibold text-red-400">{error}</p>
           <button
             onClick={retry}
-            className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-medium transition-colors"
+            className="btn-primary mt-3 px-4 py-2 text-xs"
           >
             Retry
           </button>
@@ -282,20 +285,22 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
       )}
 
       {!loading && hasSearched && results.length === 0 && (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <SearchIcon className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium text-lg">
-            No semantic matches for &ldquo;{query}&rdquo;
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900">
+            <SearchIcon className="w-6 h-6 text-zinc-500" />
+          </div>
+          <p className="font-display text-xl uppercase text-white">
+            No semantic matches
           </p>
-          <p className="text-zinc-600 mt-2">
-            Try rewording your query or upload more documents
+          <p className="mt-2 text-sm text-zinc-500">
+            Nothing close to &ldquo;{query}&rdquo;. Try rewording your query or upload more documents.
           </p>
         </div>
       )}
 
       {!loading && results.length > 0 && (
-        <div className="space-y-3">
-          <p className="text-sm text-zinc-500">
+        <div className="space-y-4">
+          <p className="kicker">
             {results.length} semantic match{results.length !== 1 ? "es" : ""} for &ldquo;{query}&rdquo;
           </p>
           <div className="space-y-3">
@@ -303,30 +308,30 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
               <a
                 key={result.id}
                 href={`/dashboard/documents/${result.documentId}`}
-                className="block p-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 hover:border-zinc-700 transition-all group"
+                className="group block border-2 border-[var(--color-border)] bg-zinc-900 p-5 shadow-[4px_4px_0_0_var(--color-primary-vivid)] transition-all hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--color-primary-vivid)]"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-zinc-800 border border-zinc-700 rounded-xl flex items-center justify-center flex-shrink-0 text-zinc-400 group-hover:border-zinc-600 transition-colors">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-950 text-purple-400 transition-colors group-hover:bg-purple-500 group-hover:text-white">
                     <FileIcon className="w-5 h-5" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-lg font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
+                      <h3 className="font-display truncate text-base uppercase text-white transition-colors group-hover:text-purple-400">
                         {result.title}
                       </h3>
-                      <span className={`flex-shrink-0 text-sm font-mono font-medium ${scoreColor(result.score)}`}>
+                      <span className={`flex-shrink-0 border-2 border-[var(--color-border)] bg-zinc-950 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest ${scoreColor(result.score)}`}>
                         {formatScore(result.score)} Match
                       </span>
                     </div>
-                    <p className="text-sm text-zinc-400 mt-2 line-clamp-3">
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-zinc-400">
                       {snippet(result.content)}
                     </p>
-                    <p className="text-xs text-zinc-600 mt-2">
+                    <p className="mt-2 font-mono text-[0.65rem] uppercase tracking-widest text-zinc-500">
                       Chunk {result.chunkIndex + 1}
                     </p>
                   </div>
                   <svg
-                    className="w-5 h-5 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0 mt-1"
+                    className="mt-1 h-5 w-5 flex-shrink-0 text-zinc-600 transition-colors group-hover:text-purple-400"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -342,13 +347,17 @@ export function SemanticSearchClient({ documents, workspaces = [] }: { documents
       )}
 
       {!loading && !hasSearched && !query && (
-        <div className="border border-zinc-800 rounded-2xl p-12 text-center">
-          <SearchIcon className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <p className="text-zinc-500 text-lg">
+        <div className="border-2 border-dashed border-[var(--color-border)] p-12 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900 shadow-[4px_4px_0_0_var(--color-primary-vivid)]">
+            <SearchIcon className="w-7 h-7 text-purple-400" />
+          </div>
+          <p className="font-display text-xl uppercase text-white">
             Search your documents by meaning
           </p>
-          <p className="text-zinc-600 mt-2 text-sm">
-            Uses AI embeddings to find semantically similar content. Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-xs">/</kbd> to focus search.
+          <p className="mt-2 text-sm text-zinc-500">
+            Uses AI embeddings to find semantically similar content. Press{" "}
+            <kbd className="border-2 border-[var(--color-border)] bg-zinc-900 px-1.5 py-0.5 font-mono text-xs text-zinc-300">/</kbd>{" "}
+            to focus search.
           </p>
         </div>
       )}
