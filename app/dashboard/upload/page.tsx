@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/upload-limits";
 import { FileTypeIcon } from "@/components/FileTypeIcon";
 import { UploadIcon, FileIcon, PdfIcon, ImageIcon, SpreadsheetIcon, DocumentIcon } from "@/components/Icons";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 const ACCEPTED_STRINGS = ".pdf,.docx,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.webp";
 
@@ -131,41 +132,42 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Upload Document</h1>
-        <p className="text-zinc-400 mt-1">
-          Support for PDF, DOCX, TXT, MD, CSV, JSON, and images
-        </p>
-      </div>
+    <div className="max-w-3xl space-y-6">
+      <PageHeader
+        kicker="Ingest"
+        title="Upload"
+        description="Add PDFs, DOCX, text, data and images. Nivah extracts the text, chunks it and indexes it for semantic search."
+      />
 
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "relative border-2 border-dashed rounded-2xl p-12 transition-all text-center",
-          dragging ? "border-purple-500 bg-purple-500/10" : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/50"
+          "relative border-2 border-dashed p-10 text-center transition-all sm:p-12",
+          dragging ? "border-purple-500 bg-purple-500/10 shadow-[6px_6px_0_0_var(--color-primary-vivid)]" : "border-[var(--color-border)] bg-zinc-900/40 hover:bg-zinc-900/70"
         )}
       >
-        <input type="file" multiple accept={ACCEPTED_STRINGS} onChange={handleFileSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+        <input type="file" multiple accept={ACCEPTED_STRINGS} onChange={handleFileSelect} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
         <div className="pointer-events-none">
-          <div className="flex items-center justify-center mb-4">
-            <UploadIcon className={cn("w-12 h-12 transition-colors", dragging ? "text-purple-400" : "text-zinc-500")} />
+          <div className="mb-5 flex justify-center">
+            <div className={cn("flex h-14 w-14 items-center justify-center border-2 border-[var(--color-border)] transition-colors", dragging ? "bg-purple-500 text-white" : "bg-zinc-950 text-purple-400")}>
+              <UploadIcon className="w-7 h-7" />
+            </div>
           </div>
-          <p className="text-lg font-medium text-white">{dragging ? "Drop files here" : "Drag & drop files here"}</p>
-          <p className="text-zinc-500 mt-2">or click to browse</p>
-          <p className="text-zinc-600 text-sm mt-4">PDF, DOCX, TXT, MD, CSV, JSON, PNG, JPG, WEBP — up to {MAX_FILE_SIZE_MB}MB</p>
+          <p className="font-display text-2xl uppercase text-white">{dragging ? "Drop files here" : "Drag & drop files"}</p>
+          <p className="mt-1 text-sm text-zinc-400">or click anywhere in this panel to browse</p>
+          <p className="kicker mt-5">PDF · DOCX · TXT · MD · CSV · JSON · PNG · JPG · WEBP — up to {MAX_FILE_SIZE_MB}MB</p>
         </div>
       </div>
 
       {workspaces.length > 0 && (
-        <div className="flex items-center gap-3">
-          <label className="text-sm text-zinc-400">Assign to workspace:</label>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="kicker">Assign workspace</label>
           <select
             value={selectedWorkspace}
             onChange={(e) => setSelectedWorkspace(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none"
+            className="brutal-input px-3 py-2 text-sm text-white"
           >
             <option value="">No workspace</option>
             {workspaces.map((w) => (
@@ -176,9 +178,9 @@ export default function UploadPage() {
       )}
 
       {uploadError && (
-        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
-          <p className="text-red-400 text-sm flex items-center gap-2">
-            <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="border-2 border-red-500 bg-red-500/10 p-4">
+          <p className="flex items-center gap-2 text-sm font-semibold text-red-400">
+            <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -189,30 +191,30 @@ export default function UploadPage() {
       )}
 
       {files.length > 0 && (
-        <div className="border border-zinc-800 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">{files.length} file{files.length !== 1 ? "s" : ""} selected</h2>
-            <button onClick={() => setFiles([])} className="text-sm text-zinc-400 hover:text-white transition-colors">Clear all</button>
+        <div className="brutal-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-display text-base uppercase text-white">{files.length} file{files.length !== 1 ? "s" : ""} selected</h2>
+            <button onClick={() => setFiles([])} className="text-[0.65rem] font-bold uppercase tracking-widest text-zinc-400 transition-colors hover:text-white">Clear all</button>
           </div>
 
           <div className="space-y-3">
             {files.map((file, index) => (
-              <div key={`${file.name}-${index}`} className="flex items-center gap-4 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-                <div className="w-9 h-9 bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center text-zinc-400">
+              <div key={`${file.name}-${index}`} className="flex items-center gap-4 border-2 border-[var(--color-border)] bg-zinc-950 p-3">
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-900 text-zinc-400">
                   <FileTypeIcon fileType={file.type || file.name.split(".").pop() || ""} className="w-4.5 h-4.5" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white truncate">{file.name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-white">{file.name}</p>
                   <p className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   {uploadProgress[index] !== undefined && (
-                    <div className="mt-2 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-purple-500 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[index]}%` }} />
+                    <div className="mt-2 h-2 overflow-hidden border-2 border-[var(--color-border)] bg-zinc-900">
+                      <div className="h-full bg-primary-vivid transition-all duration-300" style={{ width: `${uploadProgress[index]}%` }} />
                     </div>
                   )}
                 </div>
                 {!uploading && (
-                  <button onClick={() => removeFile(index)} className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-red-400 transition-colors" aria-label="Remove file">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                  <button onClick={() => removeFile(index)} className="border-2 border-transparent p-1.5 text-zinc-400 transition-colors hover:border-red-500 hover:bg-red-500/10 hover:text-red-400" aria-label="Remove file">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                   </button>
                 )}
               </div>
@@ -222,7 +224,7 @@ export default function UploadPage() {
           <button
             onClick={handleUpload}
             disabled={uploading}
-            className={cn("mt-4 w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2", uploading ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700 text-on-brand")}
+            className={cn("mt-4 flex w-full items-center justify-center gap-2 py-3 text-sm", uploading ? "cursor-not-allowed border-2 border-[var(--color-border)] bg-zinc-800 text-zinc-500" : "btn-primary")}
           >
             {uploading ? (
               <>
@@ -242,9 +244,9 @@ export default function UploadPage() {
         </div>
       )}
 
-      <div className="border border-zinc-800 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Accepted File Types</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="brutal-card p-6">
+        <h2 className="mb-4 font-display text-base uppercase text-white">Accepted File Types</h2>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {[
             { type: "PDF", icon: <PdfIcon className="w-5 h-5" />, desc: "Documents" },
             { type: "DOCX", icon: <DocumentIcon className="w-5 h-5" />, desc: "Word files" },
@@ -253,9 +255,9 @@ export default function UploadPage() {
             { type: "PNG / JPG", icon: <ImageIcon className="w-5 h-5" />, desc: "Images" },
             { type: "WEBP", icon: <ImageIcon className="w-5 h-5" />, desc: "Web images" },
           ].map((item) => (
-            <div key={item.type} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center">
-              <div className="flex items-center justify-center text-zinc-400 mb-1">{item.icon}</div>
-              <p className="font-medium text-white text-sm mt-1">{item.type}</p>
+            <div key={item.type} className="border-2 border-[var(--color-border)] bg-zinc-950 p-3 text-center shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+              <div className="mb-1 flex items-center justify-center text-purple-400">{item.icon}</div>
+              <p className="mt-1 text-[0.7rem] font-bold uppercase tracking-widest text-white">{item.type}</p>
               <p className="text-xs text-zinc-500">{item.desc}</p>
             </div>
           ))}

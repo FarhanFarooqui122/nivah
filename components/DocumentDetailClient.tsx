@@ -172,7 +172,8 @@ export function DocumentDetailClient({
       <div className="flex items-center gap-4">
         <Link
           href="/dashboard/documents"
-          className="p-2 hover:bg-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"
+          className="border-2 border-[var(--color-border)] bg-zinc-900 p-2 text-zinc-400 shadow-[2px_2px_0_0_var(--color-primary-vivid)] transition-all hover:-translate-y-0.5 hover:text-white"
+          aria-label="Back to documents"
         >
           <ArrowLeftIcon className="w-5 h-5" />
         </Link>
@@ -188,52 +189,52 @@ export function DocumentDetailClient({
                 if (e.key === "Escape") { setTitleDraft(document.title); setEditing(false); }
               }}
               disabled={saving}
-              className="text-2xl font-bold text-white bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1 w-full outline-none focus:border-purple-500"
+              className="brutal-input w-full px-2 py-1 font-display text-2xl uppercase text-white outline-none"
             />
           ) : (
             <h1
-              className="text-2xl font-bold text-white truncate cursor-pointer hover:text-purple-400 transition-colors"
+              className="headline cursor-pointer truncate text-3xl text-white transition-colors hover:text-purple-400 sm:text-4xl"
               onClick={() => { setTitleDraft(document.title); setEditing(true); }}
               title="Click to rename"
             >
               {document.title}
             </h1>
           )}
-          <p className="text-sm text-zinc-400 mt-1">{document.fileName}</p>
+          <p className="kicker mt-2 truncate">{document.fileName}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Type</p>
-          <p className="text-white font-medium mt-1">{document.fileType.split("/").pop()?.toUpperCase() || "FILE"}</p>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4 shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+          <p className="kicker">Type</p>
+          <p className="mt-2 font-display text-base text-white">{document.fileType.split("/").pop()?.toUpperCase() || "FILE"}</p>
         </div>
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Size</p>
-          <p className="text-white font-medium mt-1">{formatBytes(document.fileSize)}</p>
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4 shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+          <p className="kicker">Size</p>
+          <p className="mt-2 font-display text-base text-white">{formatBytes(document.fileSize)}</p>
         </div>
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Chunks</p>
-          <p className="text-white font-medium mt-1">{chunkCount}</p>
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4 shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+          <p className="kicker">Chunks</p>
+          <p className="mt-2 font-display text-base text-white">{chunkCount}</p>
         </div>
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Embedded</p>
-          <p className="flex items-center gap-2 mt-1">
-            <span className="text-white font-medium">{embeddedCount}/{chunkCount}</span>
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4 shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+          <p className="kicker">Embedded</p>
+          <p className="mt-2 flex items-center gap-2">
+            <span className="font-display text-base text-white">{embeddedCount}/{chunkCount}</span>
             {embeddedCount < chunkCount && (
-              <span className="text-xs text-amber-600 dark:text-amber-400">Needs re-index</span>
+              <span className="border-2 border-amber-400 px-1 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Needs re-index</span>
             )}
           </p>
         </div>
-        <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Workspace</p>
-          <div className="mt-1">
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4 shadow-[2px_2px_0_0_var(--color-primary-vivid)]">
+          <p className="kicker">Workspace</p>
+          <div className="mt-2">
             {workspaces.length > 0 && (
               <select
                 value={selectedWorkspace}
                 onChange={(e) => saveWorkspace(e.target.value)}
                 disabled={savingWorkspace}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-white text-sm w-full focus:border-purple-500 focus:outline-none disabled:opacity-50"
+                className="brutal-input w-full px-2 py-1 text-xs text-white disabled:opacity-50"
               >
                 <option value="">None</option>
                 {workspaces.map((w) => (
@@ -242,25 +243,25 @@ export function DocumentDetailClient({
               </select>
             )}
             {workspaces.length === 0 && (
-              <p className="text-white font-medium text-sm">None</p>
+              <p className="text-sm font-semibold text-white">None</p>
             )}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex flex-wrap items-center gap-3">
         <a
           href={`/api/documents/${document.id}/file`}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary rounded-xl px-4 py-2 text-sm"
+          className="btn-primary px-4 py-2 text-xs"
         >
           Download file
         </a>
         <button
           onClick={handleSummarize}
           disabled={summarizing || !document.textContent}
-          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+          className="btn-ghost flex items-center gap-2 px-4 py-2 text-xs disabled:opacity-50"
         >
           <RefreshIcon className={`w-4 h-4 ${summarizing ? "animate-spin" : ""}`} />
           {summarizing ? "Generating..." : summary ? "Regenerate Summary" : "Generate Summary"}
@@ -268,7 +269,7 @@ export function DocumentDetailClient({
         <button
           onClick={handleReindex}
           disabled={reindexing}
-          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+          className="btn-ghost flex items-center gap-2 px-4 py-2 text-xs disabled:opacity-50"
         >
           <RefreshIcon className={`w-4 h-4 ${reindexing ? "animate-spin" : ""}`} />
           {reindexing ? "Re-indexing..." : "Re-index"}
@@ -276,7 +277,7 @@ export function DocumentDetailClient({
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="px-4 py-2 bg-red-600/10 border border-red-500/30 text-red-400 hover:bg-red-600/20 hover:text-red-300 rounded-xl font-medium transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+          className="flex items-center gap-2 border-2 border-red-500 bg-red-500/10 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-400 transition-colors hover:bg-red-500/20 hover:text-red-300 disabled:opacity-50"
         >
           <TrashIcon className="w-4 h-4" />
           {deleting ? "Deleting..." : "Delete"}
@@ -284,46 +285,48 @@ export function DocumentDetailClient({
       </div>
 
       {workspaceError && (
-        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
-          <p className="text-red-400 text-sm">{workspaceError}</p>
+        <div className="border-2 border-red-500 bg-red-500/10 p-4">
+          <p className="text-sm font-semibold text-red-400">{workspaceError}</p>
         </div>
       )}
 
       {summaryError && (
-        <div className="border border-red-500/30 rounded-2xl p-4 bg-red-500/5">
-          <p className="text-red-400 text-sm">{summaryError}</p>
+        <div className="border-2 border-red-500 bg-red-500/10 p-4">
+          <p className="text-sm font-semibold text-red-400">{summaryError}</p>
         </div>
       )}
 
       {summary && (
-        <div className="p-5 rounded-2xl border border-green-500/30 bg-green-500/5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-              </svg>
+        <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-5 shadow-[4px_4px_0_0_var(--color-primary-vivid)]">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-display flex items-center gap-2 text-base uppercase text-white">
+              <span className="flex h-8 w-8 items-center justify-center border-2 border-[var(--color-border)] bg-emerald-400 text-emerald-950">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+              </span>
               AI Summary
             </h2>
           </div>
-          <p className="text-zinc-300 leading-relaxed text-sm whitespace-pre-wrap">{summary}</p>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">{summary}</p>
         </div>
       )}
 
       {reindexMsg && (
-        <div className={`p-4 rounded-2xl border ${reindexMsg.includes("failed") ? "border-red-500/30 bg-red-500/5" : "border-green-500/30 bg-green-500/5"}`}>
-          <p className={reindexMsg.includes("failed") ? "text-red-400" : "text-green-400"}>{reindexMsg}</p>
+        <div className={`border-2 p-4 ${reindexMsg.includes("failed") ? "border-red-500 bg-red-500/10" : "border-emerald-500 bg-emerald-500/10"}`}>
+          <p className={`text-sm font-semibold ${reindexMsg.includes("failed") ? "text-red-400" : "text-emerald-400"}`}>{reindexMsg}</p>
         </div>
       )}
 
-      <div className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-800 rounded-xl w-fit">
+      <div className="flex w-fit items-center gap-1 border-2 border-[var(--color-border)] bg-zinc-900 p-1">
         <button
           onClick={() => setShowStudy(false)}
           className={cn(
-            "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            !showStudy ? "bg-purple-600 text-on-brand" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            "border-2 px-4 py-2 text-[0.65rem] font-bold uppercase tracking-widest transition-all",
+            !showStudy ? "border-[var(--color-border)] bg-primary-vivid text-white" : "border-transparent text-zinc-400 hover:bg-zinc-800 hover:text-white",
           )}
         >
           Content
@@ -331,8 +334,8 @@ export function DocumentDetailClient({
         <button
           onClick={() => setShowStudy(true)}
           className={cn(
-            "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-            showStudy ? "bg-purple-600 text-on-brand" : "text-zinc-400 hover:text-white hover:bg-zinc-800",
+            "border-2 px-4 py-2 text-[0.65rem] font-bold uppercase tracking-widest transition-all",
+            showStudy ? "border-[var(--color-border)] bg-primary-vivid text-white" : "border-transparent text-zinc-400 hover:bg-zinc-800 hover:text-white",
           )}
         >
           Study Mode
@@ -343,9 +346,9 @@ export function DocumentDetailClient({
         <StudyModeClient documentId={document.id} />
       ) : document.textContent ? (
         <div>
-          <h2 className="text-lg font-semibold text-white mb-3">Content Preview</h2>
-          <div className="p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50">
-            <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-sans max-h-96 overflow-y-auto">
+          <h2 className="mb-3 font-display text-base uppercase text-white">Content Preview</h2>
+          <div className="border-2 border-[var(--color-border)] bg-zinc-900 p-4">
+            <pre className="max-h-96 overflow-y-auto whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-300">
               {document.textContent.slice(0, 5000)}
               {document.textContent.length > 5000 && (
                 <span className="text-zinc-500">... (truncated)</span>
