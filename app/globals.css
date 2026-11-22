@@ -198,6 +198,7 @@ h1, h2 {
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 0.95;
+  font-synthesis-weight: none;
 }
 
 h3, h4, h5, h6 {
@@ -415,6 +416,7 @@ html {
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 0.92;
+  font-synthesis-weight: none;
 }
 
 .kicker {

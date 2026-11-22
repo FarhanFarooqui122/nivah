@@ -14,57 +14,53 @@ interface StatCardProps {
   index?: number;
 }
 
+const ICON_TONES = {
+  green: "bg-emerald-400 text-emerald-950",
+  blue: "bg-sky-400 text-sky-950",
+  purple: "bg-purple-500 text-white",
+  orange: "bg-amber-400 text-amber-950",
+  red: "bg-red-500 text-white",
+} as const;
+
 export function StatCard({ title, value, icon, trend, color, href, index = 0 }: StatCardProps) {
-  const colorClasses = {
-    green: "bg-green-500/20 border-green-500/30 text-green-400",
-    blue: "bg-blue-500/20 border-blue-500/30 text-blue-400",
-    purple: "bg-purple-500/20 border-purple-500/30 text-purple-400",
-    orange: "bg-orange-500/20 border-orange-500/30 text-orange-400",
-    red: "bg-red-500/20 border-red-500/30 text-red-400",
-  };
-
-  const iconBgClasses = {
-    green: "bg-green-500/20",
-    blue: "bg-blue-500/20",
-    purple: "bg-purple-500/20",
-    orange: "bg-orange-500/20",
-    red: "bg-red-500/20",
-  };
-
   const cardContent = (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
-      whileHover={{ scale: 1.02, boxShadow: "0 0 25px rgba(124,58,237,0.15)" }}
-      className={cn("p-6 rounded-2xl border transition-all hover:border-opacity-50", colorClasses[color])}
+      transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
+      whileHover={{ x: -2, y: -2 }}
+      className="flex h-full flex-col justify-between border-2 border-[var(--color-border)] bg-zinc-900 p-5 shadow-[4px_4px_0_0_var(--color-primary-vivid)] transition-shadow hover:shadow-[7px_7px_0_0_var(--color-primary-vivid)]"
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-zinc-400 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold text-white mt-1">{value}</p>
-          {trend && (
-            <div className="flex items-center gap-1 mt-2 text-sm">
-              <span className={cn(trend.value >= 0 ? "text-green-400" : "text-red-400")}>
-                {trend.value >= 0 ? "↑" : "↓"} {Math.abs(trend.value)}%
-              </span>
-              <span className="text-zinc-500">{trend.label}</span>
-            </div>
-          )}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="kicker">{title}</p>
+          <p className="font-display mt-4 text-4xl leading-none tabular-nums text-white">
+            {value}
+          </p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          className={cn("p-3 rounded-xl", iconBgClasses[color])}
+        <span
+          className={cn(
+            "flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[var(--color-border)]",
+            ICON_TONES[color],
+          )}
         >
           {icon}
-        </motion.div>
+        </span>
       </div>
+      {trend && (
+        <div className="mt-4 flex items-center gap-1 text-[0.7rem] font-bold uppercase tracking-widest">
+          <span className={cn(trend.value >= 0 ? "text-emerald-400" : "text-red-400")}>
+            {trend.value >= 0 ? "↑" : "↓"} {Math.abs(trend.value)}%
+          </span>
+          <span className="text-zinc-500">{trend.label}</span>
+        </div>
+      )}
     </motion.div>
   );
 
   if (href) {
     return (
-      <a href={href} className="block group">
+      <a href={href} className="block h-full group">
         {cardContent}
       </a>
     );
@@ -87,24 +83,27 @@ export function StorageUsage({ used, total }: StorageUsageProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6"
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="border-2 border-[var(--color-border)] bg-zinc-900 p-6 shadow-[5px_5px_0_0_var(--color-primary-vivid)]"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-white">Storage Usage</h3>
-        <span className="text-sm text-zinc-400">{formattedUsed} / {formattedTotal}</span>
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <p className="kicker mb-1">Capacity</p>
+          <h3 className="font-display text-lg uppercase text-white">Storage Usage</h3>
+        </div>
+        <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">
+          {formattedUsed} / {formattedTotal}
+        </span>
       </div>
-      <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="h-4 overflow-hidden border-2 border-[var(--color-border)] bg-zinc-950">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(percentage, 100)}%` }}
-          transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-          className="h-full gradient-brand rounded-full relative overflow-hidden"
-        >
-          <div className="absolute inset-0 animate-shimmer" />
-        </motion.div>
+          transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
+          className="h-full bg-primary-vivid"
+        />
       </div>
-      <div className="flex items-center justify-between mt-3 text-sm text-zinc-500">
+      <div className="mt-3 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-widest text-zinc-500">
         <span>{Math.round(percentage)}% used</span>
         <span>{100 - Math.round(percentage)}% free</span>
       </div>
@@ -123,9 +122,9 @@ interface AIConnectionCardProps {
 
 export function AIConnectionCard({ name, icon, status, description, onConnect, index = 0 }: AIConnectionCardProps) {
   const statusConfig = {
-    connected: { color: "text-green-400", bg: "bg-green-500/20 border-green-500/30", label: "Connected" },
-    disconnected: { color: "text-zinc-500", bg: "bg-zinc-800 border-zinc-700", label: "Not Connected" },
-    pending: { color: "text-yellow-400", bg: "bg-yellow-500/20 border-yellow-500/30", label: "Pending" },
+    connected: { badge: "bg-emerald-400 text-emerald-950", label: "Connected" },
+    disconnected: { badge: "bg-zinc-800 text-zinc-400", label: "Not Connected" },
+    pending: { badge: "bg-amber-400 text-amber-950", label: "Pending" },
   };
 
   const config = statusConfig[status];
@@ -134,33 +133,35 @@ export function AIConnectionCard({ name, icon, status, description, onConnect, i
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
-      whileHover={{ scale: 1.02, y: -2 }}
-      className={cn("p-5 rounded-2xl border transition-all", config.bg)}
+      transition={{ delay: index * 0.08, duration: 0.35, ease: "easeOut" }}
+      whileHover={{ x: -2, y: -2 }}
+      className="border-2 border-[var(--color-border)] bg-zinc-900 p-5 shadow-[4px_4px_0_0_var(--color-primary-vivid)] transition-shadow hover:shadow-[7px_7px_0_0_var(--color-primary-vivid)]"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            className="p-3 rounded-xl bg-zinc-900 border border-zinc-700"
-          >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-[var(--color-border)] bg-zinc-950">
             {icon}
-          </motion.div>
-          <div>
-            <h4 className="font-semibold text-white">{name}</h4>
-            <p className="text-sm text-zinc-400 mt-1">{description}</p>
+          </div>
+          <div className="min-w-0">
+            <h4 className="font-display truncate text-base uppercase text-white">{name}</h4>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-400">{description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={cn("px-3 py-1 rounded-full text-xs font-medium", config.color, config.bg)}>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span
+            className={cn(
+              "border-2 border-[var(--color-border)] px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-widest",
+              config.badge,
+            )}
+          >
             {config.label}
           </span>
           {status !== "connected" && onConnect && (
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={onConnect}
-              className="px-4 py-1.5 btn-primary text-sm cursor-pointer select-none"
+              className="btn-primary cursor-pointer px-3 py-1.5 text-xs select-none"
             >
               Connect
             </motion.button>
