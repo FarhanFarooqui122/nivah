@@ -125,7 +125,7 @@ export function NotificationsDropdown() {
   return (
     <div className="relative" ref={containerRef}>
       <button
-        className="relative p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors focus-ring-brand"
+        className="relative p-2 border-2 border-transparent hover:border-[var(--color-border)] hover:bg-zinc-800 text-zinc-400 transition-colors focus-ring-brand"
         onClick={handleToggle}
         aria-label="Notifications"
         aria-expanded={open}
@@ -133,20 +133,20 @@ export function NotificationsDropdown() {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-1 min-w-4 h-4 px-1 bg-red-500 rounded-full text-[10px] font-bold text-on-brand flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 border-2 border-zinc-950 text-[10px] font-bold text-on-brand flex items-center justify-center">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50" role="menu">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-              <p className="text-sm font-semibold text-white">Notifications</p>
+        <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-zinc-950 border-2 border-[var(--color-border)] shadow-[6px_6px_0_0_var(--color-primary-vivid)] overflow-hidden z-50" role="menu">
+            <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[var(--color-border)]">
+              <p className="font-display text-sm uppercase text-white">Notifications</p>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors flex items-center gap-1"
+                  className="text-[0.6rem] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 hover:text-purple-500 transition-colors flex items-center gap-1"
                 >
                   <Check className="w-3 h-3" />
                   Mark all read
@@ -168,32 +168,32 @@ export function NotificationsDropdown() {
                 notifications.map((n) => (
                   <div
                     key={n.id}
-                    className={`flex items-start gap-3 px-4 py-3 hover:bg-zinc-800/50 transition-colors ${
-                      !n.read ? "bg-purple-500/5" : ""
+                    className={`flex items-start gap-3 border-b-2 border-zinc-800 px-4 py-3 last:border-b-0 transition-colors hover:bg-zinc-800/50 ${
+                      !n.read ? "border-l-4 border-l-purple-500 bg-purple-500/5" : ""
                     }`}
                   >
                     <div className="flex-1 min-w-0">
                       {n.link ? (
                         <Link href={n.link} onClick={() => { setOpen(false); markAsRead(n.id); }}>
-                          <p className="text-sm font-medium text-white truncate">{n.title}</p>
+                          <p className="text-sm font-semibold text-white truncate">{n.title}</p>
                           {n.message && (
                             <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2">{n.message}</p>
                           )}
                         </Link>
                       ) : (
                         <>
-                          <p className="text-sm font-medium text-white">{n.title}</p>
+                          <p className="text-sm font-semibold text-white">{n.title}</p>
                           {n.message && (
                             <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2">{n.message}</p>
                           )}
                         </>
                       )}
-                      <p className="text-xs text-zinc-600 mt-1">{timeStrings[n.id]}</p>
+                      <p className="text-[0.65rem] uppercase tracking-widest text-zinc-600 mt-1">{timeStrings[n.id]}</p>
                     </div>
                     {!n.read && (
                       <button
                         onClick={() => markAsRead(n.id)}
-                        className="p-1 rounded-lg hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors flex-shrink-0"
+                        className="p-1 border-2 border-transparent hover:border-[var(--color-border)] hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors flex-shrink-0"
                         aria-label="Mark as read"
                       >
                         <X className="w-3 h-3" />
