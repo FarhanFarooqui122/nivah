@@ -1,145 +1,169 @@
 "use client";
 
+import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
 import { NivahLogo } from "@/components/Icons";
 import { motion } from "framer-motion";
-import { GradientOrb, BrandPattern, SparkleIcon } from "@/components/DecorativeElements";
+import { Search, MessageSquare, FolderOpen, FileText } from "lucide-react";
+
+const FEATURES = [
+  {
+    icon: Search,
+    title: "Semantic search",
+    copy: "Find anything by meaning across every document you own.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Grounded answers",
+    copy: "Ask questions and get replies cited straight from your files.",
+  },
+  {
+    icon: FolderOpen,
+    title: "Workspaces",
+    copy: "Organize projects, teams and research into clean silos.",
+  },
+  {
+    icon: FileText,
+    title: "Study tools",
+    copy: "Generate summaries, flashcards and quizzes on demand.",
+  },
+];
 
 export default function CustomSignIn() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600/10 via-zinc-950 to-indigo-600/10 p-12 flex-col items-center justify-center relative overflow-hidden">
-        <BrandPattern />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-transparent to-transparent" />
-        <GradientOrb className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-        <GradientOrb className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl" />
+    <div className="flex min-h-screen bg-zinc-950">
+      <aside className="relative hidden w-1/2 flex-col justify-between overflow-hidden border-r-2 border-[var(--color-border)] bg-zinc-900 p-10 lg:flex xl:p-14">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+
+        <div className="relative z-10 flex items-center gap-3">
+          <NivahLogo className="h-10 w-10" />
+          <span className="font-display text-2xl uppercase tracking-tight text-white">Nivah</span>
+          <span className="kicker ml-auto hidden xl:block">AI memory layer</span>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative z-10 max-w-md text-center"
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative z-10 max-w-xl"
         >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <div className="relative inline-block">
-              <NivahLogo className="w-16 h-16 mx-auto mb-6" />
-              <motion.div
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-1 -right-1"
-              >
-                <SparkleIcon className="w-5 h-5 text-purple-400" />
-              </motion.div>
-            </div>
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl font-bold text-white mb-4"
-          >
-            Welcome back to <span className="gradient-text">Nivah</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-zinc-400 text-lg leading-relaxed"
-          >
-            Your AI-powered knowledge base and document intelligence platform.
-            Organize, search, and chat with your documents.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-12 space-y-5 text-left max-w-sm mx-auto"
-          >
-            {[
-              { icon: (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              ), text: "Semantic search across all your documents" },
-              { icon: (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2a10 10 0 1010 10 10 10 0 00-10-10z" /><path d="M12 6v6l4 2" />
-                </svg>
-              ), text: "Ask questions and get grounded AI answers" },
-              { icon: (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-                </svg>
-              ), text: "Organize with workspaces and projects" },
-              { icon: (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
-                </svg>
-              ), text: "Generate summaries, flashcards & quizzes" },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-                className="flex items-center gap-3 text-zinc-300 group"
-              >
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/30 transition-all">
-                  {item.icon}
-                </div>
-                <span className="text-sm">{item.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
-      </div>
+          <p className="kicker mb-5">Welcome back</p>
+          <h1 className="headline text-5xl text-white xl:text-6xl">
+            Pick up where
+            <br />
+            <span className="box-decoration-clone bg-primary-vivid px-2 text-white">
+              your memory
+            </span>
+            <br />
+            left off.
+          </h1>
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base">
+            Your AI-powered knowledge base and document intelligence platform. Organize, search,
+            and chat with everything you have saved.
+          </p>
 
-      <motion.div
+          <ul className="mt-10 border-t-2 border-[var(--color-border)]">
+            {FEATURES.map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <motion.li
+                  key={feature.title}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 + i * 0.08 }}
+                  className="flex items-start gap-4 border-b-2 border-[var(--color-border)] py-4"
+                >
+                  <span className="font-display text-lg leading-none text-purple-400">
+                    0{i + 1}
+                  </span>
+                  <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-400" aria-hidden />
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-widest text-white">
+                      {feature.title}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-400">{feature.copy}</p>
+                  </div>
+                </motion.li>
+              );
+            })}
+          </ul>
+        </motion.div>
+
+        <p className="relative z-10 max-w-sm border-l-4 border-purple-500 pl-4 text-[0.65rem] font-bold uppercase leading-relaxed tracking-[0.18em] text-zinc-500">
+          AI models provide intelligence.
+          <br />
+          Nivah provides memory.
+        </p>
+      </aside>
+
+      <motion.main
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full lg:w-1/2 flex items-center justify-center p-8 relative"
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="flex w-full items-center justify-center p-5 sm:p-8 lg:w-1/2"
       >
-        <BrandPattern />
-
-        <div className="w-full max-w-md relative z-10">
-          <div className="lg:hidden text-center mb-8">
-            <NivahLogo className="w-12 h-12 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-white">Welcome back</h1>
-            <p className="text-zinc-400 mt-2">Sign in to continue to Nivah</p>
+        <div className="w-full max-w-md">
+          <div className="mb-6 flex items-center gap-3 lg:hidden">
+            <NivahLogo className="h-9 w-9" />
+            <span className="font-display text-2xl uppercase tracking-tight text-white">Nivah</span>
           </div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.97, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-            className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8 shadow-glass"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15, ease: "easeOut" }}
+            className="border-2 border-[var(--color-border)] bg-zinc-900 p-6 shadow-[8px_8px_0_0_var(--color-primary-vivid)] sm:p-8"
           >
+            <div className="mb-6 flex items-end justify-between border-b-2 border-[var(--color-border)] pb-3">
+              <div>
+                <p className="kicker">Sign in</p>
+                <p className="font-display text-xl uppercase text-white">Access console</p>
+              </div>
+              <span className="font-display text-3xl leading-none text-purple-500">01</span>
+            </div>
+
             <SignIn
               routing="path"
               path="/sign-in"
               appearance={{
                 elements: {
-                  formButtonPrimary: "btn-primary rounded-xl px-4 py-3 font-medium transition-all duration-200 w-full",
+                  formButtonPrimary:
+                    "btn-primary w-full px-4 py-3 transition-all duration-200",
                   card: "bg-transparent shadow-none border-none",
-                  headerTitle: "text-2xl font-bold text-white",
+                  headerTitle: "font-display text-2xl uppercase text-white",
                   headerSubtitle: "text-zinc-400",
-                  dividerText: "text-zinc-500",
-                  formFieldLabel: "text-zinc-300 font-medium",
-                  formFieldInput: "bg-zinc-800 border-zinc-700 focus:border-purple-500 focus:ring-purple-500/20 rounded-xl transition-all duration-200",
+                  dividerText: "text-zinc-500 text-[0.65rem] font-bold uppercase tracking-widest",
+                  formFieldLabel: "text-zinc-300 text-[0.7rem] font-bold uppercase tracking-widest",
+                  formFieldInput:
+                    "bg-zinc-950 border-2 border-[var(--color-border)] rounded-none text-white focus:border-purple-500 focus:ring-0 transition-all duration-200",
                   formFieldAction: "text-purple-400 hover:text-purple-300 transition-colors",
-                  socialButtonsBlockButton: "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 rounded-xl transition-all duration-200",
+                  socialButtonsBlockButton:
+                    "bg-zinc-950 hover:bg-zinc-800 border-2 border-[var(--color-border)] rounded-none transition-all duration-200",
                   alternativeMethods: "space-y-3",
                 },
               }}
             />
           </motion.div>
+
+          <p className="mt-6 text-center text-[0.65rem] font-bold uppercase tracking-widest text-zinc-500">
+            New to Nivah?{" "}
+            <Link
+              href="/sign-up"
+              className="text-purple-400 underline decoration-2 underline-offset-4 transition-colors hover:text-white"
+            >
+              Create an account
+            </Link>
+          </p>
         </div>
-      </motion.div>
+      </motion.main>
     </div>
   );
 }
