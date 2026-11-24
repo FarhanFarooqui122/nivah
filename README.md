@@ -19,6 +19,7 @@
 - [About Nivah](#about-nivah)
 - [How It Works](#how-it-works)
 - [Features](#features)
+- [Design System](#design-system)
 - [Plans & Quotas](#plans--quotas)
 - [Tech Stack](#tech-stack)
 - [API Routes](#api-routes)
@@ -163,6 +164,61 @@ Workspaces are a grouping on top of documents — there is no sharing and no per
 - **Responsive Sidebar** — Hamburger menu on mobile, collapsible chevron on desktop
 - **Auth Pages** — Branded custom sign-in/sign-up pages with email/password, Google SSO, GitHub SSO
 - **Profile & Settings** — User profile page, settings with email notification and auto-sync toggles
+
+---
+
+## Design System
+
+The interface is a **neo-brutalist editorial** system built on Tailwind v4 theme tokens. Tokens and
+utilities live in `app/globals.css`; components consume those utilities instead of one-off gradients.
+
+### Palette
+
+Declared in `@theme inline` and remapped per theme under `[data-theme="dark"]` / `[data-theme="light"]`:
+
+| Token | Dark | Light | Used for |
+| --- | --- | --- | --- |
+| `--color-primary` | `#630ed4` | `#630ed4` | Deep Nivah purple |
+| `--color-primary-vivid` | `#7c3aed` | `#7c3aed` | Buttons, shadows, focus borders |
+| `--color-secondary` | `#4b41e1` | `#4b41e1` | Indigo companion tone |
+| `--color-outline` | `#7b7487` | `#7b7487` | Muted strokes |
+| `--color-surface-elevated` | `#171021` | `#ffffff` | Card and input surfaces |
+| `--color-border` | `#b9a7d6` | `#17121f` | 2px borders |
+| `--shadow-card` | `4px 4px 0 0 #7c3aed` | `4px 4px 0 0 #630ed4` | Flat offset card shadow |
+
+### Typography
+
+| Role | Font | Class |
+| --- | --- | --- |
+| Body | Inter (`--font-inter`) | default `font-sans` |
+| Display | Archivo Black (`--font-archivo`) | `.headline` |
+| Labels | Inter 700, 0.22em tracking, uppercase | `.kicker` |
+
+`.headline` is uppercase at `0.92` line-height with `font-synthesis-weight: none`. The display face is
+imported at a **single weight (400)** in `app/layout.tsx`: Google's variable `Archivo` makes
+`next/font` + Turbopack fail with *“queries have exactly one entry”*.
+
+### Geometry
+
+Neo-brutalism is enforced by the tokens: `--radius-sm` through `--radius-4xl` are all `0px`, so the
+`rounded-*` utilities render square. Borders are 2px solid `--color-border`; depth comes from hard,
+non-blurred shadows, not blur.
+
+| Utility | Behaviour |
+| --- | --- |
+| `.brutal-card` | Bordered surface, `5px 5px 0` purple shadow, lifts 2px on hover |
+| `.brutal-shadow` / `.brutal-shadow-sm` | 5px / 3px hard shadow |
+| `.brutal-rule` | 2px top rule for section separators |
+| `.brutal-input` | Square 2px input, 3px purple shadow on focus |
+| `.card` | Same language for legacy cards, with hover lift |
+| `.btn-primary` | Uppercase 2px button, `4px` shadow, presses down 2px when active |
+| `.btn-ghost` | Transparent variant with a 3px shadow on hover |
+| `.ai-border` | 4px-shadow panel used by AI surfaces |
+| `.chip` | Square uppercase label pill |
+| `.input-lg` | 3rem square input with purple focus shadow |
+
+Page mastheads use the shared `PageHeader` component (`components/dashboard/PageHeader.tsx`):
+optional kicker, display headline, description and actions, closed by a 2px rule.
 
 ---
 
