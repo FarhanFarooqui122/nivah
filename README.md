@@ -17,15 +17,16 @@
 ## Table of Contents
 
 - [About Nivah](#about-nivah)
+- [How It Works](#how-it-works)
 - [Features](#features)
 - [Plans & Quotas](#plans--quotas)
-- [How It Works](#how-it-works)
 - [Tech Stack](#tech-stack)
 - [API Routes](#api-routes)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Database Schema](#database-schema)
 - [Known Issues](#known-issues)
+- [Screenshots](#screenshots)
 - [Roadmap](#roadmap)
 - [License](#license)
 
