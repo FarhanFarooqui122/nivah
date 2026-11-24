@@ -235,6 +235,25 @@ non-blurred shadows, not blur.
 Page mastheads use the shared `PageHeader` component (`components/dashboard/PageHeader.tsx`):
 optional kicker, display headline, description and actions, closed by a 2px rule.
 
+### Theming
+
+The active theme is an attribute on `<html>` (`data-theme="dark" | "light"`), not a class:
+
+1. `app/layout.tsx` inlines a small script that reads `localStorage["nivah-theme"]` before hydration.
+   With nothing stored it falls back to `prefers-color-scheme`, then writes the attribute.
+2. `ThemeProvider` (`lib/theme-context.tsx`) starts at `"dark"` on server and client so the first render
+   matches; after mount (`mounted` flag) it syncs from the DOM and, on toggle, writes both the attribute
+   and `localStorage`.
+3. `globals.css` replaces Tailwind's media-query `dark:` variant with
+   `@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *))`, so `dark:` follows the
+   in-app toggle instead of the OS.
+4. `<html>` sets `suppressHydrationWarning` because the pre-hydration script changes the attribute before
+   React runs.
+
+The palette is declared per theme: `:root, [data-theme="dark"]` and `[data-theme="light"]`. Light mode
+inverts the `zinc-*` scale (`zinc-950` becomes paper, `zinc-50` becomes ink), while `.text-on-brand`
+keeps white text on saturated purple surfaces in both themes.
+
 ---
 
 ## Plans & Quotas
