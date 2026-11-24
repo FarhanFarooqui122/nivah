@@ -482,8 +482,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run seed` | Seed the database (`prisma db seed`) |
 
-Vitest currently covers two modules: the text chunker (`lib/chunker.test.ts`) and the in-memory rate
-limiter (`lib/rate-limit.test.ts`).
+### Tests
+
+Vitest runs two suites with `npm test`. `vitest.config.ts` uses the Node environment, an `@` alias and
+`**/*.test.{ts,tsx}`:
+
+| Suite | Cases | What is asserted |
+| --- | --- | --- |
+| `lib/chunker.test.ts` | 8 | Max-size slicing, short text, empty text → `[]`, whitespace preserved, fixed-step slicing (1600 chars → a 1000-char and an 800-char chunk), sequential `chunkIndex`, text exactly `CHUNK_SIZE`, `charCount` |
+| `lib/rate-limit.test.ts` | 4 | Requests are allowed up to the limit and `remaining` decrements, the next request is blocked, the bucket resets after the window, separate keys are independent |
+
+The rate-limit tests use Vitest fake timers (`vi.useFakeTimers`) to advance the 60 s window without
+sleeping.
 
 ### Database Setup
 
