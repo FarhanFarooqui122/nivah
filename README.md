@@ -551,42 +551,58 @@ least once first; accounts that already have documents are skipped unless you ad
 ```
 nivah/
 ├── app/
-│   ├── api/                    # API routes
+│   ├── api/                    # API routes (full table above)
 │   │   ├── ask/                # RAG chat endpoint
 │   │   ├── chat/               # Chat session CRUD
-│   │   ├── documents/          # Document upload, search, export, serve
+│   │   ├── dashboard/stats/    # Dashboard counters
+│   │   ├── documents/          # Upload, search, export, serve, re-index
 │   │   ├── notifications/      # Notification CRUD
-│   │   └── user/               # User preferences & account deletion
-│   ├── dashboard/              # Dashboard pages
+│   │   ├── study/              # Generated study content
+│   │   ├── user/               # Preferences & account deletion
+│   │   └── workspaces/         # Workspace CRUD + scoped documents
+│   ├── dashboard/              # Dashboard shell
+│   │   ├── ai-connections/     # AI connections (cosmetic)
 │   │   ├── ask/                # Ask Nivah RAG chat UI
-│   │   ├── semantic-search/    # Semantic search page
 │   │   ├── documents/          # Document list & detail views
-│   │   ├── workspaces/         # Workspace management
-│   │   ├── upload/             # Document upload page
-│   │   ├── settings/           # User settings
 │   │   ├── profile/            # User profile
 │   │   ├── search/             # Global search
-│   │   └── ai-connections/     # AI connections (cosmetic)
+│   │   ├── semantic-search/    # Semantic search page
+│   │   ├── settings/           # User settings
+│   │   ├── upload/             # Document upload page
+│   │   ├── workspaces/         # Workspace management
+│   │   ├── error.tsx           # Route error boundary (client component)
+│   │   ├── layout.tsx          # Sidebar + header shell
+│   │   └── loading.tsx         # Route loading state
 │   ├── sign-in/                # Custom sign-in (SSO catch-all)
-│   └── sign-up/                # Custom sign-up (SSO catch-all)
+│   ├── sign-up/                # Custom sign-up (SSO catch-all)
+│   ├── globals.css             # Theme tokens + brutalist utilities
+│   ├── layout.tsx              # Fonts and pre-hydration theme script
+│   └── page.tsx                # Landing page
 ├── components/
-│   ├── dashboard/              # Sidebar, Header, NotificationsDropdown
-│   │   └── Icons.tsx           # SVG icon components
+│   ├── dashboard/              # Sidebar, Header, PageHeader, states
+│   └── …                       # Client features (AskNivah, Documents, StudyMode, …)
 ├── lib/
 │   ├── prisma.ts               # Prisma client singleton
 │   ├── embeddings.ts           # Gemini embedding generation
 │   ├── chunker.ts              # Text chunking (1000 char, 200 overlap)
 │   ├── extract-text.ts         # File text extraction + OCR pipeline
+│   ├── delete-document.ts      # Transactional document delete
 │   ├── notifications.ts        # Notification creation helper
-│   ├── theme-context.tsx        # Dark/light theme context
-│   ├── sidebar-context.tsx      # Sidebar state management
-│   └── plans.ts                # Free/Pro plan configuration
+│   ├── plans.ts                # Free/Pro plan configuration
+│   ├── rate-limit.ts           # In-memory fixed-window limiter
+│   ├── theme-context.tsx       # Dark/light theme context
+│   ├── sidebar-context.tsx     # Sidebar state management
+│   ├── upload-limits.ts        # 10 MB per-file ceiling
+│   └── use-scroll-reveal.ts    # IntersectionObserver reveal hook
 ├── prisma/
-│   ├── schema.prisma            # Database schema
+│   ├── schema.prisma           # Database schema
 │   ├── migrations/             # Migration history
+│   ├── seed.ts                 # Demo data for `npm run seed`
 │   └── add-index-embedding.sql # Partial index on embeddings
 ├── public/                     # Static assets
-├── next.config.ts              # Next.js configuration
+├── next.config.ts              # serverExternalPackages for PDF/OCR
+├── proxy.ts                    # Clerk middleware
+├── vitest.config.ts            # Vitest config
 └── package.json
 ```
 
