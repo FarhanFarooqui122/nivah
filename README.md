@@ -379,6 +379,11 @@ Per-user, fixed window of 60 s, defined in `lib/rate-limit.ts`:
 | `POST /api/documents/semantic-search` | 60 |
 | `GET /api/study` | 120 |
 
+Buckets live in a module-level `Map` keyed by user and endpoint, with expired entries swept at most once
+a minute. That makes the limiter dependency-free, but also **per server instance**: counters reset on a
+cold start and are not shared between Vercel lambdas, so treat these numbers as best-effort traffic
+shaping rather than a security boundary. Rejections return **429** with a `Retry-After` header.
+
 ### Dashboard stats
 
 `GET /api/dashboard/stats` powers the dashboard cards. Worth knowing what the names really mean:
