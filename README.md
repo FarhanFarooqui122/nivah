@@ -621,6 +621,20 @@ nivah/
 | **Notification** | `id`, `userId`, `type`, `title`, `message`, `read`, `link` |
 | **StudyContent** | `id`, `userId`, `documentId`, `type`, `content` (JSON) |
 
+### Deleting data
+
+Deletion is deliberate about what survives:
+
+| Action | What happens |
+| --- | --- |
+| Delete one document (`DELETE /api/documents?id=…`) | `deleteDocumentForUser` (`lib/delete-document.ts`) runs a single `$transaction`: chunks (raw SQL), `StudyContent` rows, then the `Document`. A document that is not the caller's returns 404 |
+| Delete a workspace | `Document.workspaceId` and `ChatSession.workspaceId` are `SetNull` — documents and chats survive, unassigned |
+| Delete a chat session | `ChatMessage` rows cascade with the session |
+| Delete the account (`POST /api/user/delete`) | The Prisma user is deleted first (documents, chunks, sessions, workspaces, study content and notifications cascade), then the Clerk identity |
+
+`DocumentChunk` is also `onDelete: Cascade` from `Document`, but the document endpoint deletes chunks
+explicitly because this project has no Prisma model delegate for chunks and uses raw SQL for them.
+
 ---
 
 ## Troubleshooting
