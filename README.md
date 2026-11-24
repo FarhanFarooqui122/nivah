@@ -451,8 +451,8 @@ call through the request signal, so no orphaned generation keeps running.
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL database (Neon recommended)
+- **Node.js 20.9+** — Next.js 16.2 declares `"node": ">=20.9.0"` in its `engines`
+- PostgreSQL database with the `vector` extension (Neon recommended)
 - Clerk account
 - Google Gemini API key
 
