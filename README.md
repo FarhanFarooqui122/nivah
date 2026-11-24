@@ -26,6 +26,7 @@
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Database Schema](#database-schema)
+- [Troubleshooting](#troubleshooting)
 - [Known Issues](#known-issues)
 - [Screenshots](#screenshots)
 - [Roadmap](#roadmap)
@@ -584,6 +585,23 @@ nivah/
 | **Workspace** | `id`, `name`, `description`, `userId` |
 | **Notification** | `id`, `userId`, `type`, `title`, `message`, `read`, `link` |
 | **StudyContent** | `id`, `userId`, `documentId`, `type`, `content` (JSON) |
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Build fails: *“app/dashboard/error.tsx must be a Client Component”* | Next.js error boundaries are client components | Keep `"use client"` as the first line of `app/dashboard/error.tsx` |
+| Build fails with *“queries have exactly one entry”* from `next/font` | Variable `Archivo` under Turbopack | Import `Archivo_Black` at `weight: "400"` (`app/layout.tsx`) |
+| Prisma CLI cannot reach Neon | Full-verification URL (`sslmode=verify-full`, `channel_binding=require`) | Retry that CLI command with an `sslmode=require` override |
+| Uploads succeed but semantic search misses them | Chunks have no `embeddingVector` — uploaded before pgvector existed, or while Gemini was failing | Re-index the document and confirm `embeddedCount === chunkCount` |
+| PDF upload produces zero chunks | `pdf-parse` and its bundled `pdfjs-dist` versions diverged | Keep `pdfjs-dist@5.4.296` (see `package.json`) and both packages in `serverExternalPackages` |
+| `429 Too Many Requests` | Per-user rate limit | Wait the `Retry-After` seconds; the buckets are listed under [Rate limits](#rate-limits) |
+| `413 Storage limit reached` | Plan storage quota (500 MB / 50 GB) | Delete documents; Pro raises the ceiling. A single file over 10 MB is a separate **400** |
+
+PDF extraction also falls back to OCR when less than 20 characters are extracted, so scanned documents
+depend on the Tesseract path in `lib/extract-text.ts`.
 
 ---
 
