@@ -94,6 +94,20 @@ overlap and numbering.
 If chunking or embedding throws, the document row is deleted again instead of leaving a half-indexed file
 behind.
 
+### Upload size limit
+
+`lib/upload-limits.ts` is the single source of truth for the per-file ceiling:
+
+| Constant | Value |
+| --- | --- |
+| `MAX_FILE_SIZE` | `10 * 1024 * 1024` bytes (10 MiB) |
+| `MAX_FILE_SIZE_MB` | `10` — derived and used in user-facing messages |
+
+The limit is enforced twice: `app/dashboard/upload/page.tsx` filters oversized files before they are
+sent and shows *“is too large (max 10MB)”*, and `POST /api/documents/upload` re-checks it server-side,
+returning **400** with `File too large (max 10MB)`. This per-file limit is separate from the plan
+storage quota, which rejects with **413**.
+
 ### Re-indexing
 
 `POST /api/documents/[id]/reindex` rebuilds one document's chunks and embeddings. The order is deliberate:
